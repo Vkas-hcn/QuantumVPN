@@ -1,0 +1,6 @@
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/CMakeLists.txt
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/GetGitRevisionDescription.cmake
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/lz4.cmake
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/lzo.cmake
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/openssl/openssl.cmake
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/tools.cmake
