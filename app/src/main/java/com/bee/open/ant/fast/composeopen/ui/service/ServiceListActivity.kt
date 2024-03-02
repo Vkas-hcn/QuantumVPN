@@ -264,7 +264,7 @@ fun CustomAlertDialog(activity: ServiceListActivity) {
                 Text(text = "Tips")
             },
             text = {
-                Text("whether to disconnect the current connection")
+                Text("Do you want to confirm that the current server is disconnected?")
             },
             confirmButton = {
                 Button(

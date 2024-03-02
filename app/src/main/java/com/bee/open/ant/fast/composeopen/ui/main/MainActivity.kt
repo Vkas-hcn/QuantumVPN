@@ -763,7 +763,7 @@ fun IpAlertDialog(activity: MainActivity) {
                 Text(text = "Tips")
             },
             text = {
-                Text("Due to the policy reason , this service is not available in your country")
+                Text("Due to local laws and regulations, this service is not available in your country/region")
             },
             confirmButton = {
                 Button(
