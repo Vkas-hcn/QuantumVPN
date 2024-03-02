@@ -1,13 +1,16 @@
 package com.bee.open.ant.fast.composeopen.data
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class VpnBean(
     val code: Int,
     val `data`: Data,
     val msg: String
 )
 
+@Keep
 data class Data(
     @SerializedName("UNjLql")
     val server_list: List<ServerVpn> = emptyList(),
@@ -15,6 +18,7 @@ data class Data(
     val smart_list: List<ServerVpn> = emptyList()
 )
 
+@Keep
 data class ServerVpn(
     @SerializedName("kkGOFJjYT")
     val city: String,
