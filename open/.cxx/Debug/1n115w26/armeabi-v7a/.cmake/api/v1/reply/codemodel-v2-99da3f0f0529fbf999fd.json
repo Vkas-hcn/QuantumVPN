@@ -1,0 +1,159 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "ics-openvpn",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "crypto::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-crypto-Debug-168e52a911e74c2290a2.json",
+					"name" : "crypto",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "libovpnexec.so::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-libovpnexec.so-Debug-9f76b51f846dd697c014.json",
+					"name" : "libovpnexec.so",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lz4::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lz4-Debug-e31f467a4a9f493f0585.json",
+					"name" : "lz4",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lzo::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lzo-Debug-3faaaa61740fde13a32b.json",
+					"name" : "lzo",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "makeassetdir::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-makeassetdir-Debug-b6db762870bb9447a4af.json",
+					"name" : "makeassetdir",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "openvpn::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-openvpn-Debug-e30298e037c3540eadb9.json",
+					"name" : "openvpn",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "osslspeedtest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-osslspeedtest-Debug-68ac17a02e9b1cb73d5d.json",
+					"name" : "osslspeedtest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "osslutil::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-osslutil-Debug-73948ff850df22b1a646.json",
+					"name" : "osslutil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ovpn3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ovpn3-Debug-0c78d659ef52a3d9c9b1.json",
+					"name" : "ovpn3",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ovpnutil::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ovpnutil-Debug-b3427c8e7b57cf2aaca6.json",
+					"name" : "ovpnutil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "pie_openvpn.armeabi-v7a::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-pie_openvpn.armeabi-v7a-Debug-448b527787cca522b8d8.json",
+					"name" : "pie_openvpn.armeabi-v7a",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ssl::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ssl-Debug-7f9932b7c62c6581a15e.json",
+					"name" : "ssl",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/vkas/StudioProjects/FlashVpn_copy/open/.cxx/Debug/1n115w26/armeabi-v7a",
+		"source" : "/Users/vkas/StudioProjects/FlashVpn_copy/open/src/main/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

@@ -1,0 +1,14 @@
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/lzo.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/lz4.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/crypto.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/ssl.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/ovpn3.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/ovpnutil.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/osslutil.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/osslspeedtest.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/openvpn.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/libovpnexec.so.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/pie_openvpn.arm64-v8a.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/makeassetdir.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/Debug/6i5h1916/arm64-v8a/CMakeFiles/rebuild_cache.dir

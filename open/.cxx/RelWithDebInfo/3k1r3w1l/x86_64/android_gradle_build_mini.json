@@ -1,0 +1,101 @@
+{
+  "buildFiles": [
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/CMakeLists.txt",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/GetGitRevisionDescription.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/lz4.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/lzo.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/openssl/openssl.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/tools.cmake"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/vkas/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/vkas/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "osslspeedtest::@6890427a1f51a3e7e1df": {
+      "artifactName": "osslspeedtest",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libosslspeedtest.so",
+      "runtimeFiles": []
+    },
+    "lz4::@6890427a1f51a3e7e1df": {
+      "artifactName": "lz4",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/x86_64/liblz4.a",
+      "runtimeFiles": []
+    },
+    "libovpnexec.so::@6890427a1f51a3e7e1df": {
+      "artifactName": "libovpnexec.so",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libovpnexec.so",
+      "runtimeFiles": [
+        "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libopenvpn.so"
+      ]
+    },
+    "crypto::@6890427a1f51a3e7e1df": {
+      "artifactName": "crypto",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/x86_64/libcrypto.a",
+      "runtimeFiles": []
+    },
+    "makeassetdir::@6890427a1f51a3e7e1df": {
+      "artifactName": "makeassetdir",
+      "abi": "x86_64",
+      "runtimeFiles": []
+    },
+    "openvpn::@6890427a1f51a3e7e1df": {
+      "artifactName": "openvpn",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libopenvpn.so",
+      "runtimeFiles": []
+    },
+    "ovpn3::@6890427a1f51a3e7e1df": {
+      "artifactName": "ovpn3",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libovpn3.so",
+      "runtimeFiles": []
+    },
+    "lzo::@6890427a1f51a3e7e1df": {
+      "artifactName": "lzo",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/x86_64/liblzo.a",
+      "runtimeFiles": []
+    },
+    "ssl::@6890427a1f51a3e7e1df": {
+      "artifactName": "ssl",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/x86_64/libssl.a",
+      "runtimeFiles": []
+    },
+    "ovpnutil::@6890427a1f51a3e7e1df": {
+      "artifactName": "ovpnutil",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libovpnutil.so",
+      "runtimeFiles": []
+    },
+    "pie_openvpn.x86_64::@6890427a1f51a3e7e1df": {
+      "artifactName": "pie_openvpn.x86_64",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/pie_openvpn.x86_64",
+      "runtimeFiles": [
+        "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libopenvpn.so"
+      ]
+    },
+    "osslutil::@6890427a1f51a3e7e1df": {
+      "artifactName": "osslutil",
+      "abi": "x86_64",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/x86_64/libosslutil.so",
+      "runtimeFiles": []
+    }
+  }
+}

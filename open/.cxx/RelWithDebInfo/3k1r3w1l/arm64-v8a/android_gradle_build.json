@@ -1,0 +1,121 @@
+{
+  "buildFiles": [
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/CMakeLists.txt",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/GetGitRevisionDescription.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/lz4.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/lzo.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/openssl/openssl.cmake",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/src/main/cpp/tools.cmake"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/vkas/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/vkas/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "crypto::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "crypto",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/arm64-v8a/libcrypto.a"
+    },
+    "libovpnexec.so::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "libovpnexec.so",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libovpnexec.so",
+      "runtimeFiles": [
+        "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libopenvpn.so"
+      ]
+    },
+    "lz4::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "lz4",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/arm64-v8a/liblz4.a"
+    },
+    "lzo::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "lzo",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/arm64-v8a/liblzo.a"
+    },
+    "makeassetdir::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "makeassetdir"
+    },
+    "openvpn::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "openvpn",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libopenvpn.so",
+      "runtimeFiles": []
+    },
+    "osslspeedtest::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "osslspeedtest",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libosslspeedtest.so",
+      "runtimeFiles": []
+    },
+    "osslutil::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "osslutil",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libosslutil.so",
+      "runtimeFiles": []
+    },
+    "ovpn3::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ovpn3",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libovpn3.so",
+      "runtimeFiles": []
+    },
+    "ovpnutil::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ovpnutil",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libovpnutil.so",
+      "runtimeFiles": []
+    },
+    "pie_openvpn.arm64-v8a::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "pie_openvpn.arm64-v8a",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/pie_openvpn.arm64-v8a",
+      "runtimeFiles": [
+        "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/build/intermediates/cxx/RelWithDebInfo/3k1r3w1l/obj/arm64-v8a/libopenvpn.so"
+      ]
+    },
+    "ssl::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ssl",
+      "output": "/Users/vkas/StudioProjects/ComPoseOpenVpn/open/.cxx/RelWithDebInfo/3k1r3w1l/arm64-v8a/libssl.a"
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/vkas/Library/Android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/vkas/Library/Android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp",
+    "cxx"
+  ]
+}
