@@ -76,6 +76,7 @@ import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 import androidx.compose.material.*
+import androidx.compose.ui.draw.alpha
 
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.Lifecycle
@@ -242,7 +243,7 @@ class MainActivity : ComponentActivity() {
     fun connectSuccess() {
         App.isVpnState = 2
         isRotating = false
-        Log.e("TAG", "connectSuccess: $vpnState", )
+        Log.e("TAG", "connectSuccess: $vpnState")
         jumpResultActivity()
         vpnState = 2
     }
@@ -256,7 +257,7 @@ class MainActivity : ComponentActivity() {
     fun disConnectSuccess() {
         App.isVpnState = 0
         isRotating = false
-        Log.e("TAG", "disConnectSuccess: $vpnState", )
+        Log.e("TAG", "disConnectSuccess: $vpnState")
         jumpResultActivity()
         vpnState = 0
     }
@@ -343,7 +344,7 @@ class MainActivity : ComponentActivity() {
     private val mCallback = object : IOpenVPNStatusCallback.Stub() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
             Log.e("TAG", "newStatus: ${state}")
-            if (state == "CONNECTED" && vpnState !=-1) {
+            if (state == "CONNECTED" && vpnState != -1) {
                 connectSuccess()
             }
             if (state == "RECONNECTING") {
@@ -585,9 +586,11 @@ fun RotatingImageWithControl(
 
                     else -> R.drawable.ic_vpn_1
                 }
-            ), contentDescription = "Background", modifier = Modifier.graphicsLayer {
-                rotationZ = rotationDegrees
-            })
+            ), contentDescription = "Background", modifier = Modifier
+                .align(Alignment.Center)
+                .graphicsLayer {
+                    rotationZ = rotationDegrees
+                })
             Image(
                 painter = painterResource(
                     id = if (activity.vpnState == 2) {
@@ -598,8 +601,10 @@ fun RotatingImageWithControl(
                 ),
                 contentDescription = "Background",
                 modifier = Modifier
-                    .padding(end = 12.dp, bottom = 22.dp, start = 8.dp)
+                    .padding(end = 8.dp)
                     .requiredSize(48.dp)
+                    .padding()
+                    .align(Alignment.Center)
             )
         }
     }
@@ -682,21 +687,19 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 )
                 RotatingImageWithControl(activity, timerViewModel)
             }
-            if (false) {
-                Image(painter = painterResource(id = R.drawable.ic_click),
-                    contentDescription = "Background",
-                    modifier = Modifier
-                        .padding(top = 120.dp)
-                        .requiredSize(56.dp)
-                        .clickable {
-                            Toast
-                                .makeText(
-                                    activity, "The feature is not available yet", Toast.LENGTH_SHORT
-                                )
-                                .show()
-                        })
-            }
-
+            Image(painter = painterResource(id = R.drawable.ic_click),
+                contentDescription = "Background",
+                modifier = Modifier
+                    .alpha(0f)
+                    .padding(top = 120.dp)
+                    .requiredSize(56.dp)
+                    .clickable {
+//                        Toast
+//                            .makeText(
+//                                activity, "The feature is not available yet", Toast.LENGTH_SHORT
+//                            )
+//                            .show()
+                    })
         }
 
         BoxWithConstraints(
@@ -813,5 +816,6 @@ fun DrawerExample(activity: MainActivity) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    ArtistCardRow(activity = MainActivity(), {})
+//    ArtistCardRow(activity = MainActivity(), {})
+    RotatingImageWithControl(activity = MainActivity())
 }
