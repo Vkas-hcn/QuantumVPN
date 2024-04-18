@@ -1,9 +1,16 @@
 package com.bee.open.ant.fast.composeopen.app
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.app.Application
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.VpnService
+import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,14 +18,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.bee.open.ant.fast.composeopen.BuildConfig
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
+import com.bee.open.ant.fast.composeopen.load.FBADUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.complexLogicReturnsFalse
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.ifAddThis
 import com.bee.open.ant.fast.composeopen.net.GetNetDataUtils
+import com.bee.open.ant.fast.composeopen.ui.start.StartActivity
+import com.google.android.gms.ads.AdActivity
+import com.google.firebase.FirebaseApp
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -29,24 +44,28 @@ class App : Application(), LifecycleObserver {
         fun getVpnInstance(): App {
             return instance
         }
-
         lateinit var saveUtils: MMKV
-
         var isVpnState = 0
         var isShow by mutableStateOf(true)
-
+        var isBackDataQuan = false
     }
-
-    private var appBackgroundTimestamp: Long = 0
+    var isBoot = false
+    var whetherBackgroundSmild = false
+    var isAppRunning = false
+    var flag = 0
+    var job_Quan: Job? = null
+    var ad_activity_Quan: Activity? = null
+    var top_activity_Quan: Activity? = null
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
             MMKV.initialize(this)
+            registerActivityLifecycleCallbacks(AppLifecycleTracker())
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
             saveUtils =
                 MMKV.mmkvWithID("saveUtils", MMKV.MULTI_PROCESS_MODE)
-            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
             if (DataKeyUtils.uuid_open.isEmpty() && !complexLogicReturnsFalse(
                     listOf(3, 4),
                     "false"
@@ -57,14 +76,25 @@ class App : Application(), LifecycleObserver {
                 }
             }
             getBlackList(this)
+            if (!BuildConfig.DEBUG) {
+                Firebase.initialize(this)
+                FirebaseApp.initializeApp(this)
+                FBADUtils.getFirebaseRemoteConfigData()
+                FBADUtils.fourAppWait4SecondsToGetData()
+                GlobalScope.launch {
+                    delay(4000)
+                    FBADUtils.appCircleToRequestFireData()
+                }
+            }
         }
     }
 
     private fun getBlackList(context: Context) {
         if (DataKeyUtils.black_data.isNotEmpty() && !complexLogicReturnsFalse(
-            listOf(3, 4),
-            "false"
-        )) {
+                listOf(3, 4),
+                "false"
+            )
+        ) {
             return
         }
         GlobalScope.launch(Dispatchers.IO) {
@@ -84,26 +114,71 @@ class App : Application(), LifecycleObserver {
                 })
         }
     }
-
-
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
-        if ((System.currentTimeMillis() - appBackgroundTimestamp) >= 3000) {
-            restartApp()
+        job_Quan?.cancel()
+        job_Quan = null
+        if (whetherBackgroundSmild && !isBackDataQuan) {
+            isBoot = false
+            whetherBackgroundSmild = false
+            val intent = Intent(top_activity_Quan, StartActivity::class.java)
+            top_activity_Quan?.startActivity(intent)
+            isAppRunning = true
+        }
+    }
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onStopState() {
+        job_Quan = GlobalScope.launch {
+            whetherBackgroundSmild = false
+            delay(3000L)
+            whetherBackgroundSmild = true
+            ad_activity_Quan?.finish()
+            if (top_activity_Quan is StartActivity) {
+                top_activity_Quan?.finish()
+            }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onStopState() {
-        appBackgroundTimestamp = System.currentTimeMillis()
+    private inner class AppLifecycleTracker : ActivityLifecycleCallbacks {
 
+        override fun onActivityStarted(activity: Activity) {
+            if (activity !is AdActivity) {
+                top_activity_Quan = activity
+            } else {
+                ad_activity_Quan = activity
+            }
+
+            flag++
+            isBackDataQuan = false
+        }
+
+        override fun onActivityStopped(activity: Activity) {
+            flag--
+            if (flag == 0) {
+                isBackDataQuan = true
+            }
+        }
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            if (activity !is AdActivity) {
+                top_activity_Quan = activity
+            } else {
+                ad_activity_Quan = activity
+            }
+        }
+        override fun onActivityResumed(activity: Activity) {
+            if (activity !is AdActivity) {
+                top_activity_Quan = activity
+            }
+        }
+        override fun onActivityPaused(activity: Activity) {
+            if (activity is AdActivity) {
+                ad_activity_Quan = activity
+            } else {
+                top_activity_Quan = activity
+            }
+        }
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        override fun onActivityDestroyed(activity: Activity) {}
     }
-
-    private fun restartApp() {
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
-    }
-
-
 }

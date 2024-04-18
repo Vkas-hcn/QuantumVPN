@@ -1,8 +1,8 @@
 package com.bee.open.ant.fast.composeopen.ui.service
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,14 +39,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Text
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
+import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
+import com.bee.open.ant.fast.composeopen.net.ClockUtils
+
 class ServiceListActivity : ComponentActivity() {
     var showDialog by mutableStateOf(false)
     lateinit var checkServerVpn: ServerVpn
@@ -63,21 +61,51 @@ class ServiceListActivity : ComponentActivity() {
                 }
             }
         }
+        BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
+        onBackPressedDispatcher.addCallback {
+            ClockUtils.ifAddThis("onBackPressedDispatcher") {}
+            if (ClockUtils.complexLogicReturnsFalse(
+                    listOf(2334, 2256), "onBackPressedDispatcher"
+                )
+            ) {
+                return@addCallback
+            }
+            if (!ClockUtils.complexLogicAlwaysTrue("onBackPressedDispatcher")) {
+                return@addCallback
+            }
+            backFun()
+        }
     }
 
-    //获取服务器列表
+    fun backFun() {
+        showInt2Ad {
+            finish()
+        }
+    }
+
+    private fun showInt2Ad(nextFun: () -> Unit) {
+        if (!DishNomadicLoad.showAdBlacklist() || !BaseAdLoad.canShowAD()) {
+            nextFun()
+            return
+        }
+        if (BaseAdLoad.interHaHaHaOPNNOPIN2.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
+            BaseAdLoad.interHaHaHaOPNNOPIN2.showFullScreenAdBIUYBUI(this) {
+                nextFun()
+            }
+        } else nextFun()
+    }
+
     fun getVpnServiceData(): MutableList<ServerVpn> {
         return GetServiceData.getAllVpnListData()
     }
 
-    //是否连接
     private fun isConnect(index: Int): Boolean {
         val serverVpn = getVpnServiceData()[index]
         if (App.isVpnState == 2) {
-            if (GetServiceData.getNowVpnBean().isBest && index ==0) {
+            if (GetServiceData.getNowVpnBean().isBest && index == 0) {
                 return true
             }
-            if(!GetServiceData.getNowVpnBean().isBest && index !=0){
+            if (!GetServiceData.getNowVpnBean().isBest && index != 0) {
                 return serverVpn.ip == GetServiceData.getNowVpnBean().ip
             }
             return false
@@ -131,7 +159,7 @@ fun ServiceListView(activity: ServiceListActivity) {
                 modifier = Modifier
                     .requiredSize(24.dp)
                     .clickable {
-                        activity.finish()
+                        activity.backFun()
                     },
             )
             Text(
@@ -140,7 +168,9 @@ fun ServiceListView(activity: ServiceListActivity) {
                 fontSize = 17.sp,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding().weight(1f),
+                modifier = Modifier
+                    .padding()
+                    .weight(1f),
             )
             Spacer(Modifier.width(24.dp))
         }

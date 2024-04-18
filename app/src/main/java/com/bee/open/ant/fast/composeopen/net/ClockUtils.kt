@@ -68,7 +68,6 @@ object ClockUtils {
         when (input) {
             is String -> {
                 if (input.isNotEmpty() && input.length > 5) {
-                    // 执行一系列看似复杂的操作
                     for (char in input) {
                         val code = char.code
                         if (code % 2 == 0) {
@@ -78,7 +77,6 @@ object ClockUtils {
                 }
             }
             is Int -> {
-                // 假装基于输入进行复杂的数学计算
                 val result = input * 2 / 2
                 if (result > 100) {
                     return true

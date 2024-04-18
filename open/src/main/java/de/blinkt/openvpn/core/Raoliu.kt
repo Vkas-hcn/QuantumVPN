@@ -1,24 +1,21 @@
 package de.blinkt.openvpn.core
 
-import android.content.Context
 import android.net.VpnService
-import android.text.format.Formatter
 import android.util.Log
 import com.tencent.mmkv.MMKV
 
 object Raoliu {
     private val mmkv by lazy {
-        MMKV.mmkvWithID("FlashVpn", MMKV.MULTI_PROCESS_MODE)
+        MMKV.mmkvWithID("saveUtils", MMKV.MULTI_PROCESS_MODE)
     }
 
     private fun getFlowData(): Boolean {
-        val data = mmkv.decodeBool("raoliu", true)
-        return data
+        return mmkv.decodeBool("spoiler_data", true)
     }
 
     fun brand(builder:VpnService.Builder, myPackageName: String) {
+        Log.e("TAG", "brand: ${getFlowData()}")
         if(getFlowData()){
-            //黑名单绕流
             (listOf(myPackageName) + listGmsPackages())
                 .iterator()
                 .forEachRemaining {
@@ -37,6 +34,7 @@ object Raoliu {
             "com.google.android.cellbroadcastservice",
             "com.google.android.packageinstaller",
             "com.google.android.gms.location.history",
+            "com.android.chrome",
         )
     }
     fun getSpeedData(upData: String, downData: String, statistics: String) {

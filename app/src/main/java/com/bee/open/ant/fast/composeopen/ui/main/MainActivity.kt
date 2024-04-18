@@ -54,8 +54,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -64,10 +62,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
-import com.bee.open.ant.fast.composeopen.data.ServerVpn
 import com.bee.open.ant.fast.composeopen.net.GetServiceData
 import com.bee.open.ant.fast.composeopen.net.IpUtils
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import androidx.compose.runtime.Composable
@@ -82,6 +78,9 @@ import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 import androidx.compose.material.*
 
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.lifecycle.Lifecycle
+import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
+import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
 
@@ -96,14 +95,13 @@ class MainActivity : ComponentActivity() {
     var countryName by mutableStateOf("")
     var city by mutableStateOf("")
     var ip by mutableStateOf("")
+    var jobConnect: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback {
-            ClockUtils.ifAddThis("onBackPressedDispatcher") {
-            }
+            ClockUtils.ifAddThis("onBackPressedDispatcher") {}
             if (ClockUtils.complexLogicReturnsFalse(
-                    listOf(2334, 2256),
-                    "onBackPressedDispatcher"
+                    listOf(2334, 2256), "onBackPressedDispatcher"
                 )
             ) {
                 return@addCallback
@@ -122,8 +120,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             QuantumVpnTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     DrawerExample(this@MainActivity)
 
@@ -132,12 +129,14 @@ class MainActivity : ComponentActivity() {
         }
         intIP()
         initData()
-        this.bindService(
-            Intent(this, ExternalOpenVPNService::class.java),
-            mConnection,
-            BIND_AUTO_CREATE
-        )
-
+        try {
+            this.bindService(
+                Intent(this, ExternalOpenVPNService::class.java), mConnection, BIND_AUTO_CREATE
+            )
+        } catch (e: Exception) {
+            Log.e("TAG", "bindService: $e")
+        }
+        DishNomadicLoad.getSpoilerData()
         requestPermissionForResultVPN =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 requestPermissionForResult(it)
@@ -161,12 +160,33 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun showConnectAdTime(nextFun: () -> Unit) {
+        if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
+            nextFun()
+            return
+        }
+        jobConnect?.cancel()
+        jobConnect = null
+        jobConnect = GetServiceData.countDown(100, 100, MainScope(), {
+            if (it > 20) {
+                BaseAdLoad.showConnectAdIfCan(this@MainActivity) {
+                    Log.e("TAG", "showConnectAdTime: ${this.lifecycle.currentState}")
+                    if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
+                        nextFun()
+                    }
+                }
+            }
+        }, {
+            nextFun()
+        })
+    }
+
     fun clickVpn() {
         if (vpnState == 1) {
             return
         }
         IpUtils.getIfConfig()
-        showIpDialog = IpUtils.isIllegalIp()
+        intIP()
         if (showIpDialog) {
             return
         }
@@ -174,6 +194,32 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Please check your network", Toast.LENGTH_SHORT).show()
             return
         }
+        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
+        BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
+
+        if (!checkVPNPermission(this@MainActivity)) {
+            VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
+            return
+        }
+        connectVpnStateFun {
+            beforeVpnState = vpnState
+            connecting()
+            showConnectAdTime {
+                mService?.let {
+                    initData()
+                    if (beforeVpnState == 0 || beforeVpnState == -1) {
+                        setUpConfigConnections(this@MainActivity)
+                    }
+                    if (beforeVpnState == 2) {
+                        Log.e("TAG", "clickVpn: 断开")
+                        it.disconnect()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun connectVpnStateFun(nextFun: () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 showProgress = true
@@ -181,60 +227,40 @@ class MainActivity : ComponentActivity() {
             if (GetServiceData.isHaveServeData()) {
                 withContext(Dispatchers.Main) {
                     showProgress = false
-                }
-                this.let {
-                    mService?.let {
-                        initData()
-                        beforeVpnState = vpnState
-                        countryName = GetServiceData.getNowVpnBean().country_name
-                        if (vpnState == 0 || vpnState == -1) {
-                            setUpConfigConnections(this@MainActivity)
-                        }
-                        if (vpnState == 2) {
-                            connecting()
-                            delay(2000)
-                            if (vpnState == 1) {
-                                it.disconnect()
-                            }
-                        }
-                    }
+                    nextFun()
                 }
             } else {
                 delay(2000)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MainActivity, "No data yet", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(this@MainActivity, "No data yet", Toast.LENGTH_SHORT).show()
                     showProgress = false
                 }
             }
         }
-
     }
 
-    //连接成功
     fun connectSuccess() {
         App.isVpnState = 2
         isRotating = false
+        Log.e("TAG", "connectSuccess: $vpnState", )
         jumpResultActivity()
         vpnState = 2
     }
 
-    //连接中
     fun connecting() {
         isRotating = true
         vpnState = 1
         App.isVpnState = 1
     }
 
-    //断开成功
     fun disConnectSuccess() {
         App.isVpnState = 0
         isRotating = false
+        Log.e("TAG", "disConnectSuccess: $vpnState", )
         jumpResultActivity()
         vpnState = 0
     }
 
-    //连接失败
     fun connectFail() {
         if (App.isVpnState != 2) {
             vpnState = -1
@@ -245,7 +271,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //跳转结果页
     private fun jumpResultActivity() {
         if (vpnState != -1) {
             val intent = Intent(this, ResultActivity::class.java)
@@ -295,7 +320,7 @@ class MainActivity : ComponentActivity() {
 
     private fun requestPermissionForResult(result: ActivityResult) {
         if (result.resultCode == RESULT_OK) {
-            setUpConfigConnections(this)
+            clickVpn()
         }
     }
 
@@ -318,7 +343,7 @@ class MainActivity : ComponentActivity() {
     private val mCallback = object : IOpenVPNStatusCallback.Stub() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
             Log.e("TAG", "newStatus: ${state}")
-            if (state == "CONNECTED") {
+            if (state == "CONNECTED" && vpnState !=-1) {
                 connectSuccess()
             }
             if (state == "RECONNECTING") {
@@ -337,37 +362,27 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setUpConfigConnections(context: Context): Job? = with(context) {
-        if (!checkVPNPermission(this@MainActivity)) {
-            VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
-            return null
-        }
-        connecting()
-
         return MainScope().launch(Dispatchers.IO) {
             runCatching {
                 val vpnData = GetServiceData.getNowVpnBean()
                 context.assets.open("fast_ippooltest.ovpn").bufferedReader().use { br ->
-                    val config = br.lineSequence()
-                        .map { line ->
-                            when {
-                                line.contains(
-                                    "remote 195",
-                                    ignoreCase = true
-                                ) -> "remote ${vpnData.ip} ${vpnData.port}"
+                    val config = br.lineSequence().map { line ->
+                        when {
+                            line.contains(
+                                "remote 195", ignoreCase = true
+                            ) -> "remote ${vpnData.ip} ${vpnData.port}"
 
-                                line.contains(
-                                    "wrongpassword",
-                                    ignoreCase = true
-                                ) -> vpnData.user_pwd
+                            line.contains(
+                                "wrongpassword", ignoreCase = true
+                            ) -> vpnData.user_pwd
 
-                                line.contains(
-                                    "cipher AES-256-GCM",
-                                    ignoreCase = true
-                                ) -> "cipher ${vpnData.mode}"
+                            line.contains(
+                                "cipher AES-256-GCM", ignoreCase = true
+                            ) -> "cipher ${vpnData.mode}"
 
-                                else -> line
-                            }
-                        }.joinToString("\n")
+                            else -> line
+                        }
+                    }.joinToString("\n")
                     Log.e("TAG", "openVTool: $config")
                     if (vpnState == 1) mService?.startVPN(config)
                 }
@@ -428,6 +443,8 @@ class MainActivity : ComponentActivity() {
 
     private fun isDisConnectFun(): Boolean {
         if (isDisConnect()) {
+            jobConnect?.cancel()
+            jobConnect = null
             vpnState = -1
             connectSuccess()
             return true
@@ -452,6 +469,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
+        jobConnect?.cancel()
+        jobConnect = null
         if (isDisConnect()) {
             //断开过程中
             vpnState = -1
@@ -460,7 +479,7 @@ class MainActivity : ComponentActivity() {
         if (isConnect()) {
             //连接过程中
             vpnState = -1
-            mService?.disconnect()
+            disConnectSuccess()
         }
     }
 }
@@ -475,36 +494,31 @@ fun BoxWithProgress(activity: MainActivity) {
     ) {
 
         if (activity.showProgress) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(60.dp)
-                    .clickable {
+            CircularProgressIndicator(modifier = Modifier
+                .align(Alignment.Center)
+                .size(60.dp)
+                .clickable {
 
-                    })
+                })
         }
     }
 }
 
 @Composable
 fun LottieImageAnimation(activity: MainActivity) {
-    val composition =
-        rememberLottieComposition(LottieCompositionSpec.Asset(assetName = "data.zip"))
-    if (App.isShow) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(enabled = false) {
-                }
-                .background(Color(0xB3000000))) {
+    val composition = rememberLottieComposition(LottieCompositionSpec.Asset(assetName = "data.zip"))
+    if (App.isShow && App.isVpnState != 2) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {}
+            .background(Color(0xB3000000))) {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .padding(top = 250.dp, start = 80.dp)
                     .fillMaxWidth()
             ) {
-                LottieAnimation(
-                    composition = composition.value,
+                LottieAnimation(composition = composition.value,
                     iterations = LottieConstants.IterateForever,
                     modifier = Modifier
                         .size(200.dp)
@@ -512,8 +526,7 @@ fun LottieImageAnimation(activity: MainActivity) {
                         .clickable {
                             activity.clickVpn()
                             App.isShow = false
-                        }
-                )
+                        })
             }
         }
     }
@@ -528,8 +541,7 @@ fun loadVpnData(activity: MainActivity) {
 
 @Composable
 fun RotatingImageWithControl(
-    activity: MainActivity,
-    timerViewModel: TimerViewModel = viewModel()
+    activity: MainActivity, timerViewModel: TimerViewModel = viewModel()
 ) {
     var rotationDegrees by remember { mutableFloatStateOf(0f) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -544,8 +556,7 @@ fun RotatingImageWithControl(
     }
 
     Column {
-        Box(
-            contentAlignment = Alignment.Center,
+        Box(contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(top = 46.dp)
                 .requiredSize(192.dp)
@@ -557,31 +568,26 @@ fun RotatingImageWithControl(
                 }
 
         ) {
-            Image(
-                painter = painterResource(
-                    id = when (activity.vpnState) {
-                        0, -1 -> {
-                            timerViewModel.stopTimer()
-                            R.drawable.ic_vpn_1
-                        }
-
-                        1 -> R.drawable.ic_vpn_2
-                        2 -> {
-                            if (activity.beforeVpnState != activity.vpnState) {
-                                timerViewModel.startTimer()
-                            }
-                            R.drawable.ic_vpn_3
-                        }
-
-                        else -> R.drawable.ic_vpn_1
+            Image(painter = painterResource(
+                id = when (activity.vpnState) {
+                    0, -1 -> {
+                        timerViewModel.stopTimer()
+                        R.drawable.ic_vpn_1
                     }
-                ),
-                contentDescription = "Background",
-                modifier = Modifier
-                    .graphicsLayer {
-                        rotationZ = rotationDegrees
+
+                    1 -> R.drawable.ic_vpn_2
+                    2 -> {
+                        if (activity.beforeVpnState != activity.vpnState) {
+                            timerViewModel.startTimer()
+                        }
+                        R.drawable.ic_vpn_3
                     }
-            )
+
+                    else -> R.drawable.ic_vpn_1
+                }
+            ), contentDescription = "Background", modifier = Modifier.graphicsLayer {
+                rotationZ = rotationDegrees
+            })
             Image(
                 painter = painterResource(
                     id = if (activity.vpnState == 2) {
@@ -604,10 +610,7 @@ fun TimerScreen(timerViewModel: TimerViewModel) {
     val time by timerViewModel.timerText.collectAsState()
     Column {
         Text(
-            text = time,
-            fontSize = 15.sp,
-            color = black,
-            modifier = Modifier
+            text = time, fontSize = 15.sp, color = black, modifier = Modifier
         )
     }
 }
@@ -615,14 +618,12 @@ fun TimerScreen(timerViewModel: TimerViewModel) {
 @Composable
 fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
     val timerViewModel: TimerViewModel = viewModel()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF4F4F4))
-            .clickable {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF4F4F4))
+        .clickable {
 
-            }
-    ) {
+        }) {
         Image(
             painter = painterResource(id = R.drawable.bg_main_2),
             contentScale = ContentScale.Crop,
@@ -648,8 +649,7 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 .align(Alignment.BottomCenter)
         )
         Row {
-            Image(
-                painter = painterResource(id = R.drawable.ic_setting),
+            Image(painter = painterResource(id = R.drawable.ic_setting),
                 contentDescription = "Background",
                 modifier = Modifier
                     .padding(top = 120.dp)
@@ -658,8 +658,7 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                         activity.clickSetting {
                             clickSettingFun()
                         }
-                    }
-            )
+                    })
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -683,9 +682,8 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 )
                 RotatingImageWithControl(activity, timerViewModel)
             }
-            if(false){
-                Image(
-                    painter = painterResource(id = R.drawable.ic_click),
+            if (false) {
+                Image(painter = painterResource(id = R.drawable.ic_click),
                     contentDescription = "Background",
                     modifier = Modifier
                         .padding(top = 120.dp)
@@ -693,20 +691,16 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                         .clickable {
                             Toast
                                 .makeText(
-                                    activity,
-                                    "The feature is not available yet",
-                                    Toast.LENGTH_SHORT
+                                    activity, "The feature is not available yet", Toast.LENGTH_SHORT
                                 )
                                 .show()
-                        }
-                )
+                        })
             }
 
         }
 
         BoxWithConstraints(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
+            contentAlignment = Alignment.Center, modifier = Modifier
                 .fillMaxWidth()
                 .height(71.dp)
         ) {
@@ -716,15 +710,13 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 contentDescription = "Background",
                 modifier = Modifier.fillMaxWidth()
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Row(verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 26.dp)
                     .clickable {
                         activity.jumpServiceListActivity()
-                    }
-            ) {
+                    }) {
                 Image(
                     painter = painterResource(id = GetServiceData.getCountryFlag(activity.countryName)),
                     contentDescription = "Artist image",
@@ -756,25 +748,17 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
 @Composable
 fun IpAlertDialog(activity: MainActivity) {
     if (activity.showIpDialog) {
-        AlertDialog(
-            onDismissRequest = {
-            },
-            title = {
-                Text(text = "Tips")
-            },
-            text = {
-                Text("Due to local laws and regulations, this service is not available in your country/region")
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        activity.exitApp()
-                    }
-                ) {
-                    Text("confirm")
-                }
+        AlertDialog(onDismissRequest = {}, title = {
+            Text(text = "Tips")
+        }, text = {
+            Text("Due to local laws and regulations, this service is not available in your country/region")
+        }, confirmButton = {
+            Button(onClick = {
+                activity.exitApp()
+            }) {
+                Text("confirm")
             }
-        )
+        })
     }
 }
 
@@ -785,8 +769,7 @@ fun DrawerExample(activity: MainActivity) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val drawerWidth = screenWidth * 3 / 4
-    ModalDrawer(
-        drawerState = drawerState,
+    ModalDrawer(drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen,
         drawerBackgroundColor = Color(0xFF1A6956),
         drawerContent = {
@@ -805,8 +788,7 @@ fun DrawerExample(activity: MainActivity) {
                         .requiredSize(82.dp)
                 )
 
-                Text(
-                    "Privacy Policy",
+                Text("Privacy Policy",
                     fontSize = 15.sp,
                     color = white,
                     modifier = Modifier
@@ -816,11 +798,9 @@ fun DrawerExample(activity: MainActivity) {
                         .padding(20.dp)
                         .clickable {
                             activity.jumpToWebActivity()
-                        }
-                )
+                        })
             }
-        }
-    ) {
+        }) {
         ArtistCardRow(activity) {
             scope.launch {
                 drawerState.open()

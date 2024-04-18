@@ -2,6 +2,7 @@ package com.bee.open.ant.fast.composeopen.ui.end
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
@@ -27,8 +27,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import com.bee.open.ant.fast.composeopen.R
 import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
+import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
+import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.ui.theme.QuantumVpnTheme
 
 class ResultActivity : ComponentActivity() {
@@ -45,8 +49,40 @@ class ResultActivity : ComponentActivity() {
                 }
             }
         }
+        onBackPressedDispatcher.addCallback {
+            ClockUtils.ifAddThis("onBackPressedDispatcher") {}
+            if (ClockUtils.complexLogicReturnsFalse(
+                    listOf(2334, 2256), "onBackPressedDispatcher"
+                )
+            ) {
+                return@addCallback
+            }
+            if (!ClockUtils.complexLogicAlwaysTrue("onBackPressedDispatcher")) {
+                return@addCallback
+            }
+            backFun()
+        }
+    }
+    fun backFun(){
+        showInt2Ad{
+            finish()
+        }
+    }
+    private fun showInt2Ad(nextFun:()->Unit) {
+        if (!DishNomadicLoad.showAdBlacklist() || !BaseAdLoad.canShowAD()) {
+            nextFun()
+            return
+        }
+        if (BaseAdLoad.interHaHaHaOPNNOPIN2.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
+            BaseAdLoad.interHaHaHaOPNNOPIN2.showFullScreenAdBIUYBUI(this) {
+                nextFun()
+            }
+        }
+        else
+            nextFun()
     }
 }
+
 
 @Composable
 fun titleView(activity: ResultActivity) {
@@ -67,7 +103,7 @@ fun titleView(activity: ResultActivity) {
                 modifier = Modifier
                     .requiredSize(24.dp)
                     .clickable {
-                        activity.finish()
+                        activity.backFun()
                     },
             )
             Text(
@@ -76,7 +112,9 @@ fun titleView(activity: ResultActivity) {
                 fontSize = 17.sp,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding().weight(1f),
+                modifier = Modifier
+                    .padding()
+                    .weight(1f),
             )
             Spacer(Modifier.width(24.dp))
         }

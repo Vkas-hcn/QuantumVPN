@@ -24,14 +24,22 @@ import androidx.compose.ui.graphics.Color
 import android.content.Intent
 import android.os.CountDownTimer
 import android.util.Log
+import androidx.activity.addCallback
+import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
+import com.bee.open.ant.fast.composeopen.load.FBAD
+import com.bee.open.ant.fast.composeopen.load.FBADUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData
 import com.bee.open.ant.fast.composeopen.net.GetServiceData.getVpnNetData
 import com.bee.open.ant.fast.composeopen.net.IpUtils
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 
 class StartActivity : ComponentActivity() {
-
+    var job: Job? = null
+    var job2: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -44,8 +52,43 @@ class StartActivity : ComponentActivity() {
                     StartImage()
                 }
             }
+            checkAD()
             CountdownTimerExample()
         }
+        onBackPressedDispatcher.addCallback {
+
+        }
+    }
+
+    private fun checkAD() {
+        if (FBADUtils.isAppInit) {
+            FBADUtils.isAppInit = false
+            job2 = GetServiceData.countDown(8, 500, MainScope(), {
+                FBAD.checkADData {
+                    if (it) {
+                        preLoadAD()
+                        job2?.cancel()
+                    }
+                }
+            }, {
+                FBAD.checkADDataWithServer()
+                preLoadAD()
+            })
+        } else {
+            preLoadAD()
+        }
+    }
+
+    fun preLoadAD() {
+        Log.e("TAG", "preLoadAD: 11111111111111", )
+        BaseAdLoad.startOpenBOIBOIUBU.preload(this)
+        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        job?.cancel()
+        job = null
     }
 
     private fun init() {
@@ -56,17 +99,24 @@ class StartActivity : ComponentActivity() {
     @Composable
     fun CountdownTimerExample() {
         var progress by remember { mutableStateOf(1f) }
-        val totalTime = 5_000L
+        val totalTime = 12_000L
         val interval = 100L
         LaunchedEffect(key1 = true) {
             object : CountDownTimer(totalTime, interval) {
                 override fun onTick(millisUntilFinished: Long) {
                     progress = 1 - (millisUntilFinished / totalTime.toFloat())
+                    if (progress > 0.1f) {
+                        BaseAdLoad.showOpenAdIfCan(this@StartActivity) {
+                            cancel()
+                        }
+                    }
                 }
 
                 override fun onFinish() {
-                    progress = 1f
-                    startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                    if(!App.isBackDataQuan){
+                        progress = 1f
+                        startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                    }
                     finish()
                 }
             }.start()
@@ -98,9 +148,7 @@ fun StartImage() {
 
 @Composable
 fun CustomProgressBar(progress: Float) {
-    // 进度条背景颜色
     val backgroundColor = Color(0xFFECECEC)
-    // 进度条颜色
     val progressColor = Color(0xFF1CA27A)
 
     Box(
