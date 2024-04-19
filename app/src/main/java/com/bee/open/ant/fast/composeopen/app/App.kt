@@ -62,6 +62,8 @@ class App : Application(), LifecycleObserver {
         instance = this
         ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
             MMKV.initialize(this)
+            Firebase.initialize(this)
+            FirebaseApp.initializeApp(this)
             registerActivityLifecycleCallbacks(AppLifecycleTracker())
             ProcessLifecycleOwner.get().lifecycle.addObserver(this)
             saveUtils =
@@ -77,8 +79,6 @@ class App : Application(), LifecycleObserver {
             }
             getBlackList(this)
             if (!BuildConfig.DEBUG) {
-                Firebase.initialize(this)
-                FirebaseApp.initializeApp(this)
                 FBADUtils.getFirebaseRemoteConfigData()
                 FBADUtils.fourAppWait4SecondsToGetData()
                 GlobalScope.launch {
