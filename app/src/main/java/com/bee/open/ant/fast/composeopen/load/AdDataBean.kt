@@ -25,13 +25,13 @@ abstract class SoWhatCanYouDo(
 
 @Keep
 data class EveryADBean(
-    @SerializedName("ad_type")
+    @SerializedName("keep")
     var adYype: String? = null,
 
-    @SerializedName("ad_from")
+    @SerializedName("book")
     var adNetOperator: String,
 
-    @SerializedName("ad_id")
+    @SerializedName("tom")
     var adIdKKKK: String,
 
     @SerializedName("fa_c_oute")
@@ -50,22 +50,22 @@ enum class ADType(val placeName: String) {
 
 @Keep
 data class AdvertiseEntity(
-    @SerializedName("showNum")
+    @SerializedName("nunn")
     val showMax: Int = 0,
-    @SerializedName("clickNum")
+    @SerializedName("comping")
     val clickMax: Int = 0,
-    @SerializedName("open_start")
+    @SerializedName("tuop")
     val start: MutableList<EveryADBean>?,
 
-    @SerializedName("open_connect")
+    @SerializedName("intu")
     val inter: MutableList<EveryADBean>?,
 
-    @SerializedName("open_back")
+    @SerializedName("tintuba")
     val inter2: MutableList<EveryADBean>?,
 )
 
 @Keep
 data class AdOpenBean(
-    val clockType: String?= "2",
-    val raoliu: String?= "1",
+    val hang: String?= "2",
+    val miak: String?= "1",
 )

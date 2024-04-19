@@ -344,7 +344,7 @@ class MainActivity : ComponentActivity() {
     private val mCallback = object : IOpenVPNStatusCallback.Stub() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
             Log.e("TAG", "newStatus: ${state}")
-            if (state == "CONNECTED" && vpnState != -1) {
+            if (state == "CONNECTED") {
                 connectSuccess()
             }
             if (state == "RECONNECTING") {

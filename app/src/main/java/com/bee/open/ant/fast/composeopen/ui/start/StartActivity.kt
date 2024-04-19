@@ -80,7 +80,6 @@ class StartActivity : ComponentActivity() {
     }
 
     fun preLoadAD() {
-        Log.e("TAG", "preLoadAD: 11111111111111", )
         BaseAdLoad.startOpenBOIBOIUBU.preload(this)
         BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
     }

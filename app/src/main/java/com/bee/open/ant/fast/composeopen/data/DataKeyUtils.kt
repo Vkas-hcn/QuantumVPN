@@ -9,8 +9,8 @@ class DataKeyUtils {
             "https://test.quantumsphereonline.com/WgNihdyrk/dJcpwZFkiK/fseqUqCrz/"
         const val proxyUrl = "https://baidu.com"
         const val blackUrl = "https://rubbish.quantumsphereonline.com/goal/fs"
-        var adOpenKey = "adOpenKey"
-        var configOpenKey = "configOpenKey"
+        var adOpenKey = "vointt"
+        var configOpenKey = "sad"
 
         val save = App.saveUtils
 
@@ -106,85 +106,34 @@ class DataKeyUtils {
         }
 
         const val nfskjnkkk = """
-            {
-    "showNum": 50,
-    "clickNum": 1,
-    "open_start": [
+  {
+    "nunn": 20,
+    "comping": 5,
+    "tuop": [
         {
-            "ad_id": "ca-app-pub-3940256099942544/9257395921",
-            "ad_from": "admob",
-            "ad_type": "plai",
-            "cache_time": 50,
+            "tom": "ca-app-pub-2001364143953351/3192287239",
+            "book": "admob",
+            "keep": "plai",
             "fa_c_oute": 2,
-            "where": "open_start"
-        },
-        {
-            "ad_id": "ca-app-pub-3940256099942544/9257395921xx",
-            "ad_from": "admob",
-            "ad_type": "plai",
-            "cache_time": 50,
-            "fa_c_oute": 3,
-            "where": "open_start"
-        },
-        {
-            "ad_id": "ca-app-pub-3940256099942544/8691691433",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
-            "fa_c_oute": 1,
-            "where": "open_start"
+            "where": "tuop"
         }
     ],
-    "open_connect": [
+    "intu": [
         {
-            "ad_id": "ca-app-pub-3940256099942544/8691691433xx",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
-            "fa_c_oute": 3,
-            "where": "open_connect"
-        },
-        {
-            "ad_id": "ca-app-pub-3940256099942544/1033173712",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
-            "fa_c_oute": 1,
-            "where": "open_connect"
-        },
-        {
-            "ad_id": "ca-app-pub-3940256099942544/8691691433",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
+            "tom": "ca-app-pub-2001364143953351/3052686431",
+            "book": "admob",
+            "keep": "ity",
             "fa_c_oute": 2,
-            "where": "open_connect"
+            "where": "intu"
         }
     ],
-    "open_back": [
+    "tintuba": [
         {
-            "ad_id": "ca-app-pub-3940256099942544/8691691433",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
-            "fa_c_oute": 1,
-            "where": "open_back"
-        },
-        {
-            "ad_id": "ca-app-pub-3940256099942544/1033173712",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
+            "tom": "ca-app-pub-2001364143953351/1810072742",
+            "book": "admob",
+            "keep": "ity",
             "fa_c_oute": 2,
-            "where": "open_back"
-        },
-        {
-            "ad_id": "ca-app-pub-3940256099942544/8691691433xx",
-            "ad_from": "admob",
-            "ad_type": "ity",
-            "cache_time": 50,
-            "fa_c_oute": 3,
-            "where": "open_back"
+            "where": "tintuba"
         }
     ]
 }
@@ -192,8 +141,8 @@ class DataKeyUtils {
 
         const val configOpenLocal = """
   {
-    "clockType": "1",
-    "raoliu": "1"
+    "hang": "1",
+    "miak": "1"
   }
         """
     }

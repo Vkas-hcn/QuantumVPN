@@ -16,7 +16,7 @@ class DishNomadicLoad(
     companion object {
         fun showAdBlacklist(): Boolean {
             val blackData = DataKeyUtils.black_data != "scorpion"
-            return when (getLocalOpenData().clockType) {
+            return when (getLocalOpenData().hang) {
                 "1" -> {
                     !blackData
                 }
@@ -32,7 +32,7 @@ class DishNomadicLoad(
         }
 
         fun getSpoilerData() {
-            DataKeyUtils.spoiler_data = when (getLocalOpenData().raoliu) {
+            DataKeyUtils.spoiler_data = when (getLocalOpenData().miak) {
                 "1" -> {
                     true
                 }
