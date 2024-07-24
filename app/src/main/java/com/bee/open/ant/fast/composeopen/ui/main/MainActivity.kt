@@ -189,11 +189,19 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         lifecycleScope.launch {
             delay(300)
+            CanDataUtils.postPointData("antur2")
             if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) && App.isAppRunning) {
-                CanDataUtils.postPointData("antur2")
                 BaseAdLoad.mainNativeHome.showFullScreenAdBIUYBUI(this@MainActivity) {}
                 App.isAppRunning = false
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            this.unbindService(mConnection)
+        } catch (e: Exception) {
         }
     }
 
@@ -268,7 +276,9 @@ class MainActivity : ComponentActivity() {
         }
         BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
         BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
-
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU && App.isVpnState != 2) {
+            CanDataUtils.postPointData("antur5")
+        }
         if (!checkVPNPermission(this@MainActivity)) {
             if (!DataKeyUtils.service_q_x_type) {
                 DataKeyUtils.service_q_x_type = true
@@ -293,7 +303,7 @@ class MainActivity : ComponentActivity() {
                 ).show()
                 return
             }
-            CanDataUtils.postPointData("antur5")
+
         }
         connectVpnStateFun {
             beforeVpnState = vpnState

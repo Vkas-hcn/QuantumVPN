@@ -29,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
+import com.bee.open.ant.fast.composeopen.load.BaseAdLoad.isActivityResumed
 import com.bee.open.ant.fast.composeopen.load.FBAD
 import com.bee.open.ant.fast.composeopen.load.FBADUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
@@ -46,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -53,6 +55,8 @@ class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
     var isJump = false
+    private var startTimer = mutableStateOf(true)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -61,19 +65,28 @@ class StartActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    init()
                     StartImage()
                 }
             }
             checkAD()
-            CountdownTimerExample()
+            CountdownTimerExample(startTimer.value) {
+                startTimer.value = false // Reset the timer when finished
+            }
         }
         onBackPressedDispatcher.addCallback {
 
         }
+        updateUserOpinions()
         lifecycleScope.launch(Dispatchers.IO) {
+            getVpnNetData()
+            IpUtils.getIfConfig()
+            IpUtils.getOnlyIp()
             CanDataUtils.postSessionData()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     private fun checkAD() {
@@ -106,10 +119,10 @@ class StartActivity : ComponentActivity() {
         if (DataKeyUtils.userAdType) {
             return
         }
+        Log.e("TAG", "updateUserOpinions: ", )
         val debugSettings =
             ConsentDebugSettings.Builder(this)
                 .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                .addTestDeviceHashedId("BCD99A19DFC84C1B71AF2A884D73059C")
                 .build()
         val params = ConsentRequestParameters
             .Builder()
@@ -123,13 +136,19 @@ class StartActivity : ComponentActivity() {
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) {
                     if (consentInformation.canRequestAds()) {
                         DataKeyUtils.userAdType = true
+                        startTimer()
                     }
                 }
             },
             {
                 DataKeyUtils.userAdType = true
+                startTimer()
             }
         )
+    }
+
+    private fun startTimer() {
+        startTimer.value = true
     }
 
     override fun onStop() {
@@ -138,52 +157,47 @@ class StartActivity : ComponentActivity() {
         job = null
     }
 
-    private fun init() {
-        updateUserOpinions()
-        lifecycleScope.launch(Dispatchers.IO) {
-            getVpnNetData()
-            IpUtils.getIfConfig()
-            IpUtils.getOnlyIp()
-        }
-    }
 
     @Composable
-    fun CountdownTimerExample() {
-        var progress by remember { mutableStateOf(1f) }
+    fun CountdownTimerExample(startTimer: Boolean, onTimerFinish: () -> Unit) {
+        var progress by remember { mutableFloatStateOf(1f) }
         val totalTime = 12_000L
         val interval = 100L
-        var startTimer by remember { mutableStateOf(true) }
 
         LaunchedEffect(key1 = startTimer) {
-            object : CountDownTimer(totalTime, interval) {
-                override fun onTick(millisUntilFinished: Long) {
-                    progress = 1 - (millisUntilFinished / totalTime.toFloat())
-                    if (progress > 0.1f && DataKeyUtils.userAdType) {
-                        BaseAdLoad.showOpenAdIfCan(this@StartActivity, {
-                            cancel()
-                        }, {
+            if (startTimer) {
+                object : CountDownTimer(totalTime, interval) {
+                    override fun onTick(millisUntilFinished: Long) {
+                        progress = 1 - (millisUntilFinished / totalTime.toFloat())
+                        if (progress > 0.1f && DataKeyUtils.userAdType) {
+                            BaseAdLoad.showOpenAdIfCan(this@StartActivity, {
+                                cancel()
+                            }, {
+                                progress = 1f
+                                startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                                finish()
+                                isJump = true
+                            })
+                        }
+                    }
+
+                    override fun onFinish() {
+                        Log.e("TAG", "onFinish:111111111=${startTimer} ", )
+                        progress = 1f
+                        onTimerFinish()
+                        if (!App.isBackDataQuan && DataKeyUtils.userAdType) {
+                            progress = 1f
                             startActivity(Intent(this@StartActivity, MainActivity::class.java))
                             finish()
-                            isJump= true
-                        })
+                        }
                     }
-                }
-
-                override fun onFinish() {
-                    if (!App.isBackDataQuan && DataKeyUtils.userAdType) {
-                        progress = 1f
-                        startActivity(Intent(this@StartActivity, MainActivity::class.java))
-                        finish()
-                    } else {
-                        progress = 1f
-                        startTimer = false // Stop the current timer
-                        startTimer = true  // Restart the timer
-                    }
-                }
-            }.start()
+                }.start()
+            }
         }
+
         ProgressBarDemo(progress = progress)
     }
+
 }
 
 

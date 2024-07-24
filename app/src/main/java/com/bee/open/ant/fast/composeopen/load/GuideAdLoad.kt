@@ -102,6 +102,7 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
                 override fun onAdLoaded(appOpenAd: AppOpenAd) {
                     ad = appOpenAd
                     onAdLoaded.invoke()
+                    CanDataUtils.antur15(adBean)
                     appOpenAd.setOnPaidEventListener { adValue ->
                         adValue.let {
                             CanDataUtils.postAdAllData(

@@ -47,6 +47,7 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             forNativeAd { ad ->
                 Log.e("TAG", "原生广告 -${item.where}，加载成功: ")
                 nativeAd = ad
+                CanDataUtils.antur15(adBean)
                 ad.setOnPaidEventListener { adValue ->
                     Log.e("TAG", "原生广告 -${item.where}，开始上报: ")
                     CanDataUtils.postAdAllData(

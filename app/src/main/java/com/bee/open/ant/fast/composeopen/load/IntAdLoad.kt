@@ -116,6 +116,7 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     ad = interstitialAd
+                    CanDataUtils.antur15(adBean)
                     onAdLoaded.invoke()
                     interstitialAd.setOnPaidEventListener { adValue ->
                         CanDataUtils.postAdAllData(

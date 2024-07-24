@@ -307,20 +307,21 @@ object CanDataUtils {
         responseInfo: ResponseInfo?,
         adBean: EveryADBean,
     ) {
-        val json = getAdAllJson(adValue, responseInfo, adBean)
-        Log.e("TBA", "${adBean.where}-Ad-Json--->${json}")
-        antur15(adBean)
-        try {
-            GetNetDataUtils.postTbaData(
-                DataKeyUtils.tbaUrl,
-                json,
-                {
-                    Log.e("TAG", "${adBean.where}-广告事件上报-成功->${it}")
-                }, {
-                    Log.e("TAG", "${adBean.where}-广告事件上报-失败=$it")
-                })
-        } catch (e: Exception) {
-            Log.e("TAG", "${adBean.where}-广告事件上报-失败=$e")
+        GlobalScope.launch(Dispatchers.IO) {
+            val json = getAdAllJson(adValue, responseInfo, adBean)
+            Log.e("TBA", "${adBean.where}-Ad-Json--->${json}")
+            try {
+                GetNetDataUtils.postTbaData(
+                    DataKeyUtils.tbaUrl,
+                    json,
+                    {
+                        Log.e("TAG", "${adBean.where}-广告事件上报-成功->${it}")
+                    }, {
+                        Log.e("TAG", "${adBean.where}-广告事件上报-失败=$it")
+                    })
+            } catch (e: Exception) {
+                Log.e("TAG", "${adBean.where}-广告事件上报-失败=$e")
+            }
         }
     }
 
