@@ -63,7 +63,7 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
                 override fun onAdFailedToLoad(e: LoadAdError) {
                     Log.e("TAG", "原生广告 -${item.where}，加载失败: ")
                     onAdLoadFailed.invoke(e.message)
-                    if (item.where == "hhhhnn") {
+                    if (item.where == "saxc") {
                         App.appNativeAdHome = null
                     } else {
                         App.appNativeAdEnd = null
@@ -99,13 +99,13 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             "TAG",
             " NativeAd, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} show"
         )
-        if (item.where == "hhhhnn") {
+        if (item.where == "saxc") {
             App.appNativeAdHome = null
         } else {
             App.appNativeAdEnd = null
         }
         if (BaseAdLoad.canShowAD()) {
-            if (item.where == "hhhhnn") {
+            if (item.where == "saxc") {
                 App.appNativeAdHome = nativeAd
             } else {
                 App.appNativeAdEnd = nativeAd

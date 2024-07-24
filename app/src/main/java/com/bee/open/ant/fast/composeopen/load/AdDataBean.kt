@@ -72,10 +72,10 @@ data class AdvertiseEntity(
     @SerializedName("tintuba")
     val inter2: MutableList<EveryADBean>?,
 
-    @SerializedName("hhhhnn")
+    @SerializedName("saxc")
     val nnnhh: MutableList<EveryADBean>?,
 
-    @SerializedName("eeenn")
+    @SerializedName("mstan")
     val nnnee: MutableList<EveryADBean>?,
 )
 

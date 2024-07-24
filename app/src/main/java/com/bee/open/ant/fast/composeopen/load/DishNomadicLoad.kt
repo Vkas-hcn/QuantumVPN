@@ -74,7 +74,7 @@ class DishNomadicLoad(
             return
         }
 
-        if ((!showAdBlacklist()) && (item.adYype == "ity" || (item.where == "hhhhnn"))) {
+        if ((!showAdBlacklist()) && (item.adYype == "ity" || (item.where == "saxc"))) {
             Log.e("TAG", "黑名单屏蔽${item.where}广告加载 ")
             canusdkbcaushdconLoad.invoke(false)
             return

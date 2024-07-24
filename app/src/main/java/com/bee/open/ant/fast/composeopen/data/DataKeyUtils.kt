@@ -214,22 +214,22 @@ class DataKeyUtils {
             "where": "tintuba"
         }
     ],
-    "hhhhnn": [
+    "saxc": [
         {
             "tom": "ca-app-pub-3940256099942544/2247696110",
             "book": "admob",
             "keep": "nnnee",
             "fa_c_oute": 2,
-            "where": "hhhhnn"
+            "where": "saxc"
         }
     ],
-    "eeenn": [
+    "mstan": [
         {
             "tom": "ca-app-pub-3940256099942544/2247696110",
             "book": "admob",
             "keep": "nnnee",
             "fa_c_oute": 2,
-            "where": "eeenn"
+            "where": "mstan"
         }
     ]
 }

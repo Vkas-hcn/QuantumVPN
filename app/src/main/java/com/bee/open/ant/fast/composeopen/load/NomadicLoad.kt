@@ -32,7 +32,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
         baseAd.showMyNameIsHei(activity = activity, onAdDismissed = onAdDismissed)
         vsnoevn = {}
         Log.e("TAG", "showFullScreenAdBIUYBUI: ${baseAd.adBean.where}", )
-        if (baseAd.adBean.where == "intu" || baseAd.adBean.where == "hhhhnn"|| baseAd.adBean.where == "eeenn") {
+        if (baseAd.adBean.where == "intu" || baseAd.adBean.where == "saxc"|| baseAd.adBean.where == "mstan") {
             preload(activity)
         }
     }
