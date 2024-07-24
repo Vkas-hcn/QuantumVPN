@@ -869,6 +869,9 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
         ) {
             activity.showNavAd = !DishNomadicLoad.showAdBlacklist()
             if (!activity.showNavAd) {
+                if(!BaseAdLoad.canShowAD()){
+                    App.appNativeAdHome != null
+                }
                 if (App.appNativeAdHome != null) {
                     NativeAdHomeContent(App.appNativeAdHome!!)
                 } else {
