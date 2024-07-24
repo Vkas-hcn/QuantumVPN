@@ -303,7 +303,6 @@ class MainActivity : ComponentActivity() {
                 ).show()
                 return
             }
-
         }
         connectVpnStateFun {
             beforeVpnState = vpnState
@@ -311,15 +310,18 @@ class MainActivity : ComponentActivity() {
             showConnectAdTime {
                 mService?.let {
                     initData()
-                    if (beforeVpnState == 0 || beforeVpnState == -1) {
-                        setUpConfigConnections(this@MainActivity)
+                    lifecycleScope.launch {
+                        if (beforeVpnState == 0 || beforeVpnState == -1) {
+                            setUpConfigConnections(this@MainActivity)
+                        }
+                        if (beforeVpnState == 2) {
+                            BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
+                            delay(1000)
+                            it.disconnect()
+                            CanDataUtils.postPointData("antur13")
+                        }
                     }
-                    if (beforeVpnState == 2) {
-                        BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
-                        Log.e("TAG", "clickVpn: 断开")
-                        it.disconnect()
-                        CanDataUtils.postPointData("antur13")
-                    }
+
                 }
             }
         }
@@ -378,9 +380,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun jumpResultActivity() {
-        if (beforeVpnState != -2) {
-            val intent = Intent(this, ResultActivity::class.java)
-            startActivityForResult(intent, 0x445)
+        lifecycleScope.launch {
+            delay(200)
+            if (beforeVpnState != -2 && this@MainActivity.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                val intent = Intent(this@MainActivity, ResultActivity::class.java)
+                startActivityForResult(intent, 0x445)
+            }
         }
     }
 
@@ -868,9 +873,11 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 .align(Alignment.BottomCenter)
         ) {
             activity.showNavAd = !DishNomadicLoad.showAdBlacklist()
+            Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}", )
             if (!activity.showNavAd) {
+
                 if(!BaseAdLoad.canShowAD()){
-                    App.appNativeAdHome != null
+                    App.appNativeAdHome == null
                 }
                 if (App.appNativeAdHome != null) {
                     NativeAdHomeContent(App.appNativeAdHome!!)

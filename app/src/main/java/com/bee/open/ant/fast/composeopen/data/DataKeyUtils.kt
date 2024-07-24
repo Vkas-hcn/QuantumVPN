@@ -186,7 +186,7 @@ class DataKeyUtils {
         const val nfskjnkkk = """
   {
     "nunn": 200,
-    "comping": 5,
+    "comping": 1,
     "tuop": [
         {
             "tom": "ca-app-pub-3940256099942544/9257395921",

@@ -219,7 +219,7 @@ fun titleView(activity: ResultActivity) {
                 .fillMaxWidth()
         ) {
             if(!BaseAdLoad.canShowAD()){
-                App.appNativeAdEnd != null
+                App.appNativeAdEnd == null
             }
             if (App.appNativeAdEnd != null) {
                 NativeAdEndContent(App.appNativeAdEnd!!)
