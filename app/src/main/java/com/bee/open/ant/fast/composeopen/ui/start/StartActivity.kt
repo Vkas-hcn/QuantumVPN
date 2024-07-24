@@ -54,7 +54,6 @@ import kotlinx.coroutines.launch
 class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
-    var isJump = false
     private var startTimer = mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,10 +118,10 @@ class StartActivity : ComponentActivity() {
         if (DataKeyUtils.userAdType) {
             return
         }
-        Log.e("TAG", "updateUserOpinions: ", )
         val debugSettings =
             ConsentDebugSettings.Builder(this)
                 .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+                .addTestDeviceHashedId("202C0DAA36EB5148BDEA8A1E6E36A4B6")
                 .build()
         val params = ConsentRequestParameters
             .Builder()
@@ -176,13 +175,11 @@ class StartActivity : ComponentActivity() {
                                 progress = 1f
                                 startActivity(Intent(this@StartActivity, MainActivity::class.java))
                                 finish()
-                                isJump = true
                             })
                         }
                     }
 
                     override fun onFinish() {
-                        Log.e("TAG", "onFinish:111111111=${startTimer} ", )
                         progress = 1f
                         onTimerFinish()
                         if (!App.isBackDataQuan && DataKeyUtils.userAdType) {
