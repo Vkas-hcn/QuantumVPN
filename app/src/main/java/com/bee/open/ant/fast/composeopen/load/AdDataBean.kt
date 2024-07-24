@@ -2,7 +2,9 @@ package com.bee.open.ant.fast.composeopen.load
 
 import android.app.Activity
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
 import androidx.annotation.Keep
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.annotations.SerializedName
 
 
@@ -17,7 +19,7 @@ abstract class SoWhatCanYouDo(
     )
 
     abstract fun showMyNameIsHei(
-        activity: Activity,
+        activity: ComponentActivity,
         nativeParent: ViewGroup? = null,
         onAdDismissed: () -> Unit = {}
     )
@@ -40,12 +42,19 @@ data class EveryADBean(
     var where: String? = null,
 
     val adCacheInvalidTime: Int = 2,
+    var qtv_load_ip: String = "",
+    var qtv_load_city: String = "",
+    var qtv_show_ip: String = "",
+    var qtv_show_city: String = ""
 )
 
 enum class ADType(val placeName: String) {
     FULL_One("openopenDjklasheoivs"),
     INNNNNNNN_1("int1111111asfeoipwjfsvksdlv"),
     INNNNNNNN_2("int222222sasderfgvyujwersd"),
+
+    NNNAAAVVV_HHH("nnnaaavvvHhhjguvhendgkhmbndxdhnfdffgfd"),
+    NNNAAAVVV_EEE("nnnaadldoencjghekssdkefavnrxzddgggfds"),
 }
 
 @Keep
@@ -62,6 +71,12 @@ data class AdvertiseEntity(
 
     @SerializedName("tintuba")
     val inter2: MutableList<EveryADBean>?,
+
+    @SerializedName("hhhhnn")
+    val nnnhh: MutableList<EveryADBean>?,
+
+    @SerializedName("eeenn")
+    val nnnee: MutableList<EveryADBean>?,
 )
 
 @Keep

@@ -4,9 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
+import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
+import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
 
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -14,10 +18,11 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class IntAdLoad(private val context: Context, private val item: EveryADBean) :
+class IntAdLoad(private val context: Context, private var item: EveryADBean) :
     SoWhatCanYouDo(item) {
 
     private var ad: Any? = null
@@ -32,7 +37,7 @@ class IntAdLoad(private val context: Context, private val item: EveryADBean) :
     }
 
     override fun showMyNameIsHei(
-        activity: Activity,
+        activity: ComponentActivity,
         nativeParent: ViewGroup?,
         onAdDismissed: () -> Unit
     ) {
@@ -81,12 +86,13 @@ class IntAdLoad(private val context: Context, private val item: EveryADBean) :
             }
         }
 
-        fun showAdMobFullScreenAd() {
+        fun showAdMobFullScreenAd(activity: ComponentActivity) {
             when (val adF = ad) {
                 is InterstitialAd -> {
                     adF.run {
                         fullScreenContentCallback = callback
                         show(activity)
+                        item = CanDataUtils.afterLoadQTV(item)
                     }
                 }
 
@@ -94,7 +100,7 @@ class IntAdLoad(private val context: Context, private val item: EveryADBean) :
             }
         }
 
-        showAdMobFullScreenAd()
+        showAdMobFullScreenAd(activity)
     }
 
 
@@ -102,6 +108,8 @@ class IntAdLoad(private val context: Context, private val item: EveryADBean) :
         onAdLoaded: () -> Unit,
         onAdLoadFailed: (msg: String?) -> Unit
     ) {
+        item = CanDataUtils.beforeLoadQTV(item)
+        CanDataUtils.antur14(item)
         InterstitialAd.load(context,
             item.adIdKKKK,
             adRequest,
@@ -109,22 +117,20 @@ class IntAdLoad(private val context: Context, private val item: EveryADBean) :
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     ad = interstitialAd
                     onAdLoaded.invoke()
-//                    interstitialAd.setOnPaidEventListener { adValue ->
-//                        WallNetDataUtils.getAdList(
-//                            PaperThreeApp.instance,
-//                            adValue,
-//                            interstitialAd.responseInfo,
-//                            item
-//                        )
-//                        BIBIUBADDDDUtils.putPointAdOnline(adValue.valueMicros)
-//                        val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-//                        adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-//                        adRevenue.setAdRevenueNetwork(interstitialAd.responseInfo.mediationAdapterClassName)
-//                        Adjust.trackAdRevenue(adRevenue)
-//                    }
+                    interstitialAd.setOnPaidEventListener { adValue ->
+                        CanDataUtils.postAdAllData(
+                            adValue,
+                            interstitialAd.responseInfo,
+                            item
+                        )
+                        CanDataUtils.toPointAdQTV(adValue, interstitialAd.responseInfo)
+                    }
                 }
 
-                override fun onAdFailedToLoad(e: LoadAdError) = onAdLoadFailed.invoke(e.message)
+                override fun onAdFailedToLoad(e: LoadAdError){
+                    CanDataUtils.antur17(item,e.message)
+                    onAdLoadFailed.invoke(e.message)
+                }
             })
     }
 

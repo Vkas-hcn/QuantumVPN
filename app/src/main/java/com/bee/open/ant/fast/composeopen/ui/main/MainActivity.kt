@@ -1,14 +1,23 @@
 package com.bee.open.ant.fast.composeopen.ui.main
 
+import android.Manifest
 import android.app.Activity
+import android.app.Notification
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -58,6 +67,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
@@ -77,13 +87,20 @@ import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 import androidx.compose.material.*
 import androidx.compose.ui.draw.alpha
-
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdView
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 
 class MainActivity : ComponentActivity() {
     var mService: IOpenVPNAPIService? = null
@@ -91,12 +108,17 @@ class MainActivity : ComponentActivity() {
     var showProgress by mutableStateOf(false)
     var isRotating by mutableStateOf(false)
     var vpnState by mutableStateOf(-1)  // 0 未连接 1 连接中 2 已连接 -1 未知
-    var beforeVpnState by mutableStateOf(0)
+    var beforeVpnState by mutableStateOf(-2)
     var showIpDialog by mutableStateOf(false)
+    var showNoTiFaDialog by mutableStateOf(false)
+
     var countryName by mutableStateOf("")
     var city by mutableStateOf("")
     var ip by mutableStateOf("")
     var jobConnect: Job? = null
+    var showIntAd by mutableStateOf(false)
+
+    var showNavAd by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback {
@@ -142,7 +164,52 @@ class MainActivity : ComponentActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 requestPermissionForResult(it)
             }
+        showNaAd()
+
     }
+
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (!isGranted) {
+                showNoTiFaDialog = true
+            } else {
+                CanDataUtils.postPointData("antur4")
+                clickVpn()
+            }
+        }
+
+    fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        startActivity(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            delay(300)
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) && App.isAppRunning) {
+                CanDataUtils.postPointData("antur2")
+                BaseAdLoad.mainNativeHome.showFullScreenAdBIUYBUI(this@MainActivity) {}
+                App.isAppRunning = false
+            }
+        }
+    }
+
+    private fun showNaAd() {
+        lifecycleScope.launch {
+            while (isActive) {
+                if (App.appNativeAdHome == null) {
+                    BaseAdLoad.mainNativeHome.showFullScreenAdBIUYBUI(this@MainActivity) {}
+                } else {
+                    cancel()
+                }
+                delay(500)
+            }
+        }
+    }
+
 
     private fun initData() {
         countryName = GetServiceData.getNowVpnBean().country_name
@@ -186,10 +253,14 @@ class MainActivity : ComponentActivity() {
         if (vpnState == 1) {
             return
         }
+
         IpUtils.getIfConfig()
         intIP()
         if (showIpDialog) {
             return
+        }
+        if (App.isVpnState != 2) {
+            CanDataUtils.postPointData("antur6")
         }
         if (!GetServiceData.isHaveNetWork(this)) {
             Toast.makeText(this, "Please check your network", Toast.LENGTH_SHORT).show()
@@ -199,8 +270,30 @@ class MainActivity : ComponentActivity() {
         BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
 
         if (!checkVPNPermission(this@MainActivity)) {
+            if (!DataKeyUtils.service_q_x_type) {
+                DataKeyUtils.service_q_x_type = true
+                CanDataUtils.postPointData("antur7")
+            }
             VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
             return
+        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestNotificationPermissionLauncher.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+                Toast.makeText(
+                    this,
+                    "Android 14 devices require notification permissions for VPN service usage",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+            CanDataUtils.postPointData("antur5")
         }
         connectVpnStateFun {
             beforeVpnState = vpnState
@@ -212,8 +305,10 @@ class MainActivity : ComponentActivity() {
                         setUpConfigConnections(this@MainActivity)
                     }
                     if (beforeVpnState == 2) {
+                        BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
                         Log.e("TAG", "clickVpn: 断开")
                         it.disconnect()
+                        CanDataUtils.postPointData("antur13")
                     }
                 }
             }
@@ -273,7 +368,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun jumpResultActivity() {
-        if (vpnState != -1) {
+        if (beforeVpnState != -2) {
             val intent = Intent(this, ResultActivity::class.java)
             startActivityForResult(intent, 0x445)
         }
@@ -322,6 +417,10 @@ class MainActivity : ComponentActivity() {
     private fun requestPermissionForResult(result: ActivityResult) {
         if (result.resultCode == RESULT_OK) {
             clickVpn()
+            if (!DataKeyUtils.service_q_x_type2) {
+                DataKeyUtils.service_q_x_type2 = true
+                CanDataUtils.postPointData("antur8")
+            }
         }
     }
 
@@ -346,9 +445,15 @@ class MainActivity : ComponentActivity() {
             Log.e("TAG", "newStatus: ${state}")
             if (state == "CONNECTED") {
                 connectSuccess()
+                BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
+                CanDataUtils.antur10()
+
             }
             if (state == "RECONNECTING") {
                 connectFail()
+                BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
+                CanDataUtils.postPointData("antur11")
+                beforeVpnState = -2
             }
             if (state == "NOPROCESS") {
                 disConnectSuccess()
@@ -365,7 +470,10 @@ class MainActivity : ComponentActivity() {
     private fun setUpConfigConnections(context: Context): Job? = with(context) {
         return MainScope().launch(Dispatchers.IO) {
             runCatching {
+                CanDataUtils.postPointData("antur9")
                 val vpnData = GetServiceData.getNowVpnBean()
+                DataKeyUtils.tba_vpn_ip = vpnData.ip
+                DataKeyUtils.tba_vpn_city = vpnData.city
                 context.assets.open("fast_ippooltest.ovpn").bufferedReader().use { br ->
                     val config = br.lineSequence().map { line ->
                         when {
@@ -470,6 +578,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
+        Log.e("TAG", "onStop: ")
         jobConnect?.cancel()
         jobConnect = null
         if (isDisConnect()) {
@@ -742,15 +851,41 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 }
             }
         }
+        Box(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+        ) {
+            activity.showNavAd = !DishNomadicLoad.showAdBlacklist()
+            if (!activity.showNavAd) {
+                if (App.appNativeAdHome != null) {
+                    NativeAdHomeContent(App.appNativeAdHome!!)
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_ad_bg),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "Background",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                    )
+                }
+            }
+
+        }
+        LoadingDialog(activity)
         loadVpnData(activity)
-
     }
-
 }
 
 @Composable
 fun IpAlertDialog(activity: MainActivity) {
     if (activity.showIpDialog) {
+        val ip = DataKeyUtils.ipData1.ifEmpty {
+            DataKeyUtils.ipData2
+        }
+        CanDataUtils.postPointData("antur3", "qu", ip)
         AlertDialog(onDismissRequest = {}, title = {
             Text(text = "Tips")
         }, text = {
@@ -760,6 +895,29 @@ fun IpAlertDialog(activity: MainActivity) {
                 activity.exitApp()
             }) {
                 Text("confirm")
+            }
+        })
+    }
+}
+
+@Composable
+fun notificationAlertDialog(activity: MainActivity) {
+    if (activity.showNoTiFaDialog) {
+        AlertDialog(onDismissRequest = {}, title = {
+            Text(text = "Tips")
+        }, text = {
+            Text("Notification permission denied. Please enable it in settings.")
+        }, confirmButton = {
+            Button(onClick = {
+                activity.openAppSettings()
+            }) {
+                Text("confirm")
+            }
+        }, dismissButton = {
+            Button(onClick = {
+                activity.showNoTiFaDialog = false
+            }) {
+                Text("dismiss")
             }
         })
     }
@@ -810,6 +968,60 @@ fun DrawerExample(activity: MainActivity) {
             }
         }
         IpAlertDialog(activity)
+        notificationAlertDialog(activity)
+    }
+}
+
+@Composable
+fun NativeAdHomeContent(nativeAd: NativeAd) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp),
+        factory = { context ->
+            val nativeAdView = NativeAdView(context)
+            val inflater = LayoutInflater.from(context)
+            val adView = inflater.inflate(R.layout.layout_main, null) as NativeAdView
+            nativeAdView.addView(adView)
+            adView.findViewById<TextView>(R.id.ad_headline).text = nativeAd.headline
+            adView.findViewById<TextView>(R.id.ad_body).text = nativeAd.body
+            adView.findViewById<ImageView>(R.id.ad_app_icon)
+                .setImageDrawable(nativeAd.icon?.drawable)
+            adView.findViewById<TextView>(R.id.ad_call_to_action).text = nativeAd.callToAction
+            Log.e("TAG", "首页原生广告展示:")
+            adView.setNativeAd(nativeAd)
+            nativeAdView
+        }
+    )
+}
+
+@Composable
+fun LoadingDialog(activity: MainActivity) {
+    if (activity.showIntAd) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {}
+            .background(Color(0xB3000000))) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .background(Color.White, shape = RoundedCornerShape(24.dp))
+                    .padding(24.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator(color = Color.Black)
+                    Text(
+                        text = "Ads will show soon",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -817,5 +1029,13 @@ fun DrawerExample(activity: MainActivity) {
 @Composable
 fun GreetingPreview() {
 //    ArtistCardRow(activity = MainActivity(), {})
-    RotatingImageWithControl(activity = MainActivity())
+//    RotatingImageWithControl(activity = MainActivity())
+    QuantumVpnTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
+        ) {
+            DrawerExample(activity = MainActivity())
+
+        }
+    }
 }

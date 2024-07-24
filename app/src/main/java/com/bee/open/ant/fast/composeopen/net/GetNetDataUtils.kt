@@ -5,7 +5,10 @@ import com.bee.open.ant.fast.composeopen.net.ClockUtils.complexLogicAlwaysTrue
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.complexLogicReturnsFalse
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.ifAddThis
 import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.IOException
 import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -105,6 +108,41 @@ class GetNetDataUtils {
             } finally {
                 connection.disconnect()
             }
+        }
+
+
+        fun postTbaData(url: String, body: Any, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+            Thread {
+                var connection: HttpURLConnection? = null
+                try {
+                    val urlConnection = URL(url).openConnection() as HttpURLConnection
+                    connection = urlConnection
+                    connection.requestMethod = "POST"
+                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                    connection.setRequestProperty("Accept", "application/json")
+                    connection.doOutput = true
+                    connection.doInput = true
+
+                    // Write body to the request
+                    BufferedWriter(OutputStreamWriter(connection.outputStream, "UTF-8")).use { writer ->
+                        writer.write(body.toString())
+                        writer.flush()
+                    }
+
+                    val responseCode = connection.responseCode
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
+                        onSuccess(responseBody)
+                    } else {
+                        val errorBody = connection.errorStream.bufferedReader().use { it.readText() }
+                        onError(errorBody)
+                    }
+                } catch (e: IOException) {
+                    onError("Network error: ${e.message}")
+                } finally {
+                    connection?.disconnect()
+                }
+            }.start()
         }
 
     }

@@ -1,6 +1,8 @@
 package de.blinkt.openvpn.core
 
+import android.content.Context
 import android.net.VpnService
+import android.text.format.Formatter
 import android.util.Log
 import com.tencent.mmkv.MMKV
 
@@ -10,11 +12,11 @@ object Raoliu {
     }
 
     private fun getFlowData(): Boolean {
-        return mmkv.decodeBool("spoiler_data", true)
+        val data = mmkv.decodeBool("spoiler_data", true)
+        return data
     }
 
     fun brand(builder:VpnService.Builder, myPackageName: String) {
-        Log.e("TAG", "brand: ${getFlowData()}")
         if(getFlowData()){
             (listOf(myPackageName) + listGmsPackages())
                 .iterator()
@@ -34,7 +36,6 @@ object Raoliu {
             "com.google.android.cellbroadcastservice",
             "com.google.android.packageinstaller",
             "com.google.android.gms.location.history",
-            "com.android.chrome",
         )
     }
     fun getSpeedData(upData: String, downData: String, statistics: String) {

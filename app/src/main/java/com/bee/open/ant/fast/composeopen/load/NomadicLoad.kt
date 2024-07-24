@@ -2,6 +2,9 @@ package com.bee.open.ant.fast.composeopen.load
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -14,9 +17,9 @@ class NomadicLoad(private val snvlinjvk: ADType) {
     private var vsnoevn: (Boolean) -> Unit = {}
     val haveCache: Boolean get() = cacheListncsudbca.isNotEmpty()
 
-    private fun adCaData(): SoWhatCanYouDo? = cacheListncsudbca.removeFirstOrNull()
+     fun adCaData(): SoWhatCanYouDo? = cacheListncsudbca.removeFirstOrNull()
 
-    fun showFullScreenAdBIUYBUI(activity: Activity, onAdDismissed: () -> Unit) {
+    fun showFullScreenAdBIUYBUI(activity: ComponentActivity, onAdDismissed: () -> Unit) {
         if (cacheListncsudbca.isEmpty()) {
             onAdDismissed.invoke()
             return
@@ -28,7 +31,8 @@ class NomadicLoad(private val snvlinjvk: ADType) {
         }
         baseAd.showMyNameIsHei(activity = activity, onAdDismissed = onAdDismissed)
         vsnoevn = {}
-        if (baseAd.adBean.where == "open_connect") {
+        Log.e("TAG", "showFullScreenAdBIUYBUI: ${baseAd.adBean.where}", )
+        if (baseAd.adBean.where == "intu" || baseAd.adBean.where == "hhhhnn"|| baseAd.adBean.where == "eeenn") {
             preload(activity)
         }
     }

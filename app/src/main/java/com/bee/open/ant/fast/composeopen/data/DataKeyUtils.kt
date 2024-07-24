@@ -1,5 +1,6 @@
 package com.bee.open.ant.fast.composeopen.data
 
+import com.bee.open.ant.fast.composeopen.BuildConfig
 import com.bee.open.ant.fast.composeopen.app.App
 import com.tencent.mmkv.MMKV
 
@@ -9,6 +10,12 @@ class DataKeyUtils {
             "https://test.quantumsphereonline.com/WgNihdyrk/dJcpwZFkiK/fseqUqCrz/"
         const val proxyUrl = "https://baidu.com"
         const val blackUrl = "https://rubbish.quantumsphereonline.com/goal/fs"
+        val tbaUrl = if (BuildConfig.DEBUG) {
+            "https://test-backward.quantumsphereonline.com/jubilate/stun/mulct"
+        } else {
+            "https://backward.quantumsphereonline.com/czarina/ding"
+        }
+
         var adOpenKey = "vointt"
         var configOpenKey = "sad"
 
@@ -89,6 +96,77 @@ class DataKeyUtils {
             }
             get() = save.decodeBool("spoiler_data", false)
 
+        var tba_id_data = ""
+            set(value) {
+                save.encode("tba_id_data", value)
+                field = value
+            }
+            get() = save.decodeString("tba_id_data", "") ?: ""
+
+        var tba_ip_data = ""
+            set(value) {
+                save.encode("tba_ip_data", value)
+                field = value
+            }
+            get() = save.decodeString("tba_ip_data", "") ?: ""
+
+
+        var tba_vpn_ip = ""
+            set(value) {
+                save.encode("tba_vpn_ip", value)
+                field = value
+            }
+            get() = save.decodeString("tba_vpn_ip", "") ?: ""
+
+        var tba_vpn_city = ""
+            set(value) {
+                save.encode("tba_vpn_city", value)
+                field = value
+            }
+            get() = save.decodeString("tba_vpn_city", "") ?: ""
+
+        var tba_install = false
+            set(value) {
+                save.encode("tba_install", value)
+                field = value
+            }
+            get() = save.decodeBool("tba_install", false)
+
+        var userAdType = false
+            set(value) {
+                save.encode("userAdType", value)
+                field = value
+            }
+            get() = save.decodeBool("userAdType", false)
+
+
+        var ad_j_v = false
+            set(value) {
+                save.encode("ad_j_v", value)
+                field = value
+            }
+            get() = save.decodeBool("ad_j_v", false)
+
+        var black_data_up_type = false
+            set(value) {
+                save.encode("black_data_up_type", value)
+                field = value
+            }
+            get() = save.decodeBool("black_data_up_type", false)
+
+        var service_q_x_type = false
+            set(value) {
+                save.encode("service_q_x_type", value)
+                field = value
+            }
+            get() = save.decodeBool("service_q_x_type", false)
+
+        var service_q_x_type2 = false
+            set(value) {
+                save.encode("service_q_x_type2", value)
+                field = value
+            }
+            get() = save.decodeBool("service_q_x_type2", false)
         fun setAdShowNumFun(key: String, data: Int) {
             save.encode(key, data)
         }
@@ -107,11 +185,11 @@ class DataKeyUtils {
 
         const val nfskjnkkk = """
   {
-    "nunn": 20,
+    "nunn": 200,
     "comping": 5,
     "tuop": [
         {
-            "tom": "ca-app-pub-2001364143953351/3192287239",
+            "tom": "ca-app-pub-3940256099942544/9257395921",
             "book": "admob",
             "keep": "plai",
             "fa_c_oute": 2,
@@ -120,7 +198,7 @@ class DataKeyUtils {
     ],
     "intu": [
         {
-            "tom": "ca-app-pub-2001364143953351/3052686431",
+            "tom": "ca-app-pub-3940256099942544/1033173712",
             "book": "admob",
             "keep": "ity",
             "fa_c_oute": 2,
@@ -129,11 +207,29 @@ class DataKeyUtils {
     ],
     "tintuba": [
         {
-            "tom": "ca-app-pub-2001364143953351/1810072742",
+            "tom": "ca-app-pub-3940256099942544/1033173712",
             "book": "admob",
             "keep": "ity",
             "fa_c_oute": 2,
             "where": "tintuba"
+        }
+    ],
+    "hhhhnn": [
+        {
+            "tom": "ca-app-pub-3940256099942544/2247696110",
+            "book": "admob",
+            "keep": "nnnee",
+            "fa_c_oute": 2,
+            "where": "hhhhnn"
+        }
+    ],
+    "eeenn": [
+        {
+            "tom": "ca-app-pub-3940256099942544/2247696110",
+            "book": "admob",
+            "keep": "nnnee",
+            "fa_c_oute": 2,
+            "where": "eeenn"
         }
     ]
 }
@@ -142,7 +238,7 @@ class DataKeyUtils {
         const val configOpenLocal = """
   {
     "hang": "1",
-    "miak": "1"
+    "miak": "2"
   }
         """
     }

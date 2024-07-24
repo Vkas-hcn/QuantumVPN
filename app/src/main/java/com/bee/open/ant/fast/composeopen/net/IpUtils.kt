@@ -99,5 +99,19 @@ class IpUtils {
             return ipData == "IR" || ipData == "CN" ||
                     ipData == "HK" || ipData == "MO"
         }
+
+
+         fun getOnlyIp() {
+             GetNetDataUtils.getServiceData(
+                 "https://ifconfig.me/ip",
+                 onSuccess = {
+                     Log.e("TAG", "getIfConfig2-onSuccess: $it", )
+                     DataKeyUtils.tba_ip_data = it
+                 },
+                 onError = {
+                     Log.e("TAG", "getIfConfig-onError: $it")
+                 }
+             )
+        }
     }
 }

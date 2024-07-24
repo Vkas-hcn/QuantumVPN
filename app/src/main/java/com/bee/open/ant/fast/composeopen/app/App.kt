@@ -1,5 +1,6 @@
 package com.bee.open.ant.fast.composeopen.app
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
@@ -8,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
@@ -18,15 +20,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustConfig
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
 import com.bee.open.ant.fast.composeopen.BuildConfig
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.FBADUtils
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.complexLogicReturnsFalse
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.ifAddThis
 import com.bee.open.ant.fast.composeopen.net.GetNetDataUtils
 import com.bee.open.ant.fast.composeopen.ui.start.StartActivity
 import com.google.android.gms.ads.AdActivity
+import com.google.android.gms.ads.nativead.NativeAd
 import com.google.firebase.FirebaseApp
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
@@ -44,18 +52,22 @@ class App : Application(), LifecycleObserver {
         fun getVpnInstance(): App {
             return instance
         }
+
         lateinit var saveUtils: MMKV
         var isVpnState = 0
         var isShow by mutableStateOf(true)
         var isBackDataQuan = false
+        var appNativeAdHome: NativeAd? by mutableStateOf(null)
+        var appNativeAdEnd: NativeAd? by mutableStateOf(null)
+        var isAppRunning = false
+        var ad_activity_Quan: Activity? = null
+        var top_activity_Quan: Activity? = null
     }
+
     var isBoot = false
     var whetherBackgroundSmild = false
-    var isAppRunning = false
     var flag = 0
     var job_Quan: Job? = null
-    var ad_activity_Quan: Activity? = null
-    var top_activity_Quan: Activity? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -66,6 +78,8 @@ class App : Application(), LifecycleObserver {
             FirebaseApp.initializeApp(this)
             registerActivityLifecycleCallbacks(AppLifecycleTracker())
             ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+            haveRefData(this)
+            initAdJust(this)
             saveUtils =
                 MMKV.mmkvWithID("saveUtils", MMKV.MULTI_PROCESS_MODE)
             if (DataKeyUtils.uuid_open.isEmpty() && !complexLogicReturnsFalse(
@@ -76,6 +90,13 @@ class App : Application(), LifecycleObserver {
                 ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
                     DataKeyUtils.uuid_open = UUID.randomUUID().toString()
                 }
+            }
+            if (DataKeyUtils.tba_id_data.isEmpty() && !complexLogicReturnsFalse(
+                    listOf(3, 4),
+                    "false"
+                )
+            ) {
+                DataKeyUtils.tba_id_data = UUID.randomUUID().toString()
             }
             getBlackList(this)
             if (!BuildConfig.DEBUG) {
@@ -98,6 +119,7 @@ class App : Application(), LifecycleObserver {
             return
         }
         GlobalScope.launch(Dispatchers.IO) {
+            Log.e("TAG", "Black--URL: ${DataKeyUtils.blackUrl}", )
             GetNetDataUtils.getMapData(
                 DataKeyUtils.blackUrl,
                 ClockUtils.cloakMapData(context),
@@ -114,6 +136,7 @@ class App : Application(), LifecycleObserver {
                 })
         }
     }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         job_Quan?.cancel()
@@ -126,6 +149,7 @@ class App : Application(), LifecycleObserver {
             isAppRunning = true
         }
     }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStopState() {
         job_Quan = GlobalScope.launch {
@@ -166,19 +190,70 @@ class App : Application(), LifecycleObserver {
                 ad_activity_Quan = activity
             }
         }
+
         override fun onActivityResumed(activity: Activity) {
             if (activity !is AdActivity) {
                 top_activity_Quan = activity
             }
+            Adjust.onResume()
         }
+
         override fun onActivityPaused(activity: Activity) {
             if (activity is AdActivity) {
                 ad_activity_Quan = activity
             } else {
                 top_activity_Quan = activity
             }
+            Adjust.onPause()
         }
+
         override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
         override fun onActivityDestroyed(activity: Activity) {}
+    }
+
+    private fun haveRefData(context: Context) {
+        runCatching {
+            val referrerClient = InstallReferrerClient.newBuilder(context).build()
+            referrerClient.startConnection(object : InstallReferrerStateListener {
+                override fun onInstallReferrerSetupFinished(p0: Int) {
+                    when (p0) {
+                        InstallReferrerClient.InstallReferrerResponse.OK -> {
+                            runCatching {
+                                referrerClient?.installReferrer?.run {
+                                    CanDataUtils.postInstallData(context, this)
+                                }
+                            }.exceptionOrNull()
+                        }
+                    }
+                    referrerClient.endConnection()
+                }
+
+                override fun onInstallReferrerServiceDisconnected() {
+                }
+            })
+        }.onFailure { e ->
+        }
+    }
+    @SuppressLint("HardwareIds")
+    private fun initAdJust(application: Application) {
+        Adjust.addSessionCallbackParameter(
+            "customer_user_id",
+            Settings.Secure.getString(application.contentResolver, Settings.Secure.ANDROID_ID)
+        )
+        val appToken = "ih2pm2dr3k74"
+        val environment: String = AdjustConfig.ENVIRONMENT_SANDBOX
+        val config = AdjustConfig(application, appToken, environment)
+        config.needsCost = true
+        config.setOnAttributionChangedListener { attribution ->
+            Log.e("TAG", "adjust=${attribution}")
+            if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && attribution.network.contains(
+                    "organic",
+                    true
+                ).not()
+            ) {
+                DataKeyUtils.ad_j_v = true
+            }
+        }
+        Adjust.onCreate(config)
     }
 }

@@ -3,6 +3,7 @@ package com.bee.open.ant.fast.composeopen.load
 import android.content.Context
 import android.util.Log
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData.getLocalOpenData
 
 
@@ -16,7 +17,7 @@ class DishNomadicLoad(
     companion object {
         fun showAdBlacklist(): Boolean {
             val blackData = DataKeyUtils.black_data != "scorpion"
-            return when (getLocalOpenData().hang) {
+            val result = when (getLocalOpenData().hang) {
                 "1" -> {
                     !blackData
                 }
@@ -26,9 +27,14 @@ class DishNomadicLoad(
                 }
 
                 else -> {
-                    true
+                    false
                 }
             }
+            if (result && !DataKeyUtils.black_data_up_type) {
+                CanDataUtils.postPointData("antur1")
+                DataKeyUtils.black_data_up_type = true
+            }
+            return result
         }
 
         fun getSpoilerData() {
@@ -49,7 +55,7 @@ class DishNomadicLoad(
                     false
                 }
             }
-            Log.e("TAG", "brand-1: ${DataKeyUtils.spoiler_data}", )
+            Log.e("TAG", "brand-1: ${DataKeyUtils.spoiler_data}")
         }
     }
 
@@ -68,13 +74,14 @@ class DishNomadicLoad(
             return
         }
 
-        if ((item.where == "open_connect" || item.where == "open_back") && (!showAdBlacklist())) {
+        if ((!showAdBlacklist()) && (item.adYype == "ity" || (item.where == "hhhhnn"))) {
             Log.e("TAG", "黑名单屏蔽${item.where}广告加载 ")
             canusdkbcaushdconLoad.invoke(false)
             return
         }
         val baseAdanscinc = when (item.adYype) {
             "plai" -> GuideAdLoad(context = contextcaniscnaiesbc, item = item)
+            "nnnee" -> NativeAdLoad(context = contextcaniscnaiesbc, item = item)
             "ity" -> IntAdLoad(context = contextcaniscnaiesbc, item = item)
             else -> null
         }

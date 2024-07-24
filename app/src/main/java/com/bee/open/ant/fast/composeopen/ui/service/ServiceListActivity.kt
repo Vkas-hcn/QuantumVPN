@@ -40,15 +40,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieConstants
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ServiceListActivity : ComponentActivity() {
     var showDialog by mutableStateOf(false)
     lateinit var checkServerVpn: ServerVpn
+    var showIntAd by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -58,10 +70,12 @@ class ServiceListActivity : ComponentActivity() {
                     color = Color(0xFF1B6A56)
                 ) {
                     ServiceListView(this@ServiceListActivity)
+                    LoadingDialog(this)
                 }
             }
         }
         BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
+        CanDataUtils.postPointData("antur18")
         onBackPressedDispatcher.addCallback {
             ClockUtils.ifAddThis("onBackPressedDispatcher") {}
             if (ClockUtils.complexLogicReturnsFalse(
@@ -78,6 +92,7 @@ class ServiceListActivity : ComponentActivity() {
     }
 
     fun backFun() {
+        CanDataUtils.postPointData("antur20")
         showInt2Ad {
             finish()
         }
@@ -89,9 +104,15 @@ class ServiceListActivity : ComponentActivity() {
             return
         }
         if (BaseAdLoad.interHaHaHaOPNNOPIN2.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
-            BaseAdLoad.interHaHaHaOPNNOPIN2.showFullScreenAdBIUYBUI(this) {
-                nextFun()
+            lifecycleScope.launch(Dispatchers.Main) {
+                showIntAd = true
+                delay(1000)
+                showIntAd = false
+                BaseAdLoad.interHaHaHaOPNNOPIN2.showFullScreenAdBIUYBUI(this@ServiceListActivity) {
+                    nextFun()
+                }
             }
+
         } else nextFun()
     }
 
@@ -231,6 +252,35 @@ fun ServiceListView(activity: ServiceListActivity) {
     }
 }
 
+@Composable
+fun LoadingDialog(activity: ServiceListActivity) {
+    if (activity.showIntAd) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {}
+            .background(Color(0xB3000000))) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .background(Color.White, shape = RoundedCornerShape(24.dp))
+                    .padding(24.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator(color = Color.Black)
+                    Text(
+                        text = "Ads will show soon",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun VpnServiceList(activity: ServiceListActivity) {
@@ -287,7 +337,6 @@ fun CustomAlertDialog(activity: ServiceListActivity) {
     if (activity.showDialog) {
         AlertDialog(
             onDismissRequest = {
-                // 处理对话框外部点击或返回按钮等导致的对话框消失事件
                 activity.showDialog = false
             },
             title = {
@@ -301,6 +350,7 @@ fun CustomAlertDialog(activity: ServiceListActivity) {
                     onClick = {
                         activity.showDialog = false
                         activity.backToMain()
+                        CanDataUtils.postPointData("antur19")
                     }
                 ) {
                     Text("yes")
@@ -328,7 +378,7 @@ fun GreetingPreview() {
             modifier = Modifier.fillMaxSize(),
             color = Color(0xFF1B6A56)
         ) {
-            ServiceListView(activity = ServiceListActivity())
+            LoadingDialog(activity = ServiceListActivity())
         }
     }
 }

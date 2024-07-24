@@ -25,21 +25,34 @@ import android.content.Intent
 import android.os.CountDownTimer
 import android.util.Log
 import androidx.activity.addCallback
+import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.FBAD
 import com.bee.open.ant.fast.composeopen.load.FBADUtils
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData
 import com.bee.open.ant.fast.composeopen.net.GetServiceData.getVpnNetData
 import com.bee.open.ant.fast.composeopen.net.IpUtils
+import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
+import com.google.android.ump.ConsentDebugSettings
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.UserMessagingPlatform
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
+    var isJump = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -57,6 +70,9 @@ class StartActivity : ComponentActivity() {
         }
         onBackPressedDispatcher.addCallback {
 
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            CanDataUtils.postSessionData()
         }
     }
 
@@ -79,9 +95,41 @@ class StartActivity : ComponentActivity() {
         }
     }
 
-    fun preLoadAD() {
+    private fun preLoadAD() {
         BaseAdLoad.startOpenBOIBOIUBU.preload(this)
         BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
+        BaseAdLoad.mainNativeHome.preload(this)
+    }
+
+
+    private fun updateUserOpinions() {
+        if (DataKeyUtils.userAdType) {
+            return
+        }
+        val debugSettings =
+            ConsentDebugSettings.Builder(this)
+                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+                .addTestDeviceHashedId("BCD99A19DFC84C1B71AF2A884D73059C")
+                .build()
+        val params = ConsentRequestParameters
+            .Builder()
+            .setConsentDebugSettings(debugSettings)
+            .build()
+        val consentInformation: ConsentInformation =
+            UserMessagingPlatform.getConsentInformation(this)
+        consentInformation.requestConsentInfoUpdate(
+            this,
+            params, {
+                UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) {
+                    if (consentInformation.canRequestAds()) {
+                        DataKeyUtils.userAdType = true
+                    }
+                }
+            },
+            {
+                DataKeyUtils.userAdType = true
+            }
+        )
     }
 
     override fun onStop() {
@@ -91,8 +139,12 @@ class StartActivity : ComponentActivity() {
     }
 
     private fun init() {
-        getVpnNetData()
-        IpUtils.getIfConfig()
+        updateUserOpinions()
+        lifecycleScope.launch(Dispatchers.IO) {
+            getVpnNetData()
+            IpUtils.getIfConfig()
+            IpUtils.getOnlyIp()
+        }
     }
 
     @Composable
@@ -100,23 +152,33 @@ class StartActivity : ComponentActivity() {
         var progress by remember { mutableStateOf(1f) }
         val totalTime = 12_000L
         val interval = 100L
-        LaunchedEffect(key1 = true) {
+        var startTimer by remember { mutableStateOf(true) }
+
+        LaunchedEffect(key1 = startTimer) {
             object : CountDownTimer(totalTime, interval) {
                 override fun onTick(millisUntilFinished: Long) {
                     progress = 1 - (millisUntilFinished / totalTime.toFloat())
-                    if (progress > 0.1f) {
-                        BaseAdLoad.showOpenAdIfCan(this@StartActivity) {
+                    if (progress > 0.1f && DataKeyUtils.userAdType) {
+                        BaseAdLoad.showOpenAdIfCan(this@StartActivity, {
                             cancel()
-                        }
+                        }, {
+                            startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                            finish()
+                            isJump= true
+                        })
                     }
                 }
 
                 override fun onFinish() {
-                    if(!App.isBackDataQuan){
+                    if (!App.isBackDataQuan && DataKeyUtils.userAdType) {
                         progress = 1f
                         startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                        finish()
+                    } else {
+                        progress = 1f
+                        startTimer = false // Stop the current timer
+                        startTimer = true  // Restart the timer
                     }
-                    finish()
                 }
             }.start()
         }

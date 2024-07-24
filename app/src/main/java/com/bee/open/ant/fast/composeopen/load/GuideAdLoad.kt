@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -15,13 +17,11 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class GuideAdLoad(private val context: Context, private val item: EveryADBean) :
+class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
     SoWhatCanYouDo(item) {
 
     private var ad: Any? = null
     private val adRequest: AdRequest get() = AdRequest.Builder().build()
-
-
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
         Log.e(
             "WallPaper AD=${item.where}",
@@ -31,7 +31,7 @@ class GuideAdLoad(private val context: Context, private val item: EveryADBean) :
     }
 
     override fun showMyNameIsHei(
-        activity: Activity,
+        activity: ComponentActivity,
         nativeParent: ViewGroup?,
         onAdDismissed: () -> Unit
     ) {
@@ -80,6 +80,7 @@ class GuideAdLoad(private val context: Context, private val item: EveryADBean) :
                     adF.run {
                         fullScreenContentCallback = callback
                         show(activity)
+                        item = CanDataUtils.afterLoadQTV(item)
                     }
                 }
 
@@ -90,6 +91,8 @@ class GuideAdLoad(private val context: Context, private val item: EveryADBean) :
     }
 
     private fun loadAppOpen(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
+        item = CanDataUtils.beforeLoadQTV(item)
+        CanDataUtils.antur14(item)
         AppOpenAd.load(
             context,
             item.adIdKKKK,
@@ -99,24 +102,21 @@ class GuideAdLoad(private val context: Context, private val item: EveryADBean) :
                 override fun onAdLoaded(appOpenAd: AppOpenAd) {
                     ad = appOpenAd
                     onAdLoaded.invoke()
-//                    appOpenAd.setOnPaidEventListener { adValue ->
-//                        adValue.let {
-//                            WallNetDataUtils.getAdList(
-//                                PaperThreeApp.instance,
-//                                adValue,
-//                                appOpenAd.responseInfo,
-//                                item
-//                            )
-//                            BIBIUBADDDDUtils.putPointAdOnline(adValue.valueMicros)
-//                        }
-//                        val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-//                        adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-//                        adRevenue.setAdRevenueNetwork(appOpenAd.responseInfo.mediationAdapterClassName)
-//                        Adjust.trackAdRevenue(adRevenue)
-//                    }
+                    appOpenAd.setOnPaidEventListener { adValue ->
+                        adValue.let {
+                            CanDataUtils.postAdAllData(
+                                it,
+                                appOpenAd.responseInfo,
+                                item
+                            )
+                            CanDataUtils.toPointAdQTV(adValue,appOpenAd.responseInfo)
+                        }
+                    }
                 }
-
-                override fun onAdFailedToLoad(e: LoadAdError) = onAdLoadFailed.invoke(e.message)
+                override fun onAdFailedToLoad(e: LoadAdError) {
+                    CanDataUtils.antur17(item,e.message)
+                    onAdLoadFailed.invoke(e.message)
+                }
             })
     }
 
