@@ -94,6 +94,7 @@ class ResultActivity : ComponentActivity() {
             }
             backFun()
         }
+        BaseAdLoad.interHaHaHaOPNNOPINRE.preload(this)
         showNaAd()
         CanDataUtils.antur12()
     }
@@ -130,16 +131,16 @@ class ResultActivity : ComponentActivity() {
     }
 
     private fun showInt2Ad(nextFun: () -> Unit) {
-        if (!DishNomadicLoad.showAdBlacklist() || !BaseAdLoad.canShowAD()) {
+        if (DishNomadicLoad.getBuyingShieldData() || !DishNomadicLoad.showAdBlacklist() || !BaseAdLoad.canShowAD()) {
             nextFun()
             return
         }
-        if (BaseAdLoad.interHaHaHaOPNNOPIN2.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
+        if (BaseAdLoad.interHaHaHaOPNNOPINRE.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
             lifecycleScope.launch(Dispatchers.Main) {
                 showIntAd = true
                 delay(1000)
                 showIntAd = false
-                BaseAdLoad.interHaHaHaOPNNOPIN2.showFullScreenAdBIUYBUI(this@ResultActivity) {
+                BaseAdLoad.interHaHaHaOPNNOPINRE.showFullScreenAdBIUYBUI(this@ResultActivity) {
                     nextFun()
                 }
             }

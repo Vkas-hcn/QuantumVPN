@@ -32,6 +32,8 @@ object BaseAdLoad {
     val startOpenBOIBOIUBU = NomadicLoad(ADType.FULL_One)
     val interHaHaHaOPNNOPIN = NomadicLoad(ADType.INNNNNNNN_1)
     val interHaHaHaOPNNOPIN2 = NomadicLoad(ADType.INNNNNNNN_2)
+    val interHaHaHaOPNNOPINRE = NomadicLoad(ADType.INNNNNNNN_RE)
+
     val mainNativeHome = NomadicLoad(ADType.NNNAAAVVV_HHH)
     val mainNativeEnd = NomadicLoad(ADType.NNNAAAVVV_EEE)
     fun initializeAdConfig(adConfigJson: String? = null) {
@@ -46,7 +48,7 @@ object BaseAdLoad {
         startOpenBOIBOIUBU.initializeSource(advertiseEntity?.start)
         interHaHaHaOPNNOPIN.initializeSource(advertiseEntity?.inter)
         interHaHaHaOPNNOPIN2.initializeSource(advertiseEntity?.inter2)
-
+        interHaHaHaOPNNOPINRE.initializeSource(advertiseEntity?.interRe)
         mainNativeHome.initializeSource(advertiseEntity?.nnnhh)
         mainNativeEnd.initializeSource(advertiseEntity?.nnnee)
         snlveijnaielv = advertiseEntity?.showMax ?: 0

@@ -147,6 +147,13 @@ class DataKeyUtils {
             }
             get() = save.decodeBool("ad_j_v", false)
 
+        var buying_volume = false
+            set(value) {
+                save.encode("buying_volume", value)
+                field = value
+            }
+            get() = save.decodeBool("buying_volume", false)
+
         var black_data_up_type = false
             set(value) {
                 save.encode("black_data_up_type", value)
@@ -214,6 +221,15 @@ class DataKeyUtils {
             "where": "tintuba"
         }
     ],
+    "basex": [
+        {
+            "tom": "ca-app-pub-3940256099942544/1033173712",
+            "book": "admob",
+            "keep": "ity",
+            "fa_c_oute": 2,
+            "where": "basex"
+        }
+    ],
     "saxc": [
         {
             "tom": "ca-app-pub-3940256099942544/2247696110",
@@ -237,8 +253,9 @@ class DataKeyUtils {
 
         const val configOpenLocal = """
   {
-    "hang": "1",
-    "miak": "2"
+    "qua8":"2",
+    "hang": "2",
+    "miak": "1"
   }
         """
     }

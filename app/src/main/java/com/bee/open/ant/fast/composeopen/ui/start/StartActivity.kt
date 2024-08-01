@@ -1,5 +1,8 @@
 package com.bee.open.ant.fast.composeopen.ui.start
 
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,9 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import android.content.Intent
 import android.os.CountDownTimer
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustConfig
 import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
@@ -55,7 +61,7 @@ class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
     private var startTimer = mutableStateOf(true)
-
+    private var adjustNum = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -77,6 +83,7 @@ class StartActivity : ComponentActivity() {
         }
         updateUserOpinions()
         lifecycleScope.launch(Dispatchers.IO) {
+            initAdJust()
             getVpnNetData()
             IpUtils.getIfConfig()
             IpUtils.getOnlyIp()
@@ -113,6 +120,36 @@ class StartActivity : ComponentActivity() {
         BaseAdLoad.mainNativeHome.preload(this)
     }
 
+    @SuppressLint("HardwareIds")
+    private fun initAdJust() {
+        Log.e("TAG", "initAdJust: sssssssss", )
+
+        val timeStart = System.currentTimeMillis()
+        Adjust.addSessionCallbackParameter(
+            "customer_user_id",
+            Settings.Secure.getString(application.contentResolver, Settings.Secure.ANDROID_ID)
+        )
+        val appToken = "ih2pm2dr3k74"
+        val environment: String = AdjustConfig.ENVIRONMENT_SANDBOX
+        val config = AdjustConfig(application, appToken, environment)
+        config.needsCost = true
+        config.setOnAttributionChangedListener { attribution ->
+            Log.e("TAG", "adjust=${attribution}")
+            adjustNum++
+            val timeEnd = (System.currentTimeMillis() - timeStart)/1000
+            CanDataUtils.postPointData("llo", "time", timeEnd)
+            if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && attribution.network.contains(
+                    "organic",
+                    true
+                ).not()
+            ) {
+                DataKeyUtils.ad_j_v = true
+            }
+            val  op1 = if(DataKeyUtils.ad_j_v) "o" else "null"
+            CanDataUtils.postPointData("iit", "op1", op1,"op2",adjustNum)
+        }
+        Adjust.onCreate(config)
+    }
 
     private fun updateUserOpinions() {
         if (DataKeyUtils.userAdType) {

@@ -175,13 +175,13 @@ object CanDataUtils {
         }.toString()
     }
 
-    fun getTbaDataJson(name: String): String {
+    private fun getTbaDataJson(name: String): String {
         return getTopLevelJsonData().apply {
             put("dade", name)
         }.toString()
     }
 
-    fun getTbaTimeDataJson(
+    private fun getTbaTimeDataJson(
         name: String,
         parameterName1: String,
         parameterValue1: Any,

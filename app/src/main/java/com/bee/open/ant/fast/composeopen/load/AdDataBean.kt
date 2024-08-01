@@ -52,6 +52,7 @@ enum class ADType(val placeName: String) {
     FULL_One("openopenDjklasheoivs"),
     INNNNNNNN_1("int1111111asfeoipwjfsvksdlv"),
     INNNNNNNN_2("int222222sasderfgvyujwersd"),
+    INNNNNNNN_RE("int3333yyyyyttttiiiiinnnt"),
 
     NNNAAAVVV_HHH("nnnaaavvvHhhjguvhendgkhmbndxdhnfdffgfd"),
     NNNAAAVVV_EEE("nnnaadldoencjghekssdkefavnrxzddgggfds"),
@@ -72,6 +73,9 @@ data class AdvertiseEntity(
     @SerializedName("tintuba")
     val inter2: MutableList<EveryADBean>?,
 
+    @SerializedName("basex")
+    val interRe: MutableList<EveryADBean>?,
+
     @SerializedName("saxc")
     val nnnhh: MutableList<EveryADBean>?,
 
@@ -81,6 +85,7 @@ data class AdvertiseEntity(
 
 @Keep
 data class AdOpenBean(
-    val hang: String?= "2",
-    val miak: String?= "1",
+    val qua8: String? = "2",
+    val hang: String? = "2",
+    val miak: String? = "1",
 )

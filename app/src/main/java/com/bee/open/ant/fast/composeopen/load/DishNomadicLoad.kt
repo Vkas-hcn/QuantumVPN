@@ -48,7 +48,7 @@ class DishNomadicLoad(
                 }
 
                 "3" -> {
-                    DataKeyUtils.black_data == "scorpion"
+                    DataKeyUtils.black_data != "scorpion"
                 }
 
                 else -> {
@@ -56,6 +56,26 @@ class DishNomadicLoad(
                 }
             }
             Log.e("TAG", "brand-1: ${DataKeyUtils.spoiler_data}")
+        }
+
+        fun getBuyingShieldData(): Boolean {
+            return when (getLocalOpenData().qua8) {
+                "1" -> {
+                    false
+                }
+
+                "2" -> {
+                    !DataKeyUtils.ad_j_v
+                }
+
+                "3" -> {
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
         }
     }
 
@@ -73,7 +93,11 @@ class DishNomadicLoad(
             canusdkbcaushdconLoad.invoke(false)
             return
         }
-
+        if (getBuyingShieldData() && (item.where == "saxc" || (item.where == "basex"))) {
+            Log.e("TAG", "买量屏蔽${item.where}广告加载 ")
+            canusdkbcaushdconLoad.invoke(false)
+            return
+        }
         if ((!showAdBlacklist()) && (item.adYype == "ity" || (item.where == "saxc"))) {
             Log.e("TAG", "黑名单屏蔽${item.where}广告加载 ")
             canusdkbcaushdconLoad.invoke(false)

@@ -275,7 +275,7 @@ class MainActivity : ComponentActivity() {
             return
         }
         BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
-        BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
+        BaseAdLoad.interHaHaHaOPNNOPINRE.preload(this)
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU && App.isVpnState != 2) {
             CanDataUtils.postPointData("antur5")
         }
@@ -872,7 +872,7 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
-            activity.showNavAd = !DishNomadicLoad.showAdBlacklist()
+            activity.showNavAd = DishNomadicLoad.getBuyingShieldData() || (!DishNomadicLoad.showAdBlacklist())
             Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}", )
             if (!activity.showNavAd) {
 

@@ -79,7 +79,6 @@ class App : Application(), LifecycleObserver {
             registerActivityLifecycleCallbacks(AppLifecycleTracker())
             ProcessLifecycleOwner.get().lifecycle.addObserver(this)
             haveRefData(this)
-            initAdJust(this)
             saveUtils =
                 MMKV.mmkvWithID("saveUtils", MMKV.MULTI_PROCESS_MODE)
             if (DataKeyUtils.uuid_open.isEmpty() && !complexLogicReturnsFalse(
@@ -234,26 +233,5 @@ class App : Application(), LifecycleObserver {
         }.onFailure { e ->
         }
     }
-    @SuppressLint("HardwareIds")
-    private fun initAdJust(application: Application) {
-        Adjust.addSessionCallbackParameter(
-            "customer_user_id",
-            Settings.Secure.getString(application.contentResolver, Settings.Secure.ANDROID_ID)
-        )
-        val appToken = "ih2pm2dr3k74"
-        val environment: String = AdjustConfig.ENVIRONMENT_SANDBOX
-        val config = AdjustConfig(application, appToken, environment)
-        config.needsCost = true
-        config.setOnAttributionChangedListener { attribution ->
-            Log.e("TAG", "adjust=${attribution}")
-            if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && attribution.network.contains(
-                    "organic",
-                    true
-                ).not()
-            ) {
-                DataKeyUtils.ad_j_v = true
-            }
-        }
-        Adjust.onCreate(config)
-    }
+
 }
