@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustConfig
 import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.app.App.Companion.adjustNum
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad.isActivityResumed
@@ -61,7 +62,6 @@ class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
     private var startTimer = mutableStateOf(true)
-    private var adjustNum = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -122,7 +122,7 @@ class StartActivity : ComponentActivity() {
 
     @SuppressLint("HardwareIds")
     private fun initAdJust() {
-        Log.e("TAG", "initAdJust: sssssssss", )
+        Log.e("TAG", "initAdJust: sssssssss")
 
         val timeStart = System.currentTimeMillis()
         Adjust.addSessionCallbackParameter(
@@ -136,17 +136,23 @@ class StartActivity : ComponentActivity() {
         config.setOnAttributionChangedListener { attribution ->
             Log.e("TAG", "adjust=${attribution}")
             adjustNum++
-            val timeEnd = (System.currentTimeMillis() - timeStart)/1000
+            val timeEnd = (System.currentTimeMillis() - timeStart) / 1000
             CanDataUtils.postPointData("llo", "time", timeEnd)
-            if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && attribution.network.contains(
-                    "organic",
-                    true
-                ).not()
-            ) {
+            val bh = attribution.network.contains(
+                "organic",
+                true
+            ).not()
+            if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && bh) {
                 DataKeyUtils.ad_j_v = true
             }
-            val  op1 = if(DataKeyUtils.ad_j_v) "o" else "null"
-            CanDataUtils.postPointData("iit", "op1", op1,"op2",adjustNum)
+            val op1 = if (!bh) {
+                "o"
+            } else if (DataKeyUtils.ad_j_v) {
+                "m"
+            } else {
+                "null"
+            }
+            CanDataUtils.postPointData("iit", "op1", op1, "op2", adjustNum)
         }
         Adjust.onCreate(config)
     }

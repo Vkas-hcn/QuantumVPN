@@ -62,6 +62,7 @@ class App : Application(), LifecycleObserver {
         var isAppRunning = false
         var ad_activity_Quan: Activity? = null
         var top_activity_Quan: Activity? = null
+        var adjustNum = 0
     }
 
     var isBoot = false
@@ -118,7 +119,7 @@ class App : Application(), LifecycleObserver {
             return
         }
         GlobalScope.launch(Dispatchers.IO) {
-            Log.e("TAG", "Black--URL: ${DataKeyUtils.blackUrl}", )
+            Log.e("TAG", "Black--URL: ${DataKeyUtils.blackUrl}")
             GetNetDataUtils.getMapData(
                 DataKeyUtils.blackUrl,
                 ClockUtils.cloakMapData(context),
