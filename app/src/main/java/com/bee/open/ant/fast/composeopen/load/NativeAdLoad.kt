@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
@@ -30,6 +31,9 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class NativeAdLoad(private val context: Context, private var item: EveryADBean) :
     SoWhatCanYouDo(item) {
@@ -46,6 +50,9 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
         AdLoader.Builder(context, item.adIdKKKK).apply {
             forNativeAd { ad ->
                 Log.e("TAG", "原生广告 -${item.where}，加载成功: ")
+                GlobalScope.launch(Dispatchers.Main) {
+                    Toast.makeText(context,"原生广告 -${item.where}，加载成功: ",Toast.LENGTH_LONG).show()
+                }
                 nativeAd = ad
                 CanDataUtils.antur15(adBean)
                 ad.setOnPaidEventListener { adValue ->
@@ -62,6 +69,9 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             withAdListener(object : AdListener() {
                 override fun onAdFailedToLoad(e: LoadAdError) {
                     Log.e("TAG", "原生广告 -${item.where}，加载失败: ")
+                    GlobalScope.launch(Dispatchers.Main) {
+                        Toast.makeText(context,"原生广告 -${item.where}，加载失败: ",Toast.LENGTH_LONG).show()
+                    }
                     onAdLoadFailed.invoke(e.message)
                     if (item.where == "saxc") {
                         App.appNativeAdHome = null
