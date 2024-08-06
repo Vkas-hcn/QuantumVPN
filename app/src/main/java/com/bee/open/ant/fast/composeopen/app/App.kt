@@ -52,6 +52,7 @@ class App : Application(), LifecycleObserver {
         fun getVpnInstance(): App {
             return instance
         }
+        lateinit var appContext: Context
 
         lateinit var saveUtils: MMKV
         var isVpnState = 0
@@ -73,6 +74,7 @@ class App : Application(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        appContext= this
         ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
             MMKV.initialize(this)
             Firebase.initialize(this)

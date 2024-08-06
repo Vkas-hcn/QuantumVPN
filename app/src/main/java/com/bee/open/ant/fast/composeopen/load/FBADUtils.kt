@@ -1,6 +1,11 @@
 package com.bee.open.ant.fast.composeopen.load
 import android.annotation.SuppressLint
+import android.util.Log
+import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
+import com.bee.open.ant.fast.composeopen.net.GetServiceData
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -24,11 +29,21 @@ object FBADUtils {
             if (task.isSuccessful) {
                 DataKeyUtils.adOpenData =  remoteConfig?.getString(DataKeyUtils.adOpenKey)?:""
                 DataKeyUtils.configOpenData =  remoteConfig?.getString(DataKeyUtils.configOpenKey)?:""
+                initFacebookData()
                 FBAD.getFirebaseStringADData()
             }
         }
     }
 
+    private fun initFacebookData(){
+        val fbId = GetServiceData.getLocalOpenData().ssfd
+        if(!fbId.isNullOrBlank()){
+            Log.e("TAG", "fbId=====: $fbId")
+            FacebookSdk.setApplicationId(fbId)
+            FacebookSdk.sdkInitialize(App.appContext)
+            AppEventsLogger.activateApp(App.getVpnInstance())
+        }
+    }
     fun fourAppWait4SecondsToGetData() {
         MainScope().launch {
             var i = 1

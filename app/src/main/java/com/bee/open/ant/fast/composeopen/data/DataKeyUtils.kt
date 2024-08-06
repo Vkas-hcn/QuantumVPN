@@ -255,7 +255,8 @@ class DataKeyUtils {
   {
     "qua8":"2",
     "hang": "2",
-    "miak": "1"
+    "miak": "1",
+    "ssfd":""
   }
         """
     }

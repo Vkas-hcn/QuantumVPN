@@ -88,4 +88,5 @@ data class AdOpenBean(
     val qua8: String? = "2",
     val hang: String? = "2",
     val miak: String? = "1",
+    val ssfd:String? = ""
 )
