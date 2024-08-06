@@ -194,14 +194,14 @@ object GetServiceData {
 
     fun getLocalOpenData(): AdOpenBean {
         val listType = object : TypeToken<AdOpenBean>() {}.type
-        return runCatching {
+        return run {
             Gson().fromJson<AdOpenBean>(
                 decodeBase64(
                     DataKeyUtils.configOpenData
                 ),
                 listType
             )
-        }.getOrNull() ?: Gson().fromJson(
+        } ?: Gson().fromJson(
             DataKeyUtils.configOpenLocal,
             object : TypeToken<AdOpenBean?>() {}.type
         )

@@ -46,6 +46,8 @@ import com.bee.open.ant.fast.composeopen.net.GetServiceData.getVpnNetData
 import com.bee.open.ant.fast.composeopen.net.IpUtils
 import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
 import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters

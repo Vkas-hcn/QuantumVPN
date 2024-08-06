@@ -15,7 +15,6 @@ import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.EveryADBean
 import com.facebook.appevents.AppEventsLogger
-import com.facebook.appevents.internal.AppEventUtility.getAppVersion
 import com.google.android.gms.ads.AdValue
 import com.google.android.gms.ads.ResponseInfo
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
@@ -81,7 +80,10 @@ object CanDataUtils {
                 //manufacturer
                 put("annale", "hw")
                 //app_version
-                put("camp", getAppVersion())
+                put("camp", App.getVpnInstance().packageManager.getPackageInfo(
+                    App.getVpnInstance().packageName,
+                    0
+                ).versionName)
             })
         }
         return jsonData
