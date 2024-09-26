@@ -50,9 +50,6 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
         AdLoader.Builder(context, item.adIdKKKK).apply {
             forNativeAd { ad ->
                 Log.e("TAG", "原生广告 -${item.where}，加载成功: ")
-                GlobalScope.launch(Dispatchers.Main) {
-                    Toast.makeText(context,"原生广告 -${item.where}，加载成功: ",Toast.LENGTH_LONG).show()
-                }
                 nativeAd = ad
                 CanDataUtils.antur15(adBean)
                 ad.setOnPaidEventListener { adValue ->
@@ -69,9 +66,6 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             withAdListener(object : AdListener() {
                 override fun onAdFailedToLoad(e: LoadAdError) {
                     Log.e("TAG", "原生广告 -${item.where}，加载失败: ")
-                    GlobalScope.launch(Dispatchers.Main) {
-                        Toast.makeText(context,"原生广告 -${item.where}，加载失败: ",Toast.LENGTH_LONG).show()
-                    }
                     onAdLoadFailed.invoke(e.message)
                     if (item.where == "saxc") {
                         App.appNativeAdHome = null

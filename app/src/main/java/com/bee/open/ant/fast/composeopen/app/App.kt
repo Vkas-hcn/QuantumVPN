@@ -52,6 +52,7 @@ class App : Application(), LifecycleObserver {
         fun getVpnInstance(): App {
             return instance
         }
+
         lateinit var appContext: Context
 
         lateinit var saveUtils: MMKV
@@ -64,6 +65,9 @@ class App : Application(), LifecycleObserver {
         var ad_activity_Quan: Activity? = null
         var top_activity_Quan: Activity? = null
         var adjustNum = 0
+        var showSwitchState = false
+        var jumpSwitchState = false
+        var connectSwitchState = false
     }
 
     var isBoot = false
@@ -74,7 +78,7 @@ class App : Application(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        appContext= this
+        appContext = this
         ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
             MMKV.initialize(this)
             Firebase.initialize(this)
@@ -101,13 +105,11 @@ class App : Application(), LifecycleObserver {
                 DataKeyUtils.tba_id_data = UUID.randomUUID().toString()
             }
             getBlackList(this)
-            if (!BuildConfig.DEBUG) {
-                FBADUtils.getFirebaseRemoteConfigData()
-                FBADUtils.fourAppWait4SecondsToGetData()
-                GlobalScope.launch {
-                    delay(4000)
-                    FBADUtils.appCircleToRequestFireData()
-                }
+            FBADUtils.getFirebaseRemoteConfigData()
+            FBADUtils.fourAppWait4SecondsToGetData()
+            GlobalScope.launch {
+                delay(4000)
+                FBADUtils.appCircleToRequestFireData()
             }
         }
     }
@@ -131,7 +133,7 @@ class App : Application(), LifecycleObserver {
                 },
                 onError = {
                     GlobalScope.launch(Dispatchers.IO) {
-                        delay(10000)
+                        delay(5000)
                         Log.e("TAG", "The blacklist request failed：$it")
                         getBlackList(context)
                     }

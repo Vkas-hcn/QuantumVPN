@@ -97,7 +97,7 @@ object GetServiceData {
         }
     }
 
-    private fun getVpnSmartData(): ServerVpn {
+    fun getVpnSmartData(): ServerVpn {
         val vpnBean = Gson().fromJson(DataKeyUtils.vpnDataList, VpnBean::class.java)
         if (vpnBean == null) {
             getVpnNetData()

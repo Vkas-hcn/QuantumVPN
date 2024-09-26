@@ -1,6 +1,7 @@
 package com.bee.open.ant.fast.composeopen.ui.start
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
@@ -25,10 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import android.content.Intent
+import android.net.VpnService
 import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.addCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustConfig
@@ -37,6 +42,7 @@ import com.bee.open.ant.fast.composeopen.app.App.Companion.adjustNum
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad.isActivityResumed
+import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.FBAD
 import com.bee.open.ant.fast.composeopen.load.FBADUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
@@ -57,6 +63,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -64,6 +71,8 @@ class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
     private var startTimer = mutableStateOf(true)
+    lateinit var requestPermissionForResultVPN: ActivityResultLauncher<Intent?>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -84,12 +93,37 @@ class StartActivity : ComponentActivity() {
 
         }
         updateUserOpinions()
+        FBAD.showVpnPermission(this@StartActivity){
+            checkVpnPermission()
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             initAdJust()
             getVpnNetData()
             IpUtils.getIfConfig()
             IpUtils.getOnlyIp()
             CanDataUtils.postSessionData()
+        }
+        requestPermissionForResultVPN =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                requestPermissionForResult(it)
+            }
+    }
+
+    private fun checkVpnPermission() {
+        if (!checkVPNPermission(this)) {
+            VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
+        }
+    }
+
+    private fun requestPermissionForResult(result: ActivityResult) {
+        if (result.resultCode == RESULT_OK) {
+
+        }
+    }
+
+    private fun checkVPNPermission(ac: Activity): Boolean {
+        VpnService.prepare(ac).let {
+            return it == null
         }
     }
 

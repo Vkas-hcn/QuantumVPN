@@ -20,6 +20,12 @@ class DataKeyUtils {
         var configOpenKey = "sad"
 
         val save = App.saveUtils
+        var firstDialogState = false
+            set(value) {
+                save.encode("firstDialogState", value)
+                field = value
+            }
+            get() = save.decodeBool("firstDialogState", false)
 
         var uuid_open = ""
             set(value) {
@@ -174,6 +180,7 @@ class DataKeyUtils {
                 field = value
             }
             get() = save.decodeBool("service_q_x_type2", false)
+
         fun setAdShowNumFun(key: String, data: Int) {
             save.encode(key, data)
         }
@@ -253,8 +260,12 @@ class DataKeyUtils {
 
         const val configOpenLocal = """
   {
-    "qua8":"2",
-    "hang": "2",
+    "autoConnect":"1",
+    "fooey":"20&20",
+    "kate":"a",
+    "guide":"2",
+    "qua8":"1",
+    "hang": "1",
     "miak": "1",
     "ssfd":""
   }

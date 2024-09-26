@@ -1,7 +1,15 @@
 package com.bee.open.ant.fast.composeopen.load
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 object FBAD {
 
@@ -46,6 +54,20 @@ object FBAD {
                 e.printStackTrace()
             }
         }
+    }
 
+    fun showVpnPermission(ac: ComponentActivity, checkVpnPermissionFun: () -> Unit) {
+        var type = false
+        ac.lifecycleScope.launch {
+            delay(2000)
+            while (isActive) {
+                if ((DishNomadicLoad.showAdBlacklist()) && DishNomadicLoad.getAutoConnectData() && !DataKeyUtils.firstDialogState && !type) {
+                    Log.e("TAG", "showVpnPermission: ")
+                    type = true
+                    checkVpnPermissionFun()
+                }
+                delay(200)
+            }
+        }
     }
 }

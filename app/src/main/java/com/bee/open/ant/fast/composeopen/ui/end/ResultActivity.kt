@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -53,6 +54,7 @@ import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
+import com.bee.open.ant.fast.composeopen.net.GetServiceData
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
 import com.bee.open.ant.fast.composeopen.ui.main.NativeAdHomeContent
 import com.bee.open.ant.fast.composeopen.ui.theme.QuantumVpnTheme
@@ -60,6 +62,8 @@ import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -67,6 +71,8 @@ import kotlinx.coroutines.launch
 
 class ResultActivity : ComponentActivity() {
     var showIntAd by mutableStateOf(false)
+    var showSwitch by mutableStateOf(false)
+    var jobDialog: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -77,6 +83,7 @@ class ResultActivity : ComponentActivity() {
                     color = Color(0xFF1B6A56)
                 ) {
                     titleView(this@ResultActivity)
+                    SwitchDialog(this)
                     LoadingDialog(this)
                 }
             }
@@ -94,9 +101,18 @@ class ResultActivity : ComponentActivity() {
             }
             backFun()
         }
+        showSwitchDialogFun()
+
         BaseAdLoad.interHaHaHaOPNNOPINRE.preload(this)
         showNaAd()
         CanDataUtils.antur12()
+    }
+
+    private fun showSwitchDialogFun() {
+        if (App.isVpnState == 2 && !App.showSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist() && DishNomadicLoad.getIntervalTimes()) {
+            showSwitch = true
+            BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
+        }
     }
 
     override fun onResume() {
@@ -146,6 +162,37 @@ class ResultActivity : ComponentActivity() {
             }
         } else
             nextFun()
+    }
+
+    private fun showCloneDialogAd(seconds: Int = 3, nextFun: () -> Unit) {
+        if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
+            nextFun()
+            return
+        }
+        jobDialog?.cancel()
+        jobDialog = null
+        val max = seconds * 10
+        jobDialog = GetServiceData.countDown(max, 100, MainScope(), {
+            if (it > 10) {
+                BaseAdLoad.showDialogAdIfCan(this@ResultActivity) {
+                    if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
+                        nextFun()
+                    }
+                }
+            }
+        }, {
+            nextFun()
+        })
+    }
+
+    fun cloneDialogFun() {
+        lifecycleScope.launch {
+            showIntAd = true
+            showCloneDialogAd {
+                showIntAd = false
+                showSwitch = false
+            }
+        }
     }
 }
 
@@ -219,7 +266,7 @@ fun titleView(activity: ResultActivity) {
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
-            if(!BaseAdLoad.canShowAD()){
+            if (!BaseAdLoad.canShowAD()) {
                 App.appNativeAdEnd == null
             }
             if (App.appNativeAdEnd != null) {
@@ -331,6 +378,75 @@ fun LoadingDialog(activity: ResultActivity) {
     }
 }
 
+@Composable
+fun SwitchDialog(activity: ResultActivity) {
+    if (activity.showSwitch) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {}
+            .background(Color(0xB3000000))) {
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .background(Color.White, shape = RoundedCornerShape(24.dp))
+                    .padding(24.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Image(
+                            painter = painterResource(id = R.drawable.guanbi),
+                            contentDescription = "Back",
+                            alignment = Alignment.BottomEnd,
+                            modifier = Modifier
+                                .requiredSize(24.dp)
+                                .clickable {
+                                    activity.cloneDialogFun()
+                                },
+                        )
+                    }
+                    Text(
+                        text = "Discover a Better Connection !",
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Text(
+                        text = "We've found a faster and more stable\n" +
+                                "route for you.",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    //Switch按钮控件
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Black, shape = RoundedCornerShape(12.dp))
+                            .padding(top = 12.dp, bottom = 12.dp, start = 24.dp, end = 24.dp)
+                            .clickable {
+                                App.showSwitchState = true
+                                activity.showSwitch = false
+                                activity.finish()
+                            },
+                    ) {
+                        Text(
+                            text = "Switch Now",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
@@ -341,6 +457,8 @@ fun GreetingPreview() {
             color = Color(0xFF1B6A56)
         ) {
             titleView(activity = ResultActivity())
+            LoadingDialog(activity = ResultActivity())
+            SwitchDialog(activity = ResultActivity())
         }
     }
 }

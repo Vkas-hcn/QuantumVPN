@@ -8,22 +8,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
-
-    <!-- Used to show all apps in the allowed Apps selection,
-         this app needs the list the app in the allow/deny apps over the VPN -->
-<!--    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"-->
-<!--            tools:ignore="QueryAllPackagesPermission" />-->
-
-<!--    <queries>-->
-<!--        <intent>-->
-<!--            <action android:name="android.intent.action.GET_CONTENT" />-->
-<!--        </intent>-->
-<!--        <intent>-->
-<!--            <action android:name="android.intent.action.ACTION_OPEN_DOCUMENT" />-->
-<!--        </intent>-->
-<!--    </queries>-->
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
         android:name=".core.ICSOpenVPNApplication"
@@ -44,7 +29,7 @@
         <service
             android:name=".core.OpenVPNService"
             android:exported="true"
-            android:foregroundServiceType="dataSync"
+            android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":openvpn">
             <intent-filter>

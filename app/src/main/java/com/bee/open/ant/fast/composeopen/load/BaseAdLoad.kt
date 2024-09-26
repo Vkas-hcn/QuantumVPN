@@ -118,6 +118,20 @@ object BaseAdLoad {
         }
     }
 
+    fun showDialogAdIfCan(activity: ResultActivity, nextFun: () -> Unit) {
+        if (interHaHaHaOPNNOPIN.haveCache && activity.isActivityResumed()) {
+            activity.jobDialog?.cancel()
+            activity.lifecycleScope.launch(Dispatchers.Main) {
+                activity.showIntAd = true
+                delay(1000)
+                activity.showIntAd = false
+                interHaHaHaOPNNOPIN.showFullScreenAdBIUYBUI(activity) {
+                    nextFun()
+                }
+            }
+        }
+    }
+
     fun ComponentActivity.isActivityResumed(): Boolean {
         return Lifecycle.State.RESUMED == this.lifecycle.currentState
     }

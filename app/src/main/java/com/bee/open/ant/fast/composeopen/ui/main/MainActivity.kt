@@ -94,6 +94,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
+import com.bee.open.ant.fast.composeopen.load.FBAD
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
@@ -119,6 +120,8 @@ class MainActivity : ComponentActivity() {
     var showIntAd by mutableStateOf(false)
 
     var showNavAd by mutableStateOf(false)
+    var showSwitch by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback {
@@ -146,7 +149,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     DrawerExample(this@MainActivity)
-
+                    SwitchDialog(this)
+                    LoadingDialog(this)
                 }
             }
         }
@@ -159,6 +163,9 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             Log.e("TAG", "bindService: $e")
         }
+        FBAD.showVpnPermission(this) {
+            clickVpn()
+        }
         DishNomadicLoad.getSpoilerData()
         requestPermissionForResultVPN =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -168,15 +175,18 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    private val requestNotificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (!isGranted) {
-                showNoTiFaDialog = true
-            } else {
-                CanDataUtils.postPointData("antur4")
-                clickVpn()
-            }
+    fun clickToast(): Boolean {
+        val data = DishNomadicLoad.getMainClickData()
+        if (data && App.isVpnState != 2) {
+            Toast.makeText(
+                this,
+                "VPN connection is required to use this feature. Connecting...",
+                Toast.LENGTH_SHORT
+            ).show()
+            return true
         }
+        return false
+    }
 
     fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -185,14 +195,35 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 
+    private fun showSwitchDialogFun() {
+        lifecycleScope.launch {
+            if (App.isVpnState == 2 && !App.showSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist() && DishNomadicLoad.getIntervalTimes()) {
+                showSwitch = true
+                BaseAdLoad.interHaHaHaOPNNOPIN.preload(this@MainActivity)
+                return@launch
+            }
+            if (App.isVpnState == 2 && App.showSwitchState && !App.connectSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist()) {
+                switchFun()
+            }
+        }
+    }
+
+    suspend fun switchFun() {
+        App.connectSwitchState = true
+        GetServiceData.setNowVpnBean(GetServiceData.getVpnSmartData())
+        App.jumpSwitchState = true
+        mService?.disconnect()
+        delay(100)
+        clickVpn()
+    }
+
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
             delay(300)
             CanDataUtils.postPointData("antur2")
-            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) && App.isAppRunning) {
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
                 BaseAdLoad.mainNativeHome.showFullScreenAdBIUYBUI(this@MainActivity) {}
-                App.isAppRunning = false
             }
         }
     }
@@ -236,14 +267,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showConnectAdTime(nextFun: () -> Unit) {
+    private fun showConnectAdTime(seconds: Int = 20, nextFun: () -> Unit) {
         if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
             nextFun()
             return
         }
         jobConnect?.cancel()
         jobConnect = null
-        jobConnect = GetServiceData.countDown(100, 100, MainScope(), {
+        val max = seconds * 10
+
+        jobConnect = GetServiceData.countDown(max, 100, MainScope(), {
             if (it > 20) {
                 BaseAdLoad.showConnectAdIfCan(this@MainActivity) {
                     Log.e("TAG", "showConnectAdTime: ${this.lifecycle.currentState}")
@@ -257,11 +290,43 @@ class MainActivity : ComponentActivity() {
         })
     }
 
+    private fun showCloneDialogAd(seconds: Int = 3, nextFun: () -> Unit) {
+        if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
+            nextFun()
+            return
+        }
+        jobConnect?.cancel()
+        jobConnect = null
+        val max = seconds * 10
+        jobConnect = GetServiceData.countDown(max, 100, MainScope(), {
+            if (it > 10) {
+                BaseAdLoad.showConnectAdIfCan(this@MainActivity) {
+                    if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
+                        nextFun()
+                    }
+                }
+            }
+        }, {
+            nextFun()
+        })
+    }
+
+    fun cloneDialogFun() {
+        lifecycleScope.launch {
+            showIntAd = true
+            showCloneDialogAd {
+                showIntAd = false
+                showSwitch = false
+            }
+        }
+    }
+
     fun clickVpn() {
+        DataKeyUtils.firstDialogState = true
+        App.isShow = false
         if (vpnState == 1) {
             return
         }
-
         IpUtils.getIfConfig()
         intIP()
         if (showIpDialog) {
@@ -287,33 +352,20 @@ class MainActivity : ComponentActivity() {
             VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
             return
         }
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestNotificationPermissionLauncher.launch(
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
-                Toast.makeText(
-                    this,
-                    "Android 14 devices require notification permissions for VPN service usage",
-                    Toast.LENGTH_LONG
-                ).show()
-                return
-            }
-        }
         connectVpnStateFun {
             beforeVpnState = vpnState
             connecting()
-            showConnectAdTime {
+            Log.e("TAG", "clickVpn: 11111")
+            App.jumpSwitchState = false
+            if (beforeVpnState == 0 || beforeVpnState == -1) {
+                initData()
+                setUpConfigConnections(this@MainActivity)
+                return@connectVpnStateFun
+            }
+            showConnectAdTime(DishNomadicLoad.parseTwoNumbers().second) {
                 mService?.let {
                     initData()
                     lifecycleScope.launch {
-                        if (beforeVpnState == 0 || beforeVpnState == -1) {
-                            setUpConfigConnections(this@MainActivity)
-                        }
                         if (beforeVpnState == 2) {
                             BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
                             delay(1000)
@@ -380,6 +432,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun jumpResultActivity() {
+        if (App.jumpSwitchState) return
         lifecycleScope.launch {
             delay(200)
             if (beforeVpnState != -2 && this@MainActivity.lifecycle.currentState == Lifecycle.State.RESUMED) {
@@ -429,9 +482,15 @@ class MainActivity : ComponentActivity() {
         android.os.Process.killProcess(android.os.Process.myPid())
     }
 
+    fun showStateFalse() {
+        App.showSwitchState = false
+        App.connectSwitchState = false
+    }
+
     private fun requestPermissionForResult(result: ActivityResult) {
         if (result.resultCode == RESULT_OK) {
             clickVpn()
+            showStateFalse()
             if (!DataKeyUtils.service_q_x_type2) {
                 DataKeyUtils.service_q_x_type2 = true
                 CanDataUtils.postPointData("antur8")
@@ -459,7 +518,9 @@ class MainActivity : ComponentActivity() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
             Log.e("TAG", "newStatus: ${state}")
             if (state == "CONNECTED") {
-                connectSuccess()
+                showConnectAdTime(DishNomadicLoad.parseTwoNumbers().first) {
+                    connectSuccess()
+                }
                 BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
                 CanDataUtils.antur10()
 
@@ -469,6 +530,7 @@ class MainActivity : ComponentActivity() {
                 BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
                 CanDataUtils.postPointData("antur11")
                 beforeVpnState = -2
+                showStateFalse()
             }
             if (state == "NOPROCESS") {
                 disConnectSuccess()
@@ -519,6 +581,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.e("TAG", "onActivityResult11111: $requestCode")
+
         if (requestCode == 0x334 && DataKeyUtils.selectVpnServiceData != "" && vpnState != 2) {
             DataKeyUtils.nowVpnServiceData = DataKeyUtils.selectVpnServiceData
             countryName = GetServiceData.getNowVpnBean().country_name
@@ -526,9 +590,11 @@ class MainActivity : ComponentActivity() {
             ip = GetServiceData.getNowVpnBean().ip
             DataKeyUtils.selectVpnServiceData = ""
             clickVpn()
+            showStateFalse()
         }
         if (requestCode == 0x334 && DataKeyUtils.selectVpnServiceData != "" && vpnState == 2) {
             clickVpn()
+            showStateFalse()
         }
         if (requestCode == 0x445 && DataKeyUtils.selectVpnServiceData != "" && vpnState != 2) {
             DataKeyUtils.nowVpnServiceData = DataKeyUtils.selectVpnServiceData
@@ -536,6 +602,10 @@ class MainActivity : ComponentActivity() {
             city = GetServiceData.getNowVpnBean().city
             ip = GetServiceData.getNowVpnBean().ip
             DataKeyUtils.selectVpnServiceData = ""
+        }
+        if (requestCode == 0x445) {
+            Log.e("TAG", "onActivityResult: $requestCode")
+            showSwitchDialogFun()
         }
     }
 
@@ -566,14 +636,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun isDisConnectFun(): Boolean {
-        if (isDisConnect()) {
-            jobConnect?.cancel()
-            jobConnect = null
-            vpnState = -1
-            connectSuccess()
-            return true
-        }
-        return false
+//        if (isDisConnect()) {
+//            jobConnect?.cancel()
+//            jobConnect = null
+//            vpnState = -1
+//            connectSuccess()
+//            return true
+//        }
+        return isDisConnect()
     }
 
     private fun isConnectFun(): Boolean {
@@ -581,10 +651,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun clickStopFun(nextFun: () -> Unit) {
-        if (isDisConnectFun()) {
-            return
-        }
-        if (isConnectFun()) {
+
+        if (isConnectFun() || isDisConnectFun()) {
             Toast.makeText(this, "Please wait a while while connecting", Toast.LENGTH_SHORT).show()
             return
         }
@@ -599,7 +667,7 @@ class MainActivity : ComponentActivity() {
         if (isDisConnect()) {
             //断开过程中
             vpnState = -1
-            connectSuccess()
+            connecting()
         }
         if (isConnect()) {
             //连接过程中
@@ -650,12 +718,83 @@ fun LottieImageAnimation(activity: MainActivity) {
                         .padding(16.dp)
                         .clickable {
                             activity.clickVpn()
+                            activity.showStateFalse()
                             App.isShow = false
                         })
             }
         }
     }
 
+}
+
+@Composable
+fun SwitchDialog(activity: MainActivity) {
+    if (activity.showSwitch) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {}
+            .background(Color(0xB3000000))) {
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .background(Color.White, shape = RoundedCornerShape(24.dp))
+                    .padding(24.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Image(
+                            painter = painterResource(id = R.drawable.guanbi),
+                            contentDescription = "Back",
+                            alignment = Alignment.BottomEnd,
+                            modifier = Modifier
+                                .requiredSize(24.dp)
+                                .clickable {
+                                    activity.cloneDialogFun()
+                                },
+                        )
+                    }
+                    Text(
+                        text = "Discover a Better Connection !",
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Text(
+                        text = "We've found a faster and more stable\n" +
+                                "route for you.",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Black, shape = RoundedCornerShape(12.dp))
+                            .padding(top = 12.dp, bottom = 12.dp, start = 24.dp, end = 24.dp)
+                            .clickable {
+                                App.showSwitchState = true
+                                activity.showSwitch = false
+                                activity.lifecycleScope.launch {
+                                    activity.switchFun()
+                                }
+                            },
+                    ) {
+                        Text(
+                            text = "Switch Now",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -690,6 +829,7 @@ fun RotatingImageWithControl(
                     indication = null,
                 ) {
                     activity.clickVpn()
+                    activity.showStateFalse()
                 }
 
         ) {
@@ -785,6 +925,7 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                     .requiredSize(56.dp)
                     .clickable {
                         activity.clickSetting {
+                            if (activity.clickToast()) return@clickSetting
                             clickSettingFun()
                         }
                     })
@@ -818,11 +959,6 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                     .padding(top = 120.dp)
                     .requiredSize(56.dp)
                     .clickable {
-//                        Toast
-//                            .makeText(
-//                                activity, "The feature is not available yet", Toast.LENGTH_SHORT
-//                            )
-//                            .show()
                     })
         }
 
@@ -842,6 +978,7 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                     .fillMaxWidth()
                     .padding(start = 26.dp)
                     .clickable {
+                        if (activity.clickToast()) return@clickable
                         activity.jumpServiceListActivity()
                     }) {
                 Image(
@@ -857,12 +994,12 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                         color = white,
                         modifier = Modifier.padding(start = 8.dp)
                     )
-                    Text(
-                        "IP：${activity.ip}",
-                        fontSize = 12.sp,
-                        color = white,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+//                    Text(
+//                        "IP：${activity.ip}",
+//                        fontSize = 12.sp,
+//                        color = white,
+//                        modifier = Modifier.padding(start = 8.dp)
+//                    )
                 }
             }
         }
@@ -872,11 +1009,12 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
-            activity.showNavAd = DishNomadicLoad.getBuyingShieldData() || (!DishNomadicLoad.showAdBlacklist())
-            Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}", )
+            activity.showNavAd =
+                DishNomadicLoad.getBuyingShieldData() || (!DishNomadicLoad.showAdBlacklist())
+            Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}")
             if (!activity.showNavAd) {
 
-                if(!BaseAdLoad.canShowAD()){
+                if (!BaseAdLoad.canShowAD()) {
                     App.appNativeAdHome == null
                 }
                 if (App.appNativeAdHome != null) {
@@ -894,7 +1032,6 @@ fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
             }
 
         }
-        LoadingDialog(activity)
         loadVpnData(activity)
     }
 }
@@ -978,6 +1115,7 @@ fun DrawerExample(activity: MainActivity) {
                         .background(Color(0xFF1E7A64))
                         .padding(20.dp)
                         .clickable {
+                            if (activity.clickToast()) return@clickable
                             activity.jumpToWebActivity()
                         })
             }

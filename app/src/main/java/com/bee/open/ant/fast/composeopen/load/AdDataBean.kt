@@ -85,8 +85,12 @@ data class AdvertiseEntity(
 
 @Keep
 data class AdOpenBean(
+    val autoConnect: String? = "1",
+    val fooey: String? = "20&20",
+    val kate: String? = "1",
+    val guide: String? = "1",
     val qua8: String? = "2",
     val hang: String? = "2",
     val miak: String? = "1",
-    val ssfd:String? = ""
+    val ssfd: String? = ""
 )
