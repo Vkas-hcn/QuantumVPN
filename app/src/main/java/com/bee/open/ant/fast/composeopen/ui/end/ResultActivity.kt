@@ -64,6 +64,7 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -73,6 +74,8 @@ class ResultActivity : ComponentActivity() {
     var showIntAd by mutableStateOf(false)
     var showSwitch by mutableStateOf(false)
     var jobDialog: Job? = null
+    var adJobDialog: Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -101,10 +104,8 @@ class ResultActivity : ComponentActivity() {
             }
             backFun()
         }
+        showNativeAd()
         showSwitchDialogFun()
-
-        BaseAdLoad.interHaHaHaOPNNOPINRE.preload(this)
-        showNaAd()
         CanDataUtils.antur12()
     }
 
@@ -115,26 +116,29 @@ class ResultActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launch {
+    private  fun showNativeAd() {
+        adJobDialog?.cancel()
+        adJobDialog = null
+        val endNav =  BaseAdLoad.getEndNativeAdData()
+        endNav.preload(this)
+        adJobDialog = lifecycleScope.launch {
             delay(300)
-            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) && App.isAppRunning) {
-                BaseAdLoad.mainNativeEnd.showFullScreenAdBIUYBUI(this@ResultActivity) {}
-                App.isAppRunning = false
-            }
-        }
-    }
-
-    private fun showNaAd() {
-        lifecycleScope.launch {
-            while (isActive) {
-                if (App.appNativeAdEnd == null) {
-                    BaseAdLoad.mainNativeEnd.showFullScreenAdBIUYBUI(this@ResultActivity) {}
-                } else {
-                    cancel()
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                try {
+                    while (true) {
+                        if (endNav.haveCache) {
+                            Log.e("TAG", "showNativeAd---: ${App.appNativeAdEnd == null}")
+                            endNav.showFullScreenAdBIUYBUI(this@ResultActivity) {
+                                    adJobDialog?.cancel()
+                                    adJobDialog = null
+                                }
+                            break
+                        }
+                        delay(500)
+                    }
+                } catch (e: Exception) {
+                    Log.e("ResultActivity", "Error showing native ad", e)
                 }
-                delay(500)
             }
         }
     }
@@ -151,12 +155,13 @@ class ResultActivity : ComponentActivity() {
             nextFun()
             return
         }
-        if (BaseAdLoad.interHaHaHaOPNNOPINRE.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
+        val inter = BaseAdLoad.getInterResultAdData()
+        if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
             lifecycleScope.launch(Dispatchers.Main) {
                 showIntAd = true
                 delay(1000)
                 showIntAd = false
-                BaseAdLoad.interHaHaHaOPNNOPINRE.showFullScreenAdBIUYBUI(this@ResultActivity) {
+                inter.showFullScreenAdBIUYBUI(this@ResultActivity) {
                     nextFun()
                 }
             }

@@ -7,8 +7,11 @@ import android.app.Application
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Process
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -26,6 +29,8 @@ import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.bee.open.ant.fast.composeopen.BuildConfig
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
+import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
+import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.FBADUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
@@ -39,6 +44,9 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.tencent.mmkv.MMKV
+import de.blinkt.openvpn.api.ExternalOpenVPNService
+import de.blinkt.openvpn.api.IOpenVPNAPIService
+import de.blinkt.openvpn.api.IOpenVPNStatusCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -47,6 +55,8 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class App : Application(), LifecycleObserver {
+    var mService: IOpenVPNAPIService? = null
+
     companion object {
         lateinit var instance: App
         fun getVpnInstance(): App {
@@ -111,6 +121,23 @@ class App : Application(), LifecycleObserver {
                 delay(4000)
                 FBADUtils.appCircleToRequestFireData()
             }
+        }
+        if (isMainProcess(this)) {
+            try {
+                this.bindService(
+                    Intent(this, ExternalOpenVPNService::class.java), mConnection, BIND_AUTO_CREATE
+                )
+            } catch (e: Exception) {
+                Log.e("TAG", "bindService: $e")
+            }
+        }
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        try {
+            this.unbindService(mConnection)
+        } catch (e: Exception) {
         }
     }
 
@@ -239,4 +266,46 @@ class App : Application(), LifecycleObserver {
         }
     }
 
+    private val mConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(
+            className: ComponentName?,
+            service: IBinder?,
+        ) {
+            mService = IOpenVPNAPIService.Stub.asInterface(service)
+            try {
+                mService?.registerStatusCallback(mCallback)
+            } catch (e: Exception) {
+            }
+        }
+
+        override fun onServiceDisconnected(className: ComponentName?) {
+            mService = null
+        }
+    }
+    private val mCallback = object : IOpenVPNStatusCallback.Stub() {
+        override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
+            Log.e("TAG", "newStatus-App: ${state}")
+            if (state == "CONNECTED") {
+                isVpnState = 2
+            }
+            if (state == "NOPROCESS") {
+                isVpnState = 0
+            }
+        }
+    }
+
+    private fun isMainProcess(context: Context): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val myPid = Process.myPid()
+        val packageName = context.packageName
+
+        val runningAppProcesses = activityManager.runningAppProcesses ?: return false
+
+        for (processInfo in runningAppProcesses) {
+            if (processInfo.pid == myPid && processInfo.processName == packageName) {
+                return true
+            }
+        }
+        return false
+    }
 }

@@ -26,6 +26,12 @@ class DataKeyUtils {
                 field = value
             }
             get() = save.decodeBool("firstDialogState", false)
+        var firstDialogState2 = false
+            set(value) {
+                save.encode("firstDialogState2", value)
+                field = value
+            }
+            get() = save.decodeBool("firstDialogState2", false)
 
         var uuid_open = ""
             set(value) {
@@ -198,69 +204,127 @@ class DataKeyUtils {
         }
 
         const val nfskjnkkk = """
-  {
+            {
     "nunn": 200,
-    "comping": 1,
-    "tuop": [
-        {
-            "tom": "ca-app-pub-3940256099942544/9257395921",
-            "book": "admob",
-            "keep": "plai",
-            "fa_c_oute": 2,
-            "where": "tuop"
-        }
-    ],
-    "intu": [
-        {
-            "tom": "ca-app-pub-3940256099942544/1033173712",
-            "book": "admob",
-            "keep": "ity",
-            "fa_c_oute": 2,
-            "where": "intu"
-        }
-    ],
-    "tintuba": [
-        {
-            "tom": "ca-app-pub-3940256099942544/1033173712",
-            "book": "admob",
-            "keep": "ity",
-            "fa_c_oute": 2,
-            "where": "tintuba"
-        }
-    ],
-    "basex": [
-        {
-            "tom": "ca-app-pub-3940256099942544/1033173712",
-            "book": "admob",
-            "keep": "ity",
-            "fa_c_oute": 2,
-            "where": "basex"
-        }
-    ],
-    "saxc": [
-        {
-            "tom": "ca-app-pub-3940256099942544/2247696110",
-            "book": "admob",
-            "keep": "nnnee",
-            "fa_c_oute": 2,
-            "where": "saxc"
-        }
-    ],
-    "mstan": [
-        {
-            "tom": "ca-app-pub-3940256099942544/2247696110",
-            "book": "admob",
-            "keep": "nnnee",
-            "fa_c_oute": 2,
-            "where": "mstan"
-        }
-    ]
+    "comping": 5,
+    "server": {
+        "tuop": [
+            {
+                "tom": "ca-app-pub-3940256099942544/9257395921",
+                "book": "admob",
+                "keep": "plai",
+                "fa_c_oute": 2,
+                "where": "tuop"
+            }
+        ],
+        "intu": [
+            {
+                "tom": "ca-app-pub-3940256099942544/1033173712",
+                "book": "admob",
+                "keep": "ity",
+                "fa_c_oute": 2,
+                "where": "intu"
+            }
+        ],
+        "tintuba": [
+            {
+                "tom": "ca-app-pub-3940256099942544/1033173712",
+                "book": "admob",
+                "keep": "ity",
+                "fa_c_oute": 2,
+                "where": "tintuba"
+            }
+        ],
+        "basex": [
+            {
+                "tom": "ca-app-pub-3940256099942544/1033173712",
+                "book": "admob",
+                "keep": "ity",
+                "fa_c_oute": 2,
+                "where": "basex"
+            }
+        ],
+        "saxc": [
+            {
+                "tom": "ca-app-pub-3940256099942544/2247696110",
+                "book": "admob",
+                "keep": "nnnee",
+                "fa_c_oute": 2,
+                "where": "saxc"
+            }
+        ],
+        "mstan": [
+            {
+                "tom": "ca-app-pub-3940256099942544/2247696110",
+                "book": "admob",
+                "keep": "nnnee",
+                "fa_c_oute": 2,
+                "where": "mstan"
+            }
+        ]
+    },
+    "nonserver": {
+        "tuop": [
+            {
+                "tom": "ca-app-pub-3940256099942544/9257395921",
+                "book": "admob",
+                "keep": "plai",
+                "fa_c_oute": 1,
+                "where": "tuop"
+            }
+        ],
+        "intu": [
+            {
+                "tom": "ca-app-pub-3940256099942544/1033173712",
+                "book": "admob",
+                "keep": "ity",
+                "fa_c_oute": 1,
+                "where": "intu"
+            }
+        ],
+        "tintuba": [
+            {
+                "tom": "ca-app-pub-3940256099942544/1033173712",
+                "book": "admob",
+                "keep": "ity",
+                "fa_c_oute": 1,
+                "where": "tintuba"
+            }
+        ],
+        "basex": [
+            {
+                "tom": "ca-app-pub-3940256099942544/1033173712",
+                "book": "admob",
+                "keep": "ity",
+                "fa_c_oute": 1,
+                "where": "basex"
+            }
+        ],
+        "saxc": [
+            {
+                "tom": "ca-app-pub-3940256099942544/2247696110",
+                "book": "admob",
+                "keep": "nnnee",
+                "fa_c_oute": 1,
+                "where": "saxc"
+            }
+        ],
+        "mstan": [
+            {
+                "tom": "ca-app-pub-3940256099942544/2247696110",
+                "book": "admob",
+                "keep": "nnnee",
+                "fa_c_oute": 1,
+                "where": "mstan"
+            }
+        ]
+    }
 }
         """
 
         const val configOpenLocal = """
   {
-    "autoConnect":"1",
+    "brisk":"1",
     "fooey":"20&20",
     "kate":"a",
     "guide":"2",

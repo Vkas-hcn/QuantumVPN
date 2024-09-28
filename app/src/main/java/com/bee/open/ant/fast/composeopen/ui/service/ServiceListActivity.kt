@@ -1,6 +1,7 @@
 package com.bee.open.ant.fast.composeopen.ui.service
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -54,6 +55,8 @@ import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -61,6 +64,7 @@ class ServiceListActivity : ComponentActivity() {
     var showDialog by mutableStateOf(false)
     lateinit var checkServerVpn: ServerVpn
     var showIntAd by mutableStateOf(false)
+    private var listBackJob: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -74,7 +78,7 @@ class ServiceListActivity : ComponentActivity() {
                 }
             }
         }
-        BaseAdLoad.interHaHaHaOPNNOPIN2.preload(this)
+        BaseAdLoad.getInterListAdData().preload(this)
         CanDataUtils.postPointData("antur18")
         onBackPressedDispatcher.addCallback {
             ClockUtils.ifAddThis("onBackPressedDispatcher") {}
@@ -103,17 +107,24 @@ class ServiceListActivity : ComponentActivity() {
             nextFun()
             return
         }
-        if (BaseAdLoad.interHaHaHaOPNNOPIN2.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                showIntAd = true
-                delay(1000)
-                showIntAd = false
-                BaseAdLoad.interHaHaHaOPNNOPIN2.showFullScreenAdBIUYBUI(this@ServiceListActivity) {
-                    nextFun()
+        val inter = BaseAdLoad.getInterListAdData()
+        inter.preload(this)
+        listBackJob?.cancel()
+        listBackJob = null
+        val max = 5 * 10
+        showIntAd = true
+        listBackJob = GetServiceData.countDown(max, 100, MainScope(), {
+            if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    showIntAd = false
+                    inter.showFullScreenAdBIUYBUI(this@ServiceListActivity) {
+                        nextFun()
+                    }
                 }
             }
-
-        } else nextFun()
+        }, {
+            nextFun()
+        })
     }
 
     fun getVpnServiceData(): MutableList<ServerVpn> {

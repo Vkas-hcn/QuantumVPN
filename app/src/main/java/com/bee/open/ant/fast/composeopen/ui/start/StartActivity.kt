@@ -151,14 +151,13 @@ class StartActivity : ComponentActivity() {
     }
 
     private fun preLoadAD() {
-        BaseAdLoad.startOpenBOIBOIUBU.preload(this)
-        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
-        BaseAdLoad.mainNativeHome.preload(this)
+        BaseAdLoad.getMainNativeAdData().preload(this)
+        if(!DataKeyUtils.firstDialogState2){return}
+        BaseAdLoad.getStartOpenAdData().preload(this)
     }
 
     @SuppressLint("HardwareIds")
     private fun initAdJust() {
-        Log.e("TAG", "initAdJust: sssssssss")
 
         val timeStart = System.currentTimeMillis()
         Adjust.addSessionCallbackParameter(

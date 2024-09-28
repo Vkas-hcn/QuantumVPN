@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -23,10 +25,7 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
     private var ad: Any? = null
     private val adRequest: AdRequest get() = AdRequest.Builder().build()
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
-        Log.e(
-            "WallPaper AD=${item.where}",
-            " OpenAD, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} start preload"
-        )
+
         loadAppOpen(onAdLoaded, onAdLoadFailed)
     }
 
@@ -50,8 +49,8 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
 
                 override fun onAdShowedFullScreenContent() {
                     Log.e(
-                        "WallPaper AD=${item.where}",
-                        "OpenAD, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} SUS Show"
+                        "TAG",
+                        "ad-where=${item.where},InterstitialAd-id: ${item.adIdKKKK}, weight: ${item.adWeightHAHHA}  Show success"
                     )
                     BaseAdLoad.countAD()
                 }
@@ -73,8 +72,22 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
                 }
             }
         }
-
+var data = false
         fun showAdMobFullScreenAd() {
+            //不相同ip禁止加载
+            if (!data) {
+                data =true
+                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
+                // 添加重新加载广告的逻辑
+                loadAppOpen({
+                    // 广告加载成功后再次尝试展示广告
+                    showAdMobFullScreenAd()
+                }, { msg ->
+                    Log.e("TAG", "重新加载广告失败：$msg")
+                    onAdDismissed.invoke()
+                })
+                return
+            }
             when (val adF = ad) {
                 is AppOpenAd -> {
                     adF.run {
@@ -91,6 +104,10 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
     }
 
     private fun loadAppOpen(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
+        Log.e(
+            "TAG",
+            "ad-where=${item.where},InterstitialAd-id: ${item.adIdKKKK}, weight: ${item.adWeightHAHHA}  start preload"
+        )
         item = CanDataUtils.beforeLoadQTV(item)
         CanDataUtils.antur14(item)
         AppOpenAd.load(
@@ -113,10 +130,18 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
                             CanDataUtils.toPointAdQTV(adValue,appOpenAd.responseInfo)
                         }
                     }
+                    Log.e(
+                        "TAG",
+                        "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success"
+                    )
                 }
                 override fun onAdFailedToLoad(e: LoadAdError) {
                     CanDataUtils.antur17(item,e.message)
                     onAdLoadFailed.invoke(e.message)
+                    Log.e(
+                        "TAG",
+                        "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-error=${e.message}"
+                    )
                 }
             })
     }

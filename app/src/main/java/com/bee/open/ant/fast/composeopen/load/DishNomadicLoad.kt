@@ -2,6 +2,7 @@ package com.bee.open.ant.fast.composeopen.load
 
 import android.content.Context
 import android.util.Log
+import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData.getLocalOpenData
@@ -18,7 +19,7 @@ class DishNomadicLoad(
         var triggerCount = 0
 
         fun showAdBlacklist(): Boolean {
-            val blackData = DataKeyUtils.black_data != "scorpion-"
+            val blackData = DataKeyUtils.black_data != "scorpion"
             val result = when (getLocalOpenData().hang) {
                 "1" -> {
                     !blackData
@@ -110,6 +111,7 @@ class DishNomadicLoad(
                     // num 为 0，表示每次触发都会弹窗
                     true
                 }
+
                 else -> {
                     // 当 num > 0 时，判断当前的触发次数是否应该弹窗
                     val cycle = num + 1 // 弹窗周期
@@ -119,10 +121,11 @@ class DishNomadicLoad(
                 }
             }
         }
+
         fun parseTwoNumbers(): Pair<Int, Int> {
             // 默认值
             val default = 20
-            val num = getLocalOpenData().fooey?: ""
+            val num = getLocalOpenData().fooey ?: ""
             // 分割字符串
             val parts = num.split("&")
             // 检查分割结果并尝试转换为数字，转换失败则使用默认值
@@ -135,14 +138,15 @@ class DishNomadicLoad(
 
         //获取是否自动连接
         fun getAutoConnectData(): Boolean {
-            return when (getLocalOpenData().autoConnect) {
+            return when (getLocalOpenData().brisk) {
                 "1" -> {
-                   true
+                    true
                 }
 
                 "2" -> {
                     false
                 }
+
                 "3" -> {
                     !getBuyingShieldData()
                 }
@@ -194,15 +198,9 @@ class DishNomadicLoad(
             nslcasidckn.add(baseAdanscinc)
             nslcasidckn.sortByDescending { it.adBean.adWeightHAHHA }
             canusdkbcaushdconLoad.invoke(true)
-            Log.e(
-                "TAG",
-                "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success"
-            )
+
         }, onAdLoadFailed = {
-            Log.e(
-                "TAG",
-                "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-error=${it}"
-            )
+
             preloadAdByIndexibscdaiuhsdbcuahsbcukashbcu(index + 1)
         })
     }

@@ -5,6 +5,8 @@ import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
+import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -31,8 +33,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
         }
         baseAd.showMyNameIsHei(activity = activity, onAdDismissed = onAdDismissed)
         vsnoevn = {}
-        Log.e("TAG", "showFullScreenAdBIUYBUI: ${baseAd.adBean.where}", )
-        if (baseAd.adBean.where == "intu" || baseAd.adBean.where == "saxc"|| baseAd.adBean.where == "mstan") {
+        if ( baseAd.adBean.where == "saxc"|| baseAd.adBean.where == "mstan") {
             preload(activity)
         }
     }
@@ -47,12 +48,15 @@ class NomadicLoad(private val snvlinjvk: ADType) {
 
     fun preload(context: Context) {
         MainScope().launch {
+            BaseAdLoad.initializeAdConfig(DataKeyUtils.adHistory)
             if (dataList.isEmpty()) return@launch
             if (!BaseAdLoad.canShowAD()) return@launch
             if (haveCache && isCacheOverTime().not()) {
+                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: ${dataList[0].adWeightHAHHA}", )
                 return@launch
             }
             if (haveCache) {
+                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: ${dataList[0].adWeightHAHHA}", )
                 return@launch
             }
             if (isLoadBHBU) return@launch

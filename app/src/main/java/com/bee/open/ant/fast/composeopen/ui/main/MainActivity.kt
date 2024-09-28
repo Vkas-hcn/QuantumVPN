@@ -90,7 +90,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
@@ -121,6 +120,7 @@ class MainActivity : ComponentActivity() {
 
     var showNavAd by mutableStateOf(false)
     var showSwitch by mutableStateOf(false)
+    var adJobDialog: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,15 +164,15 @@ class MainActivity : ComponentActivity() {
             Log.e("TAG", "bindService: $e")
         }
         FBAD.showVpnPermission(this) {
+            DataKeyUtils.firstDialogState = true
             clickVpn()
         }
+        DataKeyUtils.firstDialogState2 = true
         DishNomadicLoad.getSpoilerData()
         requestPermissionForResultVPN =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 requestPermissionForResult(it)
             }
-        showNaAd()
-
     }
 
     fun clickToast(): Boolean {
@@ -219,11 +219,26 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        lifecycleScope.launch {
-            delay(300)
-            CanDataUtils.postPointData("antur2")
-            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                BaseAdLoad.mainNativeHome.showFullScreenAdBIUYBUI(this@MainActivity) {}
+        adJobDialog?.cancel()
+        adJobDialog = null
+        val endNav =  BaseAdLoad.getMainNativeAdData()
+        adJobDialog = lifecycleScope.launch {
+            delay(500)
+            if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+                try {
+                    while (true) {
+                        if (endNav.haveCache) {
+                            endNav.showFullScreenAdBIUYBUI(this@MainActivity) {
+                                adJobDialog?.cancel()
+                                adJobDialog = null
+                            }
+                            break
+                        }
+                        delay(500)
+                    }
+                } catch (e: Exception) {
+                    Log.e("Main", "Error showing native ad", e)
+                }
             }
         }
     }
@@ -235,20 +250,6 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
         }
     }
-
-    private fun showNaAd() {
-        lifecycleScope.launch {
-            while (isActive) {
-                if (App.appNativeAdHome == null) {
-                    BaseAdLoad.mainNativeHome.showFullScreenAdBIUYBUI(this@MainActivity) {}
-                } else {
-                    cancel()
-                }
-                delay(500)
-            }
-        }
-    }
-
 
     private fun initData() {
         countryName = GetServiceData.getNowVpnBean().country_name
@@ -275,7 +276,7 @@ class MainActivity : ComponentActivity() {
         jobConnect?.cancel()
         jobConnect = null
         val max = seconds * 10
-
+        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
         jobConnect = GetServiceData.countDown(max, 100, MainScope(), {
             if (it > 20) {
                 BaseAdLoad.showConnectAdIfCan(this@MainActivity) {
@@ -322,7 +323,6 @@ class MainActivity : ComponentActivity() {
     }
 
     fun clickVpn() {
-        DataKeyUtils.firstDialogState = true
         App.isShow = false
         if (vpnState == 1) {
             return
@@ -338,11 +338,6 @@ class MainActivity : ComponentActivity() {
         if (!GetServiceData.isHaveNetWork(this)) {
             Toast.makeText(this, "Please check your network", Toast.LENGTH_SHORT).show()
             return
-        }
-        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
-        BaseAdLoad.interHaHaHaOPNNOPINRE.preload(this)
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU && App.isVpnState != 2) {
-            CanDataUtils.postPointData("antur5")
         }
         if (!checkVPNPermission(this@MainActivity)) {
             if (!DataKeyUtils.service_q_x_type) {
@@ -367,8 +362,6 @@ class MainActivity : ComponentActivity() {
                     initData()
                     lifecycleScope.launch {
                         if (beforeVpnState == 2) {
-                            BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
-                            delay(1000)
                             it.disconnect()
                             CanDataUtils.postPointData("antur13")
                         }
@@ -520,20 +513,25 @@ class MainActivity : ComponentActivity() {
             if (state == "CONNECTED") {
                 showConnectAdTime(DishNomadicLoad.parseTwoNumbers().first) {
                     connectSuccess()
+                    BaseAdLoad.interHaHaHaOPNNOPIN.preload(this@MainActivity)
+                    BaseAdLoad.getInterResultAdData().preload(this@MainActivity)
+                    BaseAdLoad.getMainNativeAdData().preload(this@MainActivity)
                 }
-                BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
                 CanDataUtils.antur10()
-
             }
             if (state == "RECONNECTING") {
                 connectFail()
-                BaseAdLoad.mainNativeEnd.preload(this@MainActivity)
+                BaseAdLoad.getEndNativeAdData().preload(this@MainActivity)
                 CanDataUtils.postPointData("antur11")
                 beforeVpnState = -2
                 showStateFalse()
             }
             if (state == "NOPROCESS") {
                 disConnectSuccess()
+                if (beforeVpnState == 2) {
+                    BaseAdLoad.getInterResultAdData().preload(this@MainActivity)
+                    BaseAdLoad.getEndNativeAdData().preload(this@MainActivity)
+                }
             }
         }
     }

@@ -23,6 +23,7 @@ import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
 import com.bee.open.ant.fast.composeopen.R
 import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
@@ -42,14 +43,17 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
 
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
         Log.e(
-            "WallPaper AD=${item.where}",
-            " NativeAd, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} start preload"
+            "TAG",
+            "ad-where=${item.where},InterstitialAd-id: ${item.adIdKKKK}, weight: ${item.adWeightHAHHA}  start preload"
         )
         item = CanDataUtils.beforeLoadQTV(item)
         CanDataUtils.antur14(item)
         AdLoader.Builder(context, item.adIdKKKK).apply {
             forNativeAd { ad ->
-                Log.e("TAG", "原生广告 -${item.where}，加载成功: ")
+                Log.e(
+                    "TAG",
+                    "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success"
+                )
                 nativeAd = ad
                 CanDataUtils.antur15(adBean)
                 ad.setOnPaidEventListener { adValue ->
@@ -65,7 +69,10 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             }
             withAdListener(object : AdListener() {
                 override fun onAdFailedToLoad(e: LoadAdError) {
-                    Log.e("TAG", "原生广告 -${item.where}，加载失败: ")
+                    Log.e(
+                        "TAG",
+                        "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-error=${e.message}"
+                    )
                     onAdLoadFailed.invoke(e.message)
                     if (item.where == "saxc") {
                         App.appNativeAdHome = null
@@ -99,10 +106,19 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
         onAdDismissed: () -> Unit
     ) {
         if (null == nativeAd) return
-        Log.e(
-            "TAG",
-            " NativeAd, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} show"
-        )
+        //不相同ip禁止加载
+        if (App.isVpnState == 2 && item.qtv_load_ip!= DataKeyUtils.tba_vpn_ip) {
+            Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
+            // 添加重新加载广告的逻辑
+            loadHowAreYou({
+                // 广告加载成功后再次尝试展示广告
+                showMyNameIsHei(activity,nativeParent,onAdDismissed)
+            }, { msg ->
+                Log.e("TAG", "重新加载广告失败：$msg")
+                onAdDismissed.invoke()
+            })
+            return
+        }
         if (item.where == "saxc") {
             App.appNativeAdHome = null
         } else {
@@ -115,6 +131,7 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
                 App.appNativeAdEnd = nativeAd
             }
             nativeAd = null
+            onAdDismissed.invoke()
         }
         item = CanDataUtils.afterLoadQTV(item)
         BaseAdLoad.countAD(true)

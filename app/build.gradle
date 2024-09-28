@@ -83,6 +83,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-config-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.facebook.android:facebook-android-sdk:12.3.0'
+    implementation 'com.google.ads.mediation:facebook:6.17.0.0'
     implementation 'com.google.android.gms:play-services-ads:21.5.0'
 
     implementation("com.google.code.gson:gson:2.11.0")

@@ -356,7 +356,7 @@ object CanDataUtils {
 
     fun beforeLoadQTV(ufDetailBean: EveryADBean): EveryADBean {
         var data = false
-        if (App.isVpnState == 2 && !DataKeyUtils.spoiler_data) {
+        if (App.isVpnState == 2) {
             ufDetailBean.qtv_load_ip = DataKeyUtils.tba_vpn_ip
             ufDetailBean.qtv_load_city = DataKeyUtils.tba_vpn_city
         } else {
@@ -372,7 +372,7 @@ object CanDataUtils {
 
     fun afterLoadQTV(ufDetailBean: EveryADBean): EveryADBean {
         var data = false
-        if (App.isVpnState == 2 && !DataKeyUtils.spoiler_data) {
+        if (App.isVpnState == 2) {
             ufDetailBean.qtv_show_ip = DataKeyUtils.tba_vpn_ip
             ufDetailBean.qtv_show_city = DataKeyUtils.tba_vpn_city
         } else {

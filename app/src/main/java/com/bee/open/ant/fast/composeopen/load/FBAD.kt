@@ -58,6 +58,7 @@ object FBAD {
 
     fun showVpnPermission(ac: ComponentActivity, checkVpnPermissionFun: () -> Unit) {
         var type = false
+        DataKeyUtils.firstDialogState = DataKeyUtils.firstDialogState2
         ac.lifecycleScope.launch {
             delay(2000)
             while (isActive) {

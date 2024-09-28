@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bee.open.ant.fast.composeopen.app.App
+import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
@@ -33,6 +35,10 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
             "plai" -> "Open"
             else -> "Inter"
         }
+        Log.e(
+            "TAG",
+            "ad-where=${item.where},InterstitialAd-id: ${item.adIdKKKK}, weight: ${item.adWeightHAHHA}  start preload"
+        )
         loadInavnisduabnviosbvaoisubvd(onAdLoaded, onAdLoadFailed)
     }
 
@@ -87,6 +93,19 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
         }
 
         fun showAdMobFullScreenAd(activity: ComponentActivity) {
+
+            if (App.isVpnState == 2 && item.qtv_load_ip!= DataKeyUtils.tba_vpn_ip) {
+                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
+                // 添加重新加载广告的逻辑
+                loadInavnisduabnviosbvaoisubvd({
+                    // 广告加载成功后再次尝试展示广告
+                    showAdMobFullScreenAd(activity)
+                }, { msg ->
+                    Log.e("TAG", "重新加载广告失败：$msg")
+                    onAdDismissed.invoke()
+                })
+                return
+            }
             when (val adF = ad) {
                 is InterstitialAd -> {
                     adF.run {
@@ -115,6 +134,10 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    Log.e(
+                        "TAG",
+                        "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success"
+                    )
                     ad = interstitialAd
                     CanDataUtils.antur15(adBean)
                     onAdLoaded.invoke()
@@ -129,6 +152,10 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
                 }
 
                 override fun onAdFailedToLoad(e: LoadAdError){
+                    Log.e(
+                        "TAG",
+                        "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-error=${e.message}"
+                    )
                     CanDataUtils.antur17(item,e.message)
                     onAdLoadFailed.invoke(e.message)
                 }

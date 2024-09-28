@@ -53,9 +53,16 @@ enum class ADType(val placeName: String) {
     INNNNNNNN_1("int1111111asfeoipwjfsvksdlv"),
     INNNNNNNN_2("int222222sasderfgvyujwersd"),
     INNNNNNNN_RE("int3333yyyyyttttiiiiinnnt"),
-
     NNNAAAVVV_HHH("nnnaaavvvHhhjguvhendgkhmbndxdhnfdffgfd"),
     NNNAAAVVV_EEE("nnnaadldoencjghekssdkefavnrxzddgggfds"),
+
+
+    FULL_One_Dis("openopenDjklasheoivsdis"),
+    INNNNNNNN_1_Dis("int1111111asfeoipwjfsvksdlvdis"),
+    INNNNNNNN_2_Dis("int222222sasderfgvyujwersddis"),
+    INNNNNNNN_RE_Dis("int3333yyyyyttttiiiiinnntdis"),
+    NNNAAAVVV_HHH_Dis("nnnaaavvvHhhjguvhendgkhmbndxdhnfdffgfddis"),
+    NNNAAAVVV_EEE_Dis("nnnaadldoencjghekssdkefavnrxzddgggfdsdis"),
 }
 
 @Keep
@@ -64,6 +71,12 @@ data class AdvertiseEntity(
     val showMax: Int = 0,
     @SerializedName("comping")
     val clickMax: Int = 0,
+    val server: AdvertiseEntityInformation?,
+    val nonserver: AdvertiseEntityInformation?,
+)
+
+@Keep
+data class AdvertiseEntityInformation(
     @SerializedName("tuop")
     val start: MutableList<EveryADBean>?,
 
@@ -85,7 +98,7 @@ data class AdvertiseEntity(
 
 @Keep
 data class AdOpenBean(
-    val autoConnect: String? = "1",
+    val brisk: String? = "1",
     val fooey: String? = "20&20",
     val kate: String? = "1",
     val guide: String? = "1",
