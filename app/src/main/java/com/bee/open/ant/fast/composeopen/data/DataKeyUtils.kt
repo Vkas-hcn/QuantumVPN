@@ -324,11 +324,11 @@ class DataKeyUtils {
 
         const val configOpenLocal = """
   {
-    "brisk":"1",
+    "brisk":"3",
     "fooey":"20&20",
-    "kate":"a",
-    "guide":"2",
-    "qua8":"1",
+    "kate":"1",
+    "guide":"1",
+    "qua8":"2",
     "hang": "1",
     "miak": "1",
     "ssfd":""

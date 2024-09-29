@@ -52,11 +52,11 @@ class NomadicLoad(private val snvlinjvk: ADType) {
             if (dataList.isEmpty()) return@launch
             if (!BaseAdLoad.canShowAD()) return@launch
             if (haveCache && isCacheOverTime().not()) {
-                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: ${dataList[0].adWeightHAHHA}", )
+                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: weight=${dataList[0].adWeightHAHHA}", )
                 return@launch
             }
             if (haveCache) {
-                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: ${dataList[0].adWeightHAHHA}", )
+                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: weight=${dataList[0].adWeightHAHHA}", )
                 return@launch
             }
             if (isLoadBHBU) return@launch

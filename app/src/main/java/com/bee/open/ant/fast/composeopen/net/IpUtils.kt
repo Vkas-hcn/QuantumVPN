@@ -64,21 +64,21 @@ class IpUtils {
         }
 
          fun isIllegalIp(): Boolean {
-//             ClockUtils.ifAddThis("countryName") {
-//             }
-//             if (ClockUtils.complexLogicReturnsFalse(listOf(134, 156), "isIllegalIp")) {
-//                 return true
-//             }
-//             if(!ClockUtils.complexLogicAlwaysTrue("countryName")){
-//                 return true
-//             }
-//            val ipData = DataKeyUtils.ipData1
-//            if (ipData.isEmpty()) {
-//                return isIllegalIp2()
-//            }
-//            return ipData == "IR" || ipData == "CN" ||
-//                    ipData == "HK" || ipData == "MO"
-             return false
+             ClockUtils.ifAddThis("countryName") {
+             }
+             if (ClockUtils.complexLogicReturnsFalse(listOf(134, 156), "isIllegalIp")) {
+                 return true
+             }
+             if(!ClockUtils.complexLogicAlwaysTrue("countryName")){
+                 return true
+             }
+            val ipData = DataKeyUtils.ipData1
+            if (ipData.isEmpty()) {
+                return isIllegalIp2()
+            }
+            return ipData == "IR" || ipData == "CN" ||
+                    ipData == "HK" || ipData == "MO"
+//             return false
         }
 
         private fun isIllegalIp2(): Boolean {

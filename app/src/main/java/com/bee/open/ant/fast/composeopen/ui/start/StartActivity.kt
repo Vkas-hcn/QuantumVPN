@@ -93,9 +93,6 @@ class StartActivity : ComponentActivity() {
 
         }
         updateUserOpinions()
-        FBAD.showVpnPermission(this@StartActivity){
-            checkVpnPermission()
-        }
         lifecycleScope.launch(Dispatchers.IO) {
             initAdJust()
             getVpnNetData()
@@ -151,6 +148,9 @@ class StartActivity : ComponentActivity() {
     }
 
     private fun preLoadAD() {
+        FBAD.showVpnPermission(this@StartActivity){
+            checkVpnPermission()
+        }
         BaseAdLoad.getMainNativeAdData().preload(this)
         if(!DataKeyUtils.firstDialogState2){return}
         BaseAdLoad.getStartOpenAdData().preload(this)
@@ -158,7 +158,8 @@ class StartActivity : ComponentActivity() {
 
     @SuppressLint("HardwareIds")
     private fun initAdJust() {
-
+        Log.e("TAG", "start get initAdJust: ", )
+        DataKeyUtils.ad_j_v = true
         val timeStart = System.currentTimeMillis()
         Adjust.addSessionCallbackParameter(
             "customer_user_id",
@@ -169,16 +170,19 @@ class StartActivity : ComponentActivity() {
         val config = AdjustConfig(application, appToken, environment)
         config.needsCost = true
         config.setOnAttributionChangedListener { attribution ->
-            Log.e("TAG", "adjust=${attribution}")
+            Log.e("TAG", "get adjust=${attribution}")
             adjustNum++
             val timeEnd = (System.currentTimeMillis() - timeStart) / 1000
             CanDataUtils.postPointData("llo", "time", timeEnd)
-            val bh = attribution.network.contains(
-                "organic",
-                true
-            ).not()
+            //TODO 買量寫反的，修改。not
+//            val bh = attribution.network.contains(
+//                "organic",
+//                true
+//            ).not()
+            val bh = true
             if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && bh) {
                 DataKeyUtils.ad_j_v = true
+                CanDataUtils.postPointData("antur29")
             }
             val op1 = if (!bh) {
                 "o"

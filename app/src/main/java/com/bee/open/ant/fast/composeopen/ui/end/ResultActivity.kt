@@ -113,6 +113,11 @@ class ResultActivity : ComponentActivity() {
         if (App.isVpnState == 2 && !App.showSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist() && DishNomadicLoad.getIntervalTimes()) {
             showSwitch = true
             BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
+            CanDataUtils.postPointData(
+                "antur26",
+                "qu",
+                App.top_activity_Quan?.javaClass?.simpleName,
+            )
         }
     }
 
@@ -156,6 +161,7 @@ class ResultActivity : ComponentActivity() {
             return
         }
         val inter = BaseAdLoad.getInterResultAdData()
+        inter.preload(this)
         if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
             lifecycleScope.launch(Dispatchers.Main) {
                 showIntAd = true
@@ -192,6 +198,11 @@ class ResultActivity : ComponentActivity() {
 
     fun cloneDialogFun() {
         lifecycleScope.launch {
+            CanDataUtils.postPointData(
+                "antur28",
+                "qu",
+                App.top_activity_Quan?.javaClass?.simpleName,
+            )
             showIntAd = true
             showCloneDialogAd {
                 showIntAd = false
@@ -437,6 +448,11 @@ fun SwitchDialog(activity: ResultActivity) {
                                 App.showSwitchState = true
                                 activity.showSwitch = false
                                 activity.finish()
+                                CanDataUtils.postPointData(
+                                    "antur27",
+                                    "qu",
+                                    App.top_activity_Quan?.javaClass?.simpleName,
+                                )
                             },
                     ) {
                         Text(

@@ -148,11 +148,11 @@ class DishNomadicLoad(
                 }
 
                 "3" -> {
-                    !getBuyingShieldData()
+                    DataKeyUtils.ad_j_v
                 }
 
                 else -> {
-                    true
+                    DataKeyUtils.ad_j_v
                 }
             }
         }

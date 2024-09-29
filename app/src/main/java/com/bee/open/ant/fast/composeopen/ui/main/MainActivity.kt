@@ -166,6 +166,7 @@ class MainActivity : ComponentActivity() {
         FBAD.showVpnPermission(this) {
             DataKeyUtils.firstDialogState = true
             clickVpn()
+            CanDataUtils.postPointData("antur30")
         }
         DataKeyUtils.firstDialogState2 = true
         DishNomadicLoad.getSpoilerData()
@@ -200,6 +201,11 @@ class MainActivity : ComponentActivity() {
             if (App.isVpnState == 2 && !App.showSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist() && DishNomadicLoad.getIntervalTimes()) {
                 showSwitch = true
                 BaseAdLoad.interHaHaHaOPNNOPIN.preload(this@MainActivity)
+                CanDataUtils.postPointData(
+                    "antur26",
+                    "qu",
+                    App.top_activity_Quan?.javaClass?.simpleName,
+                )
                 return@launch
             }
             if (App.isVpnState == 2 && App.showSwitchState && !App.connectSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist()) {
@@ -314,6 +320,11 @@ class MainActivity : ComponentActivity() {
 
     fun cloneDialogFun() {
         lifecycleScope.launch {
+            CanDataUtils.postPointData(
+                "antur28",
+                "qu",
+                App.top_activity_Quan?.javaClass?.simpleName,
+            )
             showIntAd = true
             showCloneDialogAd {
                 showIntAd = false
@@ -350,7 +361,7 @@ class MainActivity : ComponentActivity() {
         connectVpnStateFun {
             beforeVpnState = vpnState
             connecting()
-            Log.e("TAG", "clickVpn: 11111")
+            Log.e("TAG", "clickVpn: beforeVpnState=${beforeVpnState}")
             App.jumpSwitchState = false
             if (beforeVpnState == 0 || beforeVpnState == -1) {
                 initData()
@@ -403,7 +414,6 @@ class MainActivity : ComponentActivity() {
     fun connecting() {
         isRotating = true
         vpnState = 1
-        App.isVpnState = 1
     }
 
     fun disConnectSuccess() {
@@ -511,6 +521,11 @@ class MainActivity : ComponentActivity() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
             Log.e("TAG", "newStatus: ${state}")
             if (state == "CONNECTED") {
+                if(DataKeyUtils.firstDialogState){
+                    BaseAdLoad.getInterResultAdData().preload(this@MainActivity)
+                    BaseAdLoad.getMainNativeAdData().preload(this@MainActivity)
+                    BaseAdLoad.getEndNativeAdData().preload(this@MainActivity)
+                }
                 showConnectAdTime(DishNomadicLoad.parseTwoNumbers().first) {
                     connectSuccess()
                     BaseAdLoad.interHaHaHaOPNNOPIN.preload(this@MainActivity)
@@ -780,6 +795,11 @@ fun SwitchDialog(activity: MainActivity) {
                                 activity.lifecycleScope.launch {
                                     activity.switchFun()
                                 }
+                                CanDataUtils.postPointData(
+                                    "antur27",
+                                    "qu",
+                                    App.top_activity_Quan?.javaClass?.simpleName,
+                                )
                             },
                     ) {
                         Text(

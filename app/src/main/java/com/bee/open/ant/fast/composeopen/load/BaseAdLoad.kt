@@ -54,6 +54,7 @@ object BaseAdLoad {
         } else {
             advertiseEntity?.nonserver
         }
+        Log.e("TAG", "initializeAdConfig: ${advertiseEntityInFor?.inter?.getOrNull(0)?.adWeightHAHHA}")
         //open
         startOpenBOIBOIUBU.initializeSource(advertiseEntityInFor?.start)
         //connect
