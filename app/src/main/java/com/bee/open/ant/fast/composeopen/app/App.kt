@@ -47,9 +47,11 @@ import com.tencent.mmkv.MMKV
 import de.blinkt.openvpn.api.ExternalOpenVPNService
 import de.blinkt.openvpn.api.IOpenVPNAPIService
 import de.blinkt.openvpn.api.IOpenVPNStatusCallback
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -95,7 +97,6 @@ class App : Application(), LifecycleObserver {
             FirebaseApp.initializeApp(this)
             registerActivityLifecycleCallbacks(AppLifecycleTracker())
             ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-            haveRefData(this)
             saveUtils =
                 MMKV.mmkvWithID("saveUtils", MMKV.MULTI_PROCESS_MODE)
             if (DataKeyUtils.uuid_open.isEmpty() && !complexLogicReturnsFalse(
@@ -114,21 +115,26 @@ class App : Application(), LifecycleObserver {
             ) {
                 DataKeyUtils.tba_id_data = UUID.randomUUID().toString()
             }
-            getBlackList(this)
-            FBADUtils.getFirebaseRemoteConfigData()
-            FBADUtils.fourAppWait4SecondsToGetData()
-            GlobalScope.launch {
-                delay(4000)
+
+        }
+        val appScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        if (isMainProcess(this)) {
+            appScope.launch {
+                haveRefData(this@App)
+                getBlackList(this@App)
+                FBADUtils.getFirebaseRemoteConfigData()
+                FBADUtils.fourAppWait4SecondsToGetData()
+                delay(4000) // 考虑使用更灵活的延迟机制
                 FBADUtils.appCircleToRequestFireData()
             }
-        }
-        if (isMainProcess(this)) {
             try {
                 this.bindService(
                     Intent(this, ExternalOpenVPNService::class.java), mConnection, BIND_AUTO_CREATE
                 )
             } catch (e: Exception) {
-                Log.e("TAG", "bindService: $e")
+                Log.e("AppLifecycle", "bindService failed: $e") // 更具描述性的日志标签
+                // 添加重试或其他错误处理逻辑
+                // 例如：handleBindServiceError(e)
             }
         }
     }

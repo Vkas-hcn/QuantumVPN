@@ -25,6 +25,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -121,6 +122,7 @@ class MainActivity : ComponentActivity() {
     var showNavAd by mutableStateOf(false)
     var showSwitch by mutableStateOf(false)
     var adJobDialog: Job? = null
+    private val timerViewModel: TimerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -148,7 +150,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
-                    DrawerExample(this@MainActivity)
+                    DrawerExample(this@MainActivity, timerViewModel)
                     SwitchDialog(this)
                     LoadingDialog(this)
                 }
@@ -156,12 +158,13 @@ class MainActivity : ComponentActivity() {
         }
         intIP()
         initData()
+        Log.e("TAG", "onCreate: main----")
         try {
             this.bindService(
                 Intent(this, ExternalOpenVPNService::class.java), mConnection, BIND_AUTO_CREATE
             )
         } catch (e: Exception) {
-            Log.e("TAG", "bindService: $e")
+            Log.e("TAG", "main---- bindService: $e")
         }
         FBAD.showVpnPermission(this) {
             DataKeyUtils.firstDialogState = true
@@ -174,16 +177,18 @@ class MainActivity : ComponentActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 requestPermissionForResult(it)
             }
+
     }
 
     fun clickToast(): Boolean {
         val data = DishNomadicLoad.getMainClickData()
-        if (data && App.isVpnState != 2) {
+        if (data && App.isVpnState != 2 && !DataKeyUtils.firstDialogState) {
             Toast.makeText(
                 this,
                 "VPN connection is required to use this feature. Connecting...",
                 Toast.LENGTH_SHORT
             ).show()
+            clickVpn()
             return true
         }
         return false
@@ -227,7 +232,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         adJobDialog?.cancel()
         adJobDialog = null
-        val endNav =  BaseAdLoad.getMainNativeAdData()
+        val endNav = BaseAdLoad.getMainNativeAdData()
         adJobDialog = lifecycleScope.launch {
             delay(500)
             if (lifecycle.currentState == Lifecycle.State.RESUMED) {
@@ -251,6 +256,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.e("TAG", "main--------onDestroy: ")
         try {
             this.unbindService(mConnection)
         } catch (e: Exception) {
@@ -519,9 +525,13 @@ class MainActivity : ComponentActivity() {
     }
     private val mCallback = object : IOpenVPNStatusCallback.Stub() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
-            Log.e("TAG", "newStatus: ${state}")
+            Log.e("TAG", "newStatus: ${state}-beforeVpnState=${beforeVpnState}")
             if (state == "CONNECTED") {
-                if(DataKeyUtils.firstDialogState){
+                if (beforeVpnState == -2) {
+                    connectSuccess()
+                    return
+                }
+                if (DataKeyUtils.firstDialogState) {
                     BaseAdLoad.getInterResultAdData().preload(this@MainActivity)
                     BaseAdLoad.getMainNativeAdData().preload(this@MainActivity)
                     BaseAdLoad.getEndNativeAdData().preload(this@MainActivity)
@@ -665,8 +675,13 @@ class MainActivity : ComponentActivity() {
 
     private fun clickStopFun(nextFun: () -> Unit) {
 
-        if (isConnectFun() || isDisConnectFun()) {
-            Toast.makeText(this, "Please wait a while while connecting", Toast.LENGTH_SHORT).show()
+        if (isConnectFun()) {
+            Toast.makeText(this, "Connecting, will be completed shortly", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (isDisConnectFun()) {
+            Toast.makeText(this, "Disconnecting, will be completed shortly", Toast.LENGTH_SHORT)
+                .show()
             return
         }
         nextFun()
@@ -861,6 +876,7 @@ fun RotatingImageWithControl(
                     1 -> R.drawable.ic_vpn_2
                     2 -> {
                         if (activity.beforeVpnState != activity.vpnState) {
+                            Log.e("TAG", "RotatingImageWithControl: ")
                             timerViewModel.startTimer()
                         }
                         R.drawable.ic_vpn_3
@@ -903,8 +919,11 @@ fun TimerScreen(timerViewModel: TimerViewModel) {
 }
 
 @Composable
-fun ArtistCardRow(activity: MainActivity, clickSettingFun: () -> Unit) {
-    val timerViewModel: TimerViewModel = viewModel()
+fun ArtistCardRow(
+    activity: MainActivity,
+    timerViewModel: TimerViewModel,
+    clickSettingFun: () -> Unit
+) {
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color(0xFFF4F4F4))
@@ -1099,7 +1118,7 @@ fun notificationAlertDialog(activity: MainActivity) {
 }
 
 @Composable
-fun DrawerExample(activity: MainActivity) {
+fun DrawerExample(activity: MainActivity, timerViewModel: TimerViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
@@ -1138,7 +1157,7 @@ fun DrawerExample(activity: MainActivity) {
                         })
             }
         }) {
-        ArtistCardRow(activity) {
+        ArtistCardRow(activity, timerViewModel) {
             scope.launch {
                 drawerState.open()
             }
@@ -1210,7 +1229,7 @@ fun GreetingPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
         ) {
-            DrawerExample(activity = MainActivity())
+            DrawerExample(activity = MainActivity(), timerViewModel = TimerViewModel())
 
         }
     }

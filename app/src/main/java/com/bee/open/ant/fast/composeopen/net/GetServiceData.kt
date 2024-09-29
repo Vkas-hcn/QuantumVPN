@@ -233,6 +233,28 @@ object GetServiceData {
             }
             .launchIn(scope)
     }
+    fun countDown2(
+        max: Int,
+        time: Long,
+        scope: CoroutineScope,
+        onTick: (Int) -> Boolean, // 修改为返回Boolean值
+        onFinish: (() -> Unit)? = null,
+    ): Job {
+        return flow {
+            for (num in 0..max) {
+                if (onTick(num)) {
+                    emit(num)
+                    delay(time)
+                } else {
+                    break // 如果返回false，则停止计时
+                }
+            }
+        }.flowOn(Dispatchers.Main)
+            .onCompletion { cause ->
+                if (cause == null) onFinish?.invoke()
+            }
+            .launchIn(scope)
+    }
 
 
 }

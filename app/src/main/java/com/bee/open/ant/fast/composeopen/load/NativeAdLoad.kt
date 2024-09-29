@@ -52,7 +52,7 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             forNativeAd { ad ->
                 Log.e(
                     "TAG",
-                    "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success"
+                    "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} forNativeAd-success"
                 )
                 nativeAd = ad
                 CanDataUtils.antur15(adBean)
@@ -68,6 +68,11 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
                 onAdLoaded.invoke()
             }
             withAdListener(object : AdListener() {
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    Log.e("TAG", "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success")
+
+                }
                 override fun onAdFailedToLoad(e: LoadAdError) {
                     Log.e(
                         "TAG",
@@ -130,6 +135,10 @@ class NativeAdLoad(private val context: Context, private var item: EveryADBean) 
             } else {
                 App.appNativeAdEnd = nativeAd
             }
+            Log.e(
+                "TAG",
+                "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} show success"
+            )
             nativeAd = null
             onAdDismissed.invoke()
         }

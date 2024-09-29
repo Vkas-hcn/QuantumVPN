@@ -75,6 +75,7 @@ class ResultActivity : ComponentActivity() {
     var showSwitch by mutableStateOf(false)
     var jobDialog: Job? = null
     var adJobDialog: Job? = null
+    var jobBackDialog: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +103,9 @@ class ResultActivity : ComponentActivity() {
             if (!ClockUtils.complexLogicAlwaysTrue("onBackPressedDispatcher")) {
                 return@addCallback
             }
+            if (showSwitch) {
+                return@addCallback
+            }
             backFun()
         }
         showNativeAd()
@@ -121,10 +125,10 @@ class ResultActivity : ComponentActivity() {
         }
     }
 
-    private  fun showNativeAd() {
+    private fun showNativeAd() {
         adJobDialog?.cancel()
         adJobDialog = null
-        val endNav =  BaseAdLoad.getEndNativeAdData()
+        val endNav = BaseAdLoad.getEndNativeAdData()
         endNav.preload(this)
         adJobDialog = lifecycleScope.launch {
             delay(300)
@@ -134,9 +138,9 @@ class ResultActivity : ComponentActivity() {
                         if (endNav.haveCache) {
                             Log.e("TAG", "showNativeAd---: ${App.appNativeAdEnd == null}")
                             endNav.showFullScreenAdBIUYBUI(this@ResultActivity) {
-                                    adJobDialog?.cancel()
-                                    adJobDialog = null
-                                }
+                                adJobDialog?.cancel()
+                                adJobDialog = null
+                            }
                             break
                         }
                         delay(500)
@@ -160,20 +164,38 @@ class ResultActivity : ComponentActivity() {
             nextFun()
             return
         }
+
         val inter = BaseAdLoad.getInterResultAdData()
         inter.preload(this)
-        if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                showIntAd = true
-                delay(1000)
-                showIntAd = false
-                inter.showFullScreenAdBIUYBUI(this@ResultActivity) {
-                    nextFun()
+        showIntAd = true
+        jobBackDialog?.cancel()
+        jobBackDialog = null
+
+        val max = 5 * 10
+        var adShown = false // 标志位，跟踪广告是否已显示
+
+        jobBackDialog = GetServiceData.countDown(max, 100, MainScope(), { num ->
+            if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED && !adShown) {
+                Log.e("TAG", "showInt2Ad: 111111111")
+                adShown = true // 设置标志位，广告已显示
+                lifecycleScope.launch(Dispatchers.Main) {
+                    showIntAd = false
+                    inter.showFullScreenAdBIUYBUI(this@ResultActivity) {
+                        nextFun()
+                    }
                 }
+                false // 返回false以停止计时
+            } else {
+                true // 继续计时
             }
-        } else
-            nextFun()
+        }, {
+            if (!adShown) { // 仅在广告未显示时执行
+                Log.e("TAG", "showInt2Ad: 22222222")
+                nextFun()
+            }
+        })
     }
+
 
     private fun showCloneDialogAd(seconds: Int = 3, nextFun: () -> Unit) {
         if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
@@ -188,6 +210,7 @@ class ResultActivity : ComponentActivity() {
                 BaseAdLoad.showDialogAdIfCan(this@ResultActivity) {
                     if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
                         nextFun()
+                        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
                     }
                 }
             }
