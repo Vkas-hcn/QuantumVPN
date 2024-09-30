@@ -128,7 +128,7 @@ class ServiceListActivity : ComponentActivity() {
         }, {
             Log.e("TAG", "服务器返回超时关闭: ")
             nextFun()
-        }, true)
+        })
     }
 
     fun getVpnServiceData(): MutableList<ServerVpn> {
@@ -333,6 +333,15 @@ fun VpnServiceList(activity: ServiceListActivity) {
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(start = 8.dp),
                     )
+                    if(!vpnServiceData[index].isBest){
+                        Text(
+                            text = vpnServiceData[index].city,
+                            color = Color(0xFF8288A0),
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
                     Spacer(Modifier.weight(1f))
                     Image(
                         painter = painterResource(id = activity.showWhetherCheckImg(index)),

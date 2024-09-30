@@ -167,9 +167,8 @@ class ResultActivity : ComponentActivity() {
         jobBackDialog = null
 
         val max = 5 * 10
-        var adShown = false
         jobBackDialog = GetServiceData.countDown(max, 100, MainScope(), { num ->
-            if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED && !adShown) {
+            if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
                 Log.e("TAG", "showInt2Ad: 111111111")
                 showIntAd = false
                 inter.showFullScreenAdBIUYBUI(this@ResultActivity) {
@@ -181,7 +180,7 @@ class ResultActivity : ComponentActivity() {
         }, {
             Log.e("TAG", "showInt2Ad: 22222222")
             nextFun()
-        }, true)
+        })
     }
 
 

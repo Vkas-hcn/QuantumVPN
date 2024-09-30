@@ -25,7 +25,16 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
     private var ad: Any? = null
     private val adRequest: AdRequest get() = AdRequest.Builder().build()
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
-
+//        if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
+//            Log.e(
+//                "TAG",
+//                "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"
+//            )
+//            BaseAdLoad.getStartOpenAdData().clearAdCache()
+//            BaseAdLoad.getStartOpenAdData().preload(context)
+//            onAdDismissed.invoke()
+//            return
+//        }
         loadAppOpen(onAdLoaded, onAdLoadFailed)
     }
 

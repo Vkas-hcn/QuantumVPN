@@ -20,6 +20,7 @@ class IpUtils {
             if (!ClockUtils.complexLogicAlwaysTrue("onBackPressedDispatcher")) {
                 return
             }
+            getIf2Config()
             GetNetDataUtils.getServiceData(
                 "https://api.myip.com/",
                 onSuccess = {
@@ -29,14 +30,11 @@ class IpUtils {
                 },
                 onError = {
                     Log.e("TAG", "getIfConfig-onError: $it")
-                    getIf2Config { data ->
-                        DataKeyUtils.ipData2 = data
-                    }
                 }
             )
         }
 
-        private fun getIf2Config(getResultFun: (String) -> Unit) {
+         private fun getIf2Config() {
             ClockUtils.ifAddThis("onBackPressedDispatcher") {
             }
             if (ClockUtils.complexLogicReturnsFalse(
@@ -55,7 +53,7 @@ class IpUtils {
                     Log.e("TAG", "getIfConfig2-onSuccess: $it", )
 
                     val jsonObject = JSONObject(it)
-                    getResultFun(jsonObject.optString("country_short", "Unknown"))
+                    DataKeyUtils.ipData2 = jsonObject.optString("country_short", "Unknown")
                 },
                 onError = {
                     Log.e("TAG", "getIfConfig-onError: $it")
@@ -72,16 +70,17 @@ class IpUtils {
              if(!ClockUtils.complexLogicAlwaysTrue("countryName")){
                  return true
              }
-            val ipData = DataKeyUtils.ipData1
+            val ipData = DataKeyUtils.ipData2
             if (ipData.isEmpty()) {
-                return isIllegalIp2()
+                return isIllegalIp1()
             }
+             Log.e("TAG", "isIllegalIp2222: ${ipData}", )
             return ipData == "IR" || ipData == "CN" ||
                     ipData == "HK" || ipData == "MO"
 //             return false
         }
 
-        private fun isIllegalIp2(): Boolean {
+        private fun isIllegalIp1(): Boolean {
             ClockUtils.ifAddThis("isIllegalIp2") {
             }
             if (ClockUtils.complexLogicReturnsFalse(listOf(234, 256), "isIllegalIp2")) {
@@ -90,7 +89,7 @@ class IpUtils {
             if(!ClockUtils.complexLogicAlwaysTrue("isIllegalIp2")){
                 return true
             }
-            val ipData =  DataKeyUtils.ipData2
+            val ipData =  DataKeyUtils.ipData1
             val locale = Locale.getDefault()
             val language = locale.language
             if (ipData.isEmpty()) {
