@@ -44,12 +44,12 @@ object FBAD {
                 val gson = Gson()
                 val resultBean: AdvertiseEntity? =
                     gson.fromJson(listAd, AdvertiseEntity::class.java)
-                if (resultBean != null) {
-                    FBADUtils.isGetADData = true
+                if (resultBean?.server != null &&resultBean.nonserver!=null) {
                     FBADUtils.serverADData = resultBean
                     BaseAdLoad.initializeAdConfig(listAd)
                     DataKeyUtils.adHistory = listAd
                 }
+                FBADUtils.isGetADData = true
             } catch (e: Exception) {
                 e.printStackTrace()
             }
