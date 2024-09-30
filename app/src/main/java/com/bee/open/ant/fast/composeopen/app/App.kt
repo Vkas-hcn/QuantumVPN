@@ -80,7 +80,8 @@ class App : Application(), LifecycleObserver {
         var showSwitchState = false
         var jumpSwitchState = false
         var connectSwitchState = false
-
+//        var appNativeAdHome: NativeAd? by mutableStateOf(null)
+//        var appNativeAdEnd: NativeAd? by mutableStateOf(null)
     }
 
     var isBoot = false

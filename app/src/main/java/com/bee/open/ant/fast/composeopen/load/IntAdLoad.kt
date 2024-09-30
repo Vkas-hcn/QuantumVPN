@@ -13,6 +13,7 @@ import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
+import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -31,10 +32,6 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
     private val adRequest: AdRequest get() = AdRequest.Builder().build()
 
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
-        val type = when (item.adYype) {
-            "plai" -> "Open"
-            else -> "Inter"
-        }
         Log.e(
             "TAG",
             "ad-where=${item.where},InterstitialAd-id: ${item.adIdKKKK}, weight: ${item.adWeightHAHHA}  start preload"
@@ -94,37 +91,37 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
 
         fun showAdMobFullScreenAd(activity: ComponentActivity) {
             if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
-                Log.e(
-                    "TAG",
-                    "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"
-                )
-                if (item.where == "basex") {
-                    BaseAdLoad.getInterResultAdData().clearAdCache()
-                    BaseAdLoad.getInterResultAdData().preload(activity)
+                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
+                // 清除缓存
+                val adLoader = if (item.where == "basex") BaseAdLoad.getInterResultAdData() else BaseAdLoad.getInterListAdData()
+                adLoader.clearAdCache()
+                // 处理广告显示逻辑
+                BaseAdLoad.setActivityShowIntAd(activity,true)
 
-                } else {
-                    BaseAdLoad.getInterListAdData().clearAdCache()
-                    BaseAdLoad.getInterListAdData().preload(activity)
-                }
-                onAdDismissed.invoke()
+                // 添加重新加载广告的逻辑
+                loadHowAreYou({
+                    activity.lifecycleScope.launch {
+                        delay(1000)
+                        BaseAdLoad.setActivityShowIntAd(activity,false)
+                        showMyNameIsHei(activity, nativeParent, onAdDismissed)
+                    }
+                }, { msg ->
+                    Log.e("TAG", "重新加载广告失败：$msg")
+                    BaseAdLoad.setActivityShowIntAd(activity,false)
+                    onAdDismissed.invoke()
+                })
+
                 return
             }
-            Log.e("TAG", "showAdMobFullScreenAd-相同ip展示: ${item.adIdKKKK}")
-            when (val adF = ad) {
-                is InterstitialAd -> {
-                    adF.run {
-                        fullScreenContentCallback = callback
-                        show(activity)
-                        item = CanDataUtils.afterLoadQTV(item)
-                    }
-                }
-
-                else -> onAdDismissed.invoke()
-            }
+            (ad as? InterstitialAd)?.let {
+                it.fullScreenContentCallback = callback
+                it.show(activity)
+                item = CanDataUtils.afterLoadQTV(item)
+            } ?: onAdDismissed.invoke()
         }
-
         showAdMobFullScreenAd(activity)
     }
+    // 提取的公共方法，用于处理 showIntAd 的逻辑
 
 
     private fun loadInavnisduabnviosbvaoisubvd(

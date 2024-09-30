@@ -24,14 +24,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class NativeAdLoad(private val context: Context, private var item2: EveryADBean) :
+class NativeAdLoadDis(private val context: Context, private var item2: EveryADBean) :
     SoWhatCanYouDo(item2) {
     companion object {
         var nativeAdHome: NativeAd? = null
         var nativeAdEnd: NativeAd? = null
     }
 
-    //    var item2 :EveryADBean?=null
+    //        var item2 :EveryADBean?=null
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
 
 //        if (item2?.where == "saxc") {
@@ -44,11 +44,13 @@ class NativeAdLoad(private val context: Context, private var item2: EveryADBean)
             "TAG",
             "ad-where=${item2?.where}, InterstitialAd-id: ${item2?.adIdKKKK}, weight: ${item2?.adWeightHAHHA}  start preload==App.isVpnState == 2${App.isVpnState == 2}"
         )
+        var ip = ""
+
         CanDataUtils.antur14(item2!!)
         AdLoader.Builder(context, item2!!.adIdKKKK).apply {
             forNativeAd { ad ->
                 item2 = item2?.let { CanDataUtils.beforeLoadQTV(it) }!!
-                Log.e("TAG", "loadHowAreYou=qtv_load_ip=服务器: ${item2.qtv_load_ip}")
+                Log.e("TAG", "loadHowAreYou=qtv_load_ip=非服务器: ${item2.qtv_load_ip}")
                 if (item2?.where == "saxc") {
                     nativeAdHome = ad
                 } else {
@@ -56,7 +58,7 @@ class NativeAdLoad(private val context: Context, private var item2: EveryADBean)
                 }
                 CanDataUtils.antur15(adBean)
                 ad.setOnPaidEventListener { adValue ->
-                    Log.e("TAG", "原生广告 -${item2?.where}，开始上报-服务器: ${item2.qtv_load_ip}")
+                    Log.e("TAG", "原生广告 -${item2?.where}，开始上报-非服务器: ${item2.qtv_load_ip}")
                     CanDataUtils.postAdAllData(
                         adValue,
                         ad.responseInfo,

@@ -12,6 +12,7 @@ import com.bee.open.ant.fast.composeopen.data.NomadicFun.stringComplexLogicCheck
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
+import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 import com.bee.open.ant.fast.composeopen.ui.start.StartActivity
 
 import com.facebook.appevents.AppEventsLogger
@@ -205,5 +206,18 @@ object BaseAdLoad {
             mainNativeEndDis
         }
     }
-
+     fun setActivityShowIntAd(activity: ComponentActivity,state:Boolean) {
+        when (activity) {
+            is MainActivity -> {
+                activity.showIntAd = state
+            }
+            is ServiceListActivity -> {
+                activity.showIntAd = state
+            }
+            is ResultActivity -> {
+                activity.showIntAd = state
+            }
+            else -> {}
+        }
+    }
 }

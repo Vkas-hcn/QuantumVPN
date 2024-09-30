@@ -311,7 +311,7 @@ object CanDataUtils {
     ) {
         GlobalScope.launch(Dispatchers.IO) {
             val json = getAdAllJson(adValue, responseInfo, adBean)
-            Log.e("TBA", "${adBean.where}-Ad-Json--->${json}")
+            Log.e("TBA", "${adBean.where}-广告事件上报数据--->${json}")
             try {
                 GetNetDataUtils.postTbaData(
                     DataKeyUtils.tbaUrl,

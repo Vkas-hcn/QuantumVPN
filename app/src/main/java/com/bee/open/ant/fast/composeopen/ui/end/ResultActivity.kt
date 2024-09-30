@@ -51,6 +51,7 @@ import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.NativeAdLoad
+import com.bee.open.ant.fast.composeopen.load.NativeAdLoadDis
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData
@@ -130,9 +131,13 @@ class ResultActivity : ComponentActivity() {
                 try {
                     while (true) {
                         if (endNav.haveCache) {
-                            Log.e("TAG", "showNativeAd---: ${NativeAdLoad.nativeAdEnd == null}")
+                            Log.e("TAG", "showNativeAd---: ${NativeAdLoadDis.nativeAdEnd == null}")
                             endNav.showFullScreenAdBIUYBUI(this@ResultActivity) {
-                                appNativeAdEnd = NativeAdLoad.nativeAdEnd
+                                if (App.isVpnState == 2) {
+                                    appNativeAdEnd = NativeAdLoad.nativeAdEnd
+                                } else {
+                                    appNativeAdEnd = NativeAdLoadDis.nativeAdEnd
+                                }
                                 adJobDialog?.cancel()
                                 adJobDialog = null
                             }

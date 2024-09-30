@@ -19,8 +19,11 @@ class NomadicLoad(private val snvlinjvk: ADType) {
     private var vsnoevn: (Boolean) -> Unit = {}
     val haveCache: Boolean get() = cacheListncsudbca.isNotEmpty()
 
-     fun adCaData(): SoWhatCanYouDo? = cacheListncsudbca.removeFirstOrNull()
+    fun adCaData(): SoWhatCanYouDo? = cacheListncsudbca.removeFirstOrNull()
 
+    fun getAdDataBean(): EveryADBean? {
+        return dataList.firstOrNull()
+    }
     fun showFullScreenAdBIUYBUI(activity: ComponentActivity, onAdDismissed: () -> Unit) {
         if (cacheListncsudbca.isEmpty()) {
             onAdDismissed.invoke()
@@ -33,7 +36,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
         }
         baseAd.showMyNameIsHei(activity = activity, onAdDismissed = onAdDismissed)
         vsnoevn = {}
-        if ( baseAd.adBean.where == "saxc"|| baseAd.adBean.where == "mstan") {
+        if (baseAd.adBean.where == "saxc" || baseAd.adBean.where == "mstan") {
             preload(activity)
         }
     }
@@ -52,11 +55,17 @@ class NomadicLoad(private val snvlinjvk: ADType) {
             if (dataList.isEmpty()) return@launch
             if (!BaseAdLoad.canShowAD()) return@launch
             if (haveCache && isCacheOverTime().not()) {
-                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: weight=${dataList[0].adWeightHAHHA}", )
+                Log.e(
+                    "TAG",
+                    "广告-${dataList[0].where}-已有缓存: weight=${dataList[0].adWeightHAHHA}",
+                )
                 return@launch
             }
             if (haveCache) {
-                Log.e("TAG", "广告-${dataList[0].where}-已有缓存: weight=${dataList[0].adWeightHAHHA}", )
+                Log.e(
+                    "TAG",
+                    "广告-${dataList[0].where}-已有缓存: weight=${dataList[0].adWeightHAHHA}",
+                )
                 return@launch
             }
             if (isLoadBHBU) return@launch
@@ -77,6 +86,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
             false
         }
     }
+
     fun clearAdCache() {
         cacheListncsudbca.clear()
     }

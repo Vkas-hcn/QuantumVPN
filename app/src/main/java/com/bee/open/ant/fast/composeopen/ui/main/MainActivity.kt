@@ -96,6 +96,7 @@ import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.FBAD
 import com.bee.open.ant.fast.composeopen.load.NativeAdLoad
+import com.bee.open.ant.fast.composeopen.load.NativeAdLoadDis
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
@@ -246,7 +247,11 @@ class MainActivity : ComponentActivity() {
                     while (true) {
                         if (endNav.haveCache) {
                             endNav.showFullScreenAdBIUYBUI(this@MainActivity) {
-                                appNativeAdHome = NativeAdLoad.nativeAdHome
+                                if (App.isVpnState == 2) {
+                                    appNativeAdHome = NativeAdLoad.nativeAdHome
+                                } else {
+                                    appNativeAdHome = NativeAdLoadDis.nativeAdHome
+                                }
                                 adJobDialog?.cancel()
                                 adJobDialog = null
                             }
@@ -1057,7 +1062,7 @@ fun ArtistCardRow(
         ) {
             activity.showNavAd =
                 DishNomadicLoad.getBuyingShieldData() || (!DishNomadicLoad.showAdBlacklist())
-            Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}====${activity.showNavAd}")
+            Log.e("TAG", "ArtistCardRow====: ${DishNomadicLoad.getBuyingShieldData()}==${!DishNomadicLoad.showAdBlacklist()}==${activity.showNavAd}")
             if (!activity.showNavAd) {
 
                 if (!BaseAdLoad.canShowAD()) {

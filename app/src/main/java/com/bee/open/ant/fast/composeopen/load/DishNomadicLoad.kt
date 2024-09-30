@@ -183,9 +183,17 @@ class DishNomadicLoad(
             canusdkbcaushdconLoad.invoke(false)
             return
         }
+
         val baseAdanscinc = when (item.adYype) {
             "plai" -> GuideAdLoad(context = contextcaniscnaiesbc, item = item)
-            "nnnee" -> NativeAdLoad(context = contextcaniscnaiesbc, item = item)
+            "nnnee" -> {
+                if(App.isVpnState ==2){
+                    NativeAdLoad(context = contextcaniscnaiesbc, item2 = item)
+                }else{
+                    NativeAdLoadDis(context = contextcaniscnaiesbc, item2 = item)
+                }
+            }
+
             "ity" -> IntAdLoad(context = contextcaniscnaiesbc, item = item)
             else -> null
         }

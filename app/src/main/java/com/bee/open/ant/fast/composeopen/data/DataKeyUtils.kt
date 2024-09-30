@@ -333,10 +333,10 @@ class DataKeyUtils {
   {
     "brisk":"3",
     "fooey":"20&20",
-    "kate":"1",
+    "kate":"0",
     "guide":"2",
     "qua8":"1",
-    "hang": "1",
+    "hang": "2",
     "miak": "1",
     "ssfd":""
   }
