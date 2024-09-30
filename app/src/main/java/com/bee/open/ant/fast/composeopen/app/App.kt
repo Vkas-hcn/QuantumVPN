@@ -71,8 +71,8 @@ class App : Application(), LifecycleObserver {
         var isVpnState = 0
         var isShow by mutableStateOf(true)
         var isBackDataQuan = false
-        var appNativeAdHome: NativeAd? by mutableStateOf(null)
-        var appNativeAdEnd: NativeAd? by mutableStateOf(null)
+//        var appNativeAdHome: NativeAd? by mutableStateOf(null)
+//        var appNativeAdEnd: NativeAd? by mutableStateOf(null)
         var isAppRunning = false
         var ad_activity_Quan: Activity? = null
         var top_activity_Quan: Activity? = null
@@ -80,6 +80,7 @@ class App : Application(), LifecycleObserver {
         var showSwitchState = false
         var jumpSwitchState = false
         var connectSwitchState = false
+
     }
 
     var isBoot = false
@@ -124,7 +125,7 @@ class App : Application(), LifecycleObserver {
                 getBlackList(this@App)
                 FBADUtils.getFirebaseRemoteConfigData()
                 FBADUtils.fourAppWait4SecondsToGetData()
-                delay(4000) // 考虑使用更灵活的延迟机制
+                delay(4000)
                 FBADUtils.appCircleToRequestFireData()
             }
             try {
@@ -132,9 +133,7 @@ class App : Application(), LifecycleObserver {
                     Intent(this, ExternalOpenVPNService::class.java), mConnection, BIND_AUTO_CREATE
                 )
             } catch (e: Exception) {
-                Log.e("AppLifecycle", "bindService failed: $e") // 更具描述性的日志标签
-                // 添加重试或其他错误处理逻辑
-                // 例如：handleBindServiceError(e)
+                Log.e("AppLifecycle", "bindService failed: $e")
             }
         }
     }
@@ -184,6 +183,7 @@ class App : Application(), LifecycleObserver {
             val intent = Intent(top_activity_Quan, StartActivity::class.java)
             top_activity_Quan?.startActivity(intent)
             isAppRunning = true
+            DataKeyUtils.autoConnect=true
         }
     }
 

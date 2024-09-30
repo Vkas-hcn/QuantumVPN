@@ -95,6 +95,7 @@ import androidx.lifecycle.Lifecycle
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.FBAD
+import com.bee.open.ant.fast.composeopen.load.NativeAdLoad
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
@@ -123,6 +124,7 @@ class MainActivity : ComponentActivity() {
     var showSwitch by mutableStateOf(false)
     var adJobDialog: Job? = null
     private val timerViewModel: TimerViewModel by viewModels()
+    var appNativeAdHome: NativeAd? by mutableStateOf(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,18 +173,18 @@ class MainActivity : ComponentActivity() {
             clickVpn()
             CanDataUtils.postPointData("antur30")
         }
+        getHomeNativeAd()
         DataKeyUtils.firstDialogState2 = true
         DishNomadicLoad.getSpoilerData()
         requestPermissionForResultVPN =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 requestPermissionForResult(it)
             }
-
     }
 
     fun clickToast(): Boolean {
         val data = DishNomadicLoad.getMainClickData()
-        if (data && App.isVpnState != 2 && !DataKeyUtils.firstDialogState) {
+        if (data && App.isVpnState != 2 && !DataKeyUtils.autoConnect) {
             Toast.makeText(
                 this,
                 "VPN connection is required to use this feature. Connecting...",
@@ -230,6 +232,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+
+    }
+
+    fun getHomeNativeAd(){
         adJobDialog?.cancel()
         adJobDialog = null
         val endNav = BaseAdLoad.getMainNativeAdData()
@@ -240,6 +246,7 @@ class MainActivity : ComponentActivity() {
                     while (true) {
                         if (endNav.haveCache) {
                             endNav.showFullScreenAdBIUYBUI(this@MainActivity) {
+                                appNativeAdHome = NativeAdLoad.nativeAdHome
                                 adJobDialog?.cancel()
                                 adJobDialog = null
                             }
@@ -296,6 +303,7 @@ class MainActivity : ComponentActivity() {
                     if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
                         nextFun()
                     }
+
                 }
             }
         }, {
@@ -367,6 +375,7 @@ class MainActivity : ComponentActivity() {
         connectVpnStateFun {
             beforeVpnState = vpnState
             connecting()
+            DataKeyUtils.autoConnect = true
             Log.e("TAG", "clickVpn: beforeVpnState=${beforeVpnState}")
             App.jumpSwitchState = false
             if (beforeVpnState == 0 || beforeVpnState == -1) {
@@ -1048,14 +1057,19 @@ fun ArtistCardRow(
         ) {
             activity.showNavAd =
                 DishNomadicLoad.getBuyingShieldData() || (!DishNomadicLoad.showAdBlacklist())
-            Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}")
+            Log.e("TAG", "ArtistCardRow====: ${BaseAdLoad.canShowAD()}====${activity.showNavAd}")
             if (!activity.showNavAd) {
 
                 if (!BaseAdLoad.canShowAD()) {
-                    App.appNativeAdHome == null
+                    activity.appNativeAdHome == null
                 }
-                if (App.appNativeAdHome != null) {
-                    NativeAdHomeContent(App.appNativeAdHome!!)
+                var ad by remember {
+                    mutableStateOf(activity.appNativeAdHome)
+                }
+                ad = activity.appNativeAdHome
+                if (activity.appNativeAdHome != null) {
+                    Log.e("TAG", "App.appNativeAdHome=${activity.appNativeAdHome == null}")
+                    NativeAdHomeContent(ad!!)
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.ic_ad_bg),
@@ -1067,7 +1081,6 @@ fun ArtistCardRow(
                     )
                 }
             }
-
         }
         loadVpnData(activity)
     }
@@ -1169,6 +1182,7 @@ fun DrawerExample(activity: MainActivity, timerViewModel: TimerViewModel) {
 
 @Composable
 fun NativeAdHomeContent(nativeAd: NativeAd) {
+
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()

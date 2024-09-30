@@ -44,30 +44,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.R
 import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
+import com.bee.open.ant.fast.composeopen.load.NativeAdLoad
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData
-import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
-import com.bee.open.ant.fast.composeopen.ui.main.NativeAdHomeContent
 import com.bee.open.ant.fast.composeopen.ui.theme.QuantumVpnTheme
-import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.NonCancellable.isActive
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class ResultActivity : ComponentActivity() {
@@ -76,6 +69,7 @@ class ResultActivity : ComponentActivity() {
     var jobDialog: Job? = null
     var adJobDialog: Job? = null
     var jobBackDialog: Job? = null
+    var appNativeAdEnd: NativeAd? by mutableStateOf(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,8 +130,9 @@ class ResultActivity : ComponentActivity() {
                 try {
                     while (true) {
                         if (endNav.haveCache) {
-                            Log.e("TAG", "showNativeAd---: ${App.appNativeAdEnd == null}")
+                            Log.e("TAG", "showNativeAd---: ${NativeAdLoad.nativeAdEnd == null}")
                             endNav.showFullScreenAdBIUYBUI(this@ResultActivity) {
+                                appNativeAdEnd = NativeAdLoad.nativeAdEnd
                                 adJobDialog?.cancel()
                                 adJobDialog = null
                             }
@@ -172,28 +167,21 @@ class ResultActivity : ComponentActivity() {
         jobBackDialog = null
 
         val max = 5 * 10
-        var adShown = false // 标志位，跟踪广告是否已显示
-
+        var adShown = false
         jobBackDialog = GetServiceData.countDown(max, 100, MainScope(), { num ->
             if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED && !adShown) {
                 Log.e("TAG", "showInt2Ad: 111111111")
-                adShown = true // 设置标志位，广告已显示
-                lifecycleScope.launch(Dispatchers.Main) {
-                    showIntAd = false
-                    inter.showFullScreenAdBIUYBUI(this@ResultActivity) {
-                        nextFun()
-                    }
+                showIntAd = false
+                inter.showFullScreenAdBIUYBUI(this@ResultActivity) {
+                    nextFun()
                 }
-                false // 返回false以停止计时
-            } else {
-                true // 继续计时
+                jobBackDialog?.cancel()
+                jobBackDialog = null
             }
         }, {
-            if (!adShown) { // 仅在广告未显示时执行
-                Log.e("TAG", "showInt2Ad: 22222222")
-                nextFun()
-            }
-        })
+            Log.e("TAG", "showInt2Ad: 22222222")
+            nextFun()
+        }, true)
     }
 
 
@@ -306,10 +294,10 @@ fun titleView(activity: ResultActivity) {
                 .fillMaxWidth()
         ) {
             if (!BaseAdLoad.canShowAD()) {
-                App.appNativeAdEnd == null
+                activity.appNativeAdEnd == null
             }
-            if (App.appNativeAdEnd != null) {
-                NativeAdEndContent(App.appNativeAdEnd!!)
+            if (activity.appNativeAdEnd != null) {
+                NativeAdEndContent(activity.appNativeAdEnd!!)
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.ic_ad_end_oc),

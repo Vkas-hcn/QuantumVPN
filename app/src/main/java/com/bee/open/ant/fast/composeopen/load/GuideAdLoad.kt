@@ -72,20 +72,16 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
                 }
             }
         }
-var data = false
+
         fun showAdMobFullScreenAd() {
-            //不相同ip禁止加载
-            if (!data) {
-                data =true
-                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
-                // 添加重新加载广告的逻辑
-                loadAppOpen({
-                    // 广告加载成功后再次尝试展示广告
-                    showAdMobFullScreenAd()
-                }, { msg ->
-                    Log.e("TAG", "重新加载广告失败：$msg")
-                    onAdDismissed.invoke()
-                })
+            if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
+                Log.e(
+                    "TAG",
+                    "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"
+                )
+                BaseAdLoad.getStartOpenAdData().clearAdCache()
+                BaseAdLoad.getStartOpenAdData().preload(activity)
+                onAdDismissed.invoke()
                 return
             }
             when (val adF = ad) {
@@ -127,7 +123,7 @@ var data = false
                                 appOpenAd.responseInfo,
                                 item
                             )
-                            CanDataUtils.toPointAdQTV(adValue,appOpenAd.responseInfo)
+                            CanDataUtils.toPointAdQTV(adValue, appOpenAd.responseInfo)
                         }
                     }
                     Log.e(
@@ -135,8 +131,9 @@ var data = false
                         "ad-where-${item.where}, id: ${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-success"
                     )
                 }
+
                 override fun onAdFailedToLoad(e: LoadAdError) {
-                    CanDataUtils.antur17(item,e.message)
+                    CanDataUtils.antur17(item, e.message)
                     onAdLoadFailed.invoke(e.message)
                     Log.e(
                         "TAG",

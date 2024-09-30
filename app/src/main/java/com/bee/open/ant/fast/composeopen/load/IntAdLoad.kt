@@ -93,19 +93,23 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
         }
 
         fun showAdMobFullScreenAd(activity: ComponentActivity) {
+            if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
+                Log.e(
+                    "TAG",
+                    "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"
+                )
+                if (item.where == "basex") {
+                    BaseAdLoad.getInterResultAdData().clearAdCache()
+                    BaseAdLoad.getInterResultAdData().preload(activity)
 
-            if (App.isVpnState == 2 && item.qtv_load_ip!= DataKeyUtils.tba_vpn_ip) {
-                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
-                // 添加重新加载广告的逻辑
-                loadInavnisduabnviosbvaoisubvd({
-                    // 广告加载成功后再次尝试展示广告
-                    showAdMobFullScreenAd(activity)
-                }, { msg ->
-                    Log.e("TAG", "重新加载广告失败：$msg")
-                    onAdDismissed.invoke()
-                })
+                } else {
+                    BaseAdLoad.getInterListAdData().clearAdCache()
+                    BaseAdLoad.getInterListAdData().preload(activity)
+                }
+                onAdDismissed.invoke()
                 return
             }
+            Log.e("TAG", "showAdMobFullScreenAd-相同ip展示: ${item.adIdKKKK}")
             when (val adF = ad) {
                 is InterstitialAd -> {
                     adF.run {
@@ -151,12 +155,12 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
                     }
                 }
 
-                override fun onAdFailedToLoad(e: LoadAdError){
+                override fun onAdFailedToLoad(e: LoadAdError) {
                     Log.e(
                         "TAG",
                         "ad-where-${item.where}, id :${item.adIdKKKK}, adweight: ${item.adWeightHAHHA} onAdLoaded-error=${e.message}"
                     )
-                    CanDataUtils.antur17(item,e.message)
+                    CanDataUtils.antur17(item, e.message)
                     onAdLoadFailed.invoke(e.message)
                 }
             })

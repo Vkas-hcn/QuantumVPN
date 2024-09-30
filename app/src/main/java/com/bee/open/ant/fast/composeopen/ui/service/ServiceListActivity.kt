@@ -118,13 +118,17 @@ class ServiceListActivity : ComponentActivity() {
                 lifecycleScope.launch(Dispatchers.Main) {
                     showIntAd = false
                     inter.showFullScreenAdBIUYBUI(this@ServiceListActivity) {
+                        Log.e("TAG", "服务器返回关闭: ")
                         nextFun()
                     }
                 }
+                listBackJob?.cancel()
+                listBackJob = null
             }
         }, {
+            Log.e("TAG", "服务器返回超时关闭: ")
             nextFun()
-        })
+        }, true)
     }
 
     fun getVpnServiceData(): MutableList<ServerVpn> {

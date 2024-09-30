@@ -187,6 +187,13 @@ class DataKeyUtils {
             }
             get() = save.decodeBool("service_q_x_type2", false)
 
+        var autoConnect = false
+            set(value) {
+                save.encode("autoConnect", value)
+                field = value
+            }
+            get() = save.decodeBool("autoConnect", false)
+
         fun setAdShowNumFun(key: String, data: Int) {
             save.encode(key, data)
         }
@@ -327,8 +334,8 @@ class DataKeyUtils {
     "brisk":"3",
     "fooey":"20&20",
     "kate":"1",
-    "guide":"1",
-    "qua8":"2",
+    "guide":"2",
+    "qua8":"1",
     "hang": "1",
     "miak": "1",
     "ssfd":""

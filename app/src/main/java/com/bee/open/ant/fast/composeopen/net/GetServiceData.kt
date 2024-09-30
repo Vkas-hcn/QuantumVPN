@@ -211,47 +211,48 @@ object GetServiceData {
         return String(android.util.Base64.decode(str, android.util.Base64.DEFAULT))
     }
 
+//    fun countDown(
+//        max: Int,
+//        time: Long,
+//        scope: CoroutineScope,
+//        onTick: (Int) -> Unit,
+//        onFinish: (() -> Unit)? = null,
+//    ): Job {
+//        return flow {
+//            for (num in 0..max) {
+//                emit(num)
+//                if (num != 0) delay(time)
+//            }
+//        }.flowOn(Dispatchers.Main)
+//            .onEach {
+//                onTick.invoke(it)
+//            }
+//            .onCompletion { cause ->
+//                if (cause == null)
+//                    onFinish?.invoke()
+//            }
+//            .launchIn(scope)
+//    }
     fun countDown(
         max: Int,
         time: Long,
         scope: CoroutineScope,
         onTick: (Int) -> Unit,
         onFinish: (() -> Unit)? = null,
+        shouldSkipTimeout: Boolean = false
     ): Job {
         return flow {
             for (num in 0..max) {
                 emit(num)
-                if (num != 0) delay(time)
+                if (num != 0 && !shouldSkipTimeout) delay(time)
             }
         }.flowOn(Dispatchers.Main)
             .onEach {
                 onTick.invoke(it)
             }
             .onCompletion { cause ->
-                if (cause == null)
+                if (cause == null && !shouldSkipTimeout)
                     onFinish?.invoke()
-            }
-            .launchIn(scope)
-    }
-    fun countDown2(
-        max: Int,
-        time: Long,
-        scope: CoroutineScope,
-        onTick: (Int) -> Boolean, // 修改为返回Boolean值
-        onFinish: (() -> Unit)? = null,
-    ): Job {
-        return flow {
-            for (num in 0..max) {
-                if (onTick(num)) {
-                    emit(num)
-                    delay(time)
-                } else {
-                    break // 如果返回false，则停止计时
-                }
-            }
-        }.flowOn(Dispatchers.Main)
-            .onCompletion { cause ->
-                if (cause == null) onFinish?.invoke()
             }
             .launchIn(scope)
     }

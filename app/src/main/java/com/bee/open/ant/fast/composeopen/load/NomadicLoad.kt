@@ -77,5 +77,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
             false
         }
     }
-
+    fun clearAdCache() {
+        cacheListncsudbca.clear()
+    }
 }

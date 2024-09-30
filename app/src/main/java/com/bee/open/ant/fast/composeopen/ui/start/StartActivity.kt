@@ -159,7 +159,7 @@ class StartActivity : ComponentActivity() {
     @SuppressLint("HardwareIds")
     private fun initAdJust() {
         Log.e("TAG", "start get initAdJust: ", )
-        DataKeyUtils.ad_j_v = true
+//        DataKeyUtils.ad_j_v = true
         val timeStart = System.currentTimeMillis()
         Adjust.addSessionCallbackParameter(
             "customer_user_id",
@@ -175,11 +175,11 @@ class StartActivity : ComponentActivity() {
             val timeEnd = (System.currentTimeMillis() - timeStart) / 1000
             CanDataUtils.postPointData("llo", "time", timeEnd)
             //TODO 買量寫反的，修改。not
-//            val bh = attribution.network.contains(
-//                "organic",
-//                true
-//            ).not()
-            val bh = true
+            val bh = attribution.network.contains(
+                "organic",
+                true
+            ).not()
+//            val bh = true
             if (!DataKeyUtils.ad_j_v && attribution.network.isNotEmpty() && bh) {
                 DataKeyUtils.ad_j_v = true
                 CanDataUtils.postPointData("antur29")

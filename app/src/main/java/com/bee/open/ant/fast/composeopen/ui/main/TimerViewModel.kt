@@ -16,7 +16,7 @@ class TimerViewModel : ViewModel() {
     val timerText: StateFlow<String> = _timerText
 
     fun startTimer() {
-        if (timerJob != null) return
+        if (timerJob?.isActive == true) return
         timerJob?.cancel()
         secondsElapsed = 0
         timerJob = viewModelScope.launch {
