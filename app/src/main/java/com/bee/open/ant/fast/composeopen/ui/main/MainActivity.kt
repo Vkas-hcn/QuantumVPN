@@ -68,6 +68,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
@@ -99,6 +100,7 @@ import com.bee.open.ant.fast.composeopen.load.NativeAdLoad
 import com.bee.open.ant.fast.composeopen.load.NativeAdLoadDis
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
+import com.bee.open.ant.fast.composeopen.ui.end.NativeAdEndContent
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -126,7 +128,6 @@ class MainActivity : ComponentActivity() {
     var adJobDialog: Job? = null
     private val timerViewModel: TimerViewModel by viewModels()
     var appNativeAdHome: NativeAd? by mutableStateOf(null)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback {
@@ -161,6 +162,7 @@ class MainActivity : ComponentActivity() {
         }
         intIP()
         initData()
+        CanDataUtils.postPointData("antur2")
         Log.e("TAG", "onCreate: main----")
         try {
             this.bindService(
@@ -181,6 +183,10 @@ class MainActivity : ComponentActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 requestPermissionForResult(it)
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     fun clickToast(): Boolean {
@@ -231,12 +237,8 @@ class MainActivity : ComponentActivity() {
         clickVpn()
     }
 
-    override fun onResume() {
-        super.onResume()
 
-    }
-
-    fun getHomeNativeAd(){
+    fun getHomeNativeAd() {
         adJobDialog?.cancel()
         adJobDialog = null
         val endNav = BaseAdLoad.getMainNativeAdData()
@@ -938,6 +940,7 @@ fun ArtistCardRow(
     timerViewModel: TimerViewModel,
     clickSettingFun: () -> Unit
 ) {
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color(0xFFF4F4F4))
@@ -1062,19 +1065,18 @@ fun ArtistCardRow(
         ) {
             activity.showNavAd =
                 DishNomadicLoad.getBuyingShieldData() || (!DishNomadicLoad.showAdBlacklist())
-            Log.e("TAG", "ArtistCardRow====: ${DishNomadicLoad.getBuyingShieldData()}==${!DishNomadicLoad.showAdBlacklist()}==${activity.showNavAd}")
+            Log.e(
+                "TAG",
+                "ArtistCardRow====: ${DishNomadicLoad.getBuyingShieldData()}==${!DishNomadicLoad.showAdBlacklist()}==${activity.showNavAd}"
+            )
             if (!activity.showNavAd) {
 
                 if (!BaseAdLoad.canShowAD()) {
                     activity.appNativeAdHome == null
                 }
-                var ad by remember {
-                    mutableStateOf(activity.appNativeAdHome)
-                }
-                ad = activity.appNativeAdHome
                 if (activity.appNativeAdHome != null) {
                     Log.e("TAG", "App.appNativeAdHome=${activity.appNativeAdHome == null}")
-                    NativeAdHomeContent(ad!!)
+                    NativeAdHomeContent(activity.appNativeAdHome!!)
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.ic_ad_bg),
@@ -1087,6 +1089,8 @@ fun ArtistCardRow(
                 }
             }
         }
+
+
         loadVpnData(activity)
     }
 }
@@ -1185,6 +1189,9 @@ fun DrawerExample(activity: MainActivity, timerViewModel: TimerViewModel) {
     }
 }
 
+
+private var nativeAdView: NativeAdView? = null
+
 @Composable
 fun NativeAdHomeContent(nativeAd: NativeAd) {
 
@@ -1193,18 +1200,30 @@ fun NativeAdHomeContent(nativeAd: NativeAd) {
             .fillMaxWidth()
             .height(60.dp),
         factory = { context ->
-            val nativeAdView = NativeAdView(context)
+            nativeAdView?.removeAllViews()
+            nativeAdView = NativeAdView(context)
             val inflater = LayoutInflater.from(context)
             val adView = inflater.inflate(R.layout.layout_main, null) as NativeAdView
-            nativeAdView.addView(adView)
-            adView.findViewById<TextView>(R.id.ad_headline).text = nativeAd.headline
-            adView.findViewById<TextView>(R.id.ad_body).text = nativeAd.body
-            adView.findViewById<ImageView>(R.id.ad_app_icon)
-                .setImageDrawable(nativeAd.icon?.drawable)
-            adView.findViewById<TextView>(R.id.ad_call_to_action).text = nativeAd.callToAction
+            nativeAdView!!.addView(adView)
+            adView.findViewById<TextView>(R.id.ad_headline).apply {
+                text = nativeAd.headline
+                adView.headlineView = this
+            }
+            adView.findViewById<TextView>(R.id.ad_body).apply {
+                text = nativeAd.body
+                adView.bodyView = this
+            }
+            adView.findViewById<ImageView>(R.id.ad_app_icon).apply {
+                setImageDrawable(nativeAd.icon?.drawable)
+                adView.iconView = this
+            }
+            adView.findViewById<TextView>(R.id.ad_call_to_action).apply {
+                text = nativeAd.callToAction
+                adView.callToActionView = this
+            }
             Log.e("TAG", "首页原生广告展示:")
             adView.setNativeAd(nativeAd)
-            nativeAdView
+            nativeAdView!!
         }
     )
 }

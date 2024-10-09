@@ -55,7 +55,10 @@ object BaseAdLoad {
         } else {
             advertiseEntity?.nonserver
         }
-        Log.e("TAG", "initializeAdConfig: ${advertiseEntityInFor?.inter?.getOrNull(0)?.adWeightHAHHA}")
+        Log.e(
+            "TAG",
+            "initializeAdConfig: ${advertiseEntityInFor?.inter?.getOrNull(0)?.adWeightHAHHA}"
+        )
         //open
         startOpenBOIBOIUBU.initializeSource(advertiseEntityInFor?.start)
         //connect
@@ -126,9 +129,14 @@ object BaseAdLoad {
         return show() && click()
     }
 
-    fun showOpenAdIfCan(activity: StartActivity, cancelFun: () -> Unit, jumpToNext: () -> Unit) {
+    fun showOpenAdIfCan(
+        activity: StartActivity,
+        isAdShow: Boolean = false,
+        cancelFun: () -> Unit,
+        jumpToNext: () -> Unit
+    ) {
         val startOpen = getStartOpenAdData()
-        if (startOpen.haveCache && activity.isActivityResumed()) {
+        if (startOpen.haveCache && (activity.isActivityResumed() || isAdShow)) {
             activity.job?.cancel()
             cancelFun()
             startOpen.showFullScreenAdBIUYBUI(activity) {
@@ -176,6 +184,7 @@ object BaseAdLoad {
             startOpenBOIBOIUBUDis
         }
     }
+
     fun getInterListAdData(): NomadicLoad {
         return if (App.isVpnState == 2) {
             interHaHaHaOPNNOPIN2
@@ -191,6 +200,7 @@ object BaseAdLoad {
             interHaHaHaOPNNOPINREDis
         }
     }
+
     fun getMainNativeAdData(): NomadicLoad {
         return if (App.isVpnState == 2) {
             mainNativeHome
@@ -206,17 +216,21 @@ object BaseAdLoad {
             mainNativeEndDis
         }
     }
-     fun setActivityShowIntAd(activity: ComponentActivity,state:Boolean) {
+
+    fun setActivityShowIntAd(activity: ComponentActivity, state: Boolean) {
         when (activity) {
             is MainActivity -> {
                 activity.showIntAd = state
             }
+
             is ServiceListActivity -> {
                 activity.showIntAd = state
             }
+
             is ResultActivity -> {
                 activity.showIntAd = state
             }
+
             else -> {}
         }
     }

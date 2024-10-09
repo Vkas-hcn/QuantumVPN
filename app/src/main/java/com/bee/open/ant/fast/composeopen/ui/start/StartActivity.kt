@@ -146,20 +146,21 @@ class StartActivity : ComponentActivity() {
             preLoadAD()
         }
     }
-
+    var isAdShow = false
     private fun preLoadAD() {
         FBAD.showVpnPermission(this@StartActivity){
             checkVpnPermission()
+            isAdShow =true
         }
         BaseAdLoad.getMainNativeAdData().preload(this)
-        if(!DataKeyUtils.firstDialogState2){return}
+//        if(!DataKeyUtils.firstDialogState2){return}
         BaseAdLoad.getStartOpenAdData().preload(this)
     }
 
     @SuppressLint("HardwareIds")
     private fun initAdJust() {
         Log.e("TAG", "start get initAdJust: ", )
-//        DataKeyUtils.ad_j_v = true
+        DataKeyUtils.ad_j_v = true
         val timeStart = System.currentTimeMillis()
         Adjust.addSessionCallbackParameter(
             "customer_user_id",
@@ -251,7 +252,7 @@ class StartActivity : ComponentActivity() {
                     override fun onTick(millisUntilFinished: Long) {
                         progress = 1 - (millisUntilFinished / totalTime.toFloat())
                         if (progress > 0.1f && DataKeyUtils.userAdType) {
-                            BaseAdLoad.showOpenAdIfCan(this@StartActivity, {
+                            BaseAdLoad.showOpenAdIfCan(this@StartActivity, isAdShow ,{
                                 cancel()
                             }, {
                                 progress = 1f
