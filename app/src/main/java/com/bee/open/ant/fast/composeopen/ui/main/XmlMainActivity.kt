@@ -300,6 +300,8 @@ class XmlMainActivity : AppCompatActivity() {
             }
             if (App.isVpnState == 2 && App.showSwitchState && !App.connectSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist()) {
                 switchFun()
+            }else{
+                getHomeNativeAd()
             }
         }
     }
@@ -482,6 +484,7 @@ class XmlMainActivity : AppCompatActivity() {
 
     fun connectSuccess() {
         lifecycleScope.launch(Dispatchers.Main) {
+            binding.vpnGuide = false
             App.isVpnState = 2
             binding.imgVpn.stopRotate()
             timerViewModel.startTimer()
@@ -679,9 +682,7 @@ class XmlMainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("TAG", "onActivityResult11111: $requestCode")
-        if (requestCode == 0x334 || requestCode == 0x445 || requestCode == 0x555) {
-            getHomeNativeAd()
-        }
+
         if (requestCode == 0x334 && DataKeyUtils.selectVpnServiceData != "" && vpnState != 2) {
             DataKeyUtils.nowVpnServiceData = DataKeyUtils.selectVpnServiceData
             setVpnInfor()
@@ -701,6 +702,9 @@ class XmlMainActivity : AppCompatActivity() {
         if (requestCode == 0x445) {
             Log.e("TAG", "onActivityResult: $requestCode")
             showSwitchDialogFun()
+        }
+        if (requestCode == 0x334 || requestCode == 0x555) {
+            getHomeNativeAd()
         }
     }
 

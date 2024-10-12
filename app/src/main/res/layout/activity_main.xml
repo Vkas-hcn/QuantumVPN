@@ -29,6 +29,7 @@
             name="showModel"
             type="Boolean"
             android:value="false" />
+
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
