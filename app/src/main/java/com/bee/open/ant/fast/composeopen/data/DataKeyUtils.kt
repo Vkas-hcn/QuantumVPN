@@ -8,7 +8,6 @@ class DataKeyUtils {
     companion object {
         const val VPN_DATA_URL =
             "https://test.quantumsphereonline.com/WgNihdyrk/dJcpwZFkiK/fseqUqCrz/"
-        const val proxyUrl = "https://baidu.com"
         const val blackUrl = "https://rubbish.quantumsphereonline.com/goal/fs"
         val tbaUrl = if (BuildConfig.DEBUG) {
             "https://test-backward.quantumsphereonline.com/jubilate/stun/mulct"
