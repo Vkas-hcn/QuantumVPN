@@ -124,6 +124,11 @@ class NativeAdLoadDis(private val context: Context, private var item2: EveryADBe
                 val state = activity.lifecycle.currentState == Lifecycle.State.RESUMED
                 Log.e("TAG", "setDisplayHomeNativeAdFlash: ${state}")
                 if (state) {
+                    if (DishNomadicLoad.getBuyingShieldData()) {
+                        Log.e("TAG", "买量屏蔽广告show")
+                        activity.binding.adLayout.isVisible = false
+                        return@launch
+                    }
                     val adView = activity.layoutInflater.inflate(
                         R.layout.layout_main,
                         null

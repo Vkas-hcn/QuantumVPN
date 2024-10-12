@@ -51,6 +51,7 @@ import kotlinx.coroutines.withContext
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.widget.Button
+import androidx.core.view.isVisible
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad.isActivityResumed
 import com.bee.open.ant.fast.composeopen.net.MyService
 
@@ -110,6 +111,10 @@ class XmlMainActivity : AppCompatActivity() {
         // 启动服务
         val intent = Intent(this, MyService::class.java)
         startService(intent)
+        if (DishNomadicLoad.getBuyingShieldData()) {
+            Log.e("TAG", "买量屏蔽广告show")
+            binding.adLayout.isVisible = false
+        }
     }
 
 
