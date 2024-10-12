@@ -6,7 +6,6 @@ import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import org.json.JSONObject
 import java.util.Locale
-
 class IpUtils {
     companion object {
         fun getIfConfig() {
