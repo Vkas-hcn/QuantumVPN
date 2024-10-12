@@ -1081,7 +1081,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 VpnStatus.logDebug("Orbot not installed?");
             }
         }
-        Raoliu.INSTANCE.brand(builder, getPackageName());
+//        Raoliu.INSTANCE.brand(builder, getPackageName());
         if (mProfile.mAllowedAppsVpnAreDisallowed) {
             VpnStatus.logDebug(R.string.disallowed_vpn_apps_info, TextUtils.join(", ", mProfile.mAllowedAppsVpn));
         } else {
@@ -1306,7 +1306,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             String upData = humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, true, getResources());
             String dowData = humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, true, getResources());
             String statisticsData = humanReadableByteCount(in, false, getResources());
-            Raoliu.INSTANCE.getSpeedData(upData, dowData, statisticsData);
+//            Raoliu.INSTANCE.getSpeedData(upData, dowData, statisticsData);
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
         }
 

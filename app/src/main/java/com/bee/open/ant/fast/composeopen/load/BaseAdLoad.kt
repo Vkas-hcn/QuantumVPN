@@ -1,8 +1,10 @@
 package com.bee.open.ant.fast.composeopen.load
 
+import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.app.App
@@ -11,7 +13,9 @@ import com.bee.open.ant.fast.composeopen.data.NomadicFun
 import com.bee.open.ant.fast.composeopen.data.NomadicFun.stringComplexLogicCheck
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
+import com.bee.open.ant.fast.composeopen.ui.end.XmlResultActivity
 import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
+import com.bee.open.ant.fast.composeopen.ui.main.XmlMainActivity
 import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 import com.bee.open.ant.fast.composeopen.ui.start.StartActivity
 
@@ -159,13 +163,27 @@ object BaseAdLoad {
         }
     }
 
-    fun showDialogAdIfCan(activity: ResultActivity, nextFun: () -> Unit) {
+    fun showConnectAdIfCan(activity: XmlMainActivity, nextFun: () -> Unit) {
+        if (interHaHaHaOPNNOPIN.haveCache && activity.isActivityResumed()) {
+            activity.jobConnect?.cancel()
+            activity.lifecycleScope.launch(Dispatchers.Main) {
+                activity.binding.showIntAd = true
+                delay(1000)
+                activity.binding.showIntAd = false
+                interHaHaHaOPNNOPIN.showFullScreenAdBIUYBUI(activity) {
+                    nextFun()
+                }
+            }
+        }
+    }
+
+    fun showDialogAdIfCan(activity: XmlResultActivity, nextFun: () -> Unit) {
         if (interHaHaHaOPNNOPIN.haveCache && activity.isActivityResumed()) {
             activity.jobDialog?.cancel()
             activity.lifecycleScope.launch(Dispatchers.Main) {
-                activity.showIntAd = true
+                activity.binding.showIntAd = true
                 delay(1000)
-                activity.showIntAd = false
+                activity.binding.showIntAd = false
                 interHaHaHaOPNNOPIN.showFullScreenAdBIUYBUI(activity) {
                     nextFun()
                 }
@@ -174,6 +192,9 @@ object BaseAdLoad {
     }
 
     fun ComponentActivity.isActivityResumed(): Boolean {
+        return Lifecycle.State.RESUMED == this.lifecycle.currentState
+    }
+    fun AppCompatActivity.isActivityResumed(): Boolean {
         return Lifecycle.State.RESUMED == this.lifecycle.currentState
     }
 
@@ -217,7 +238,7 @@ object BaseAdLoad {
         }
     }
 
-    fun setActivityShowIntAd(activity: ComponentActivity, state: Boolean) {
+    fun setActivityShowIntAd(activity: Activity, state: Boolean) {
         when (activity) {
             is MainActivity -> {
                 activity.showIntAd = state
@@ -229,6 +250,12 @@ object BaseAdLoad {
 
             is ResultActivity -> {
                 activity.showIntAd = state
+            }
+            is XmlMainActivity -> {
+                activity.binding.showIntAd = state
+            }
+            is XmlResultActivity -> {
+                activity.binding.showIntAd = state
             }
 
             else -> {}

@@ -85,7 +85,6 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bee.open.ant.fast.composeopen.app.App
-import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
 import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
 import androidx.compose.material.*
 import androidx.compose.ui.draw.alpha
@@ -96,11 +95,9 @@ import androidx.lifecycle.Lifecycle
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
 import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.FBAD
-import com.bee.open.ant.fast.composeopen.load.NativeAdLoad
-import com.bee.open.ant.fast.composeopen.load.NativeAdLoadDis
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils
-import com.bee.open.ant.fast.composeopen.ui.end.NativeAdEndContent
+import com.bee.open.ant.fast.composeopen.ui.end.XmlResultActivity
 import com.bee.open.ant.fast.composeopen.ui.web.WebActivity
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -176,7 +173,6 @@ class MainActivity : ComponentActivity() {
             clickVpn()
             CanDataUtils.postPointData("antur30")
         }
-        getHomeNativeAd()
         DataKeyUtils.firstDialogState2 = true
         DishNomadicLoad.getSpoilerData()
         requestPermissionForResultVPN =
@@ -187,6 +183,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        getHomeNativeAd()
     }
 
     fun clickToast(): Boolean {
@@ -246,14 +243,9 @@ class MainActivity : ComponentActivity() {
             delay(500)
             if (lifecycle.currentState == Lifecycle.State.RESUMED) {
                 try {
-                    while (true) {
+                    while (isActive) {
                         if (endNav.haveCache) {
                             endNav.showFullScreenAdBIUYBUI(this@MainActivity) {
-                                if (App.isVpnState == 2) {
-                                    appNativeAdHome = NativeAdLoad.nativeAdHome
-                                } else {
-                                    appNativeAdHome = NativeAdLoadDis.nativeAdHome
-                                }
                                 adJobDialog?.cancel()
                                 adJobDialog = null
                             }
@@ -399,7 +391,6 @@ class MainActivity : ComponentActivity() {
                             CanDataUtils.postPointData("antur13")
                         }
                     }
-
                 }
             }
         }
@@ -461,7 +452,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             delay(200)
             if (beforeVpnState != -2 && this@MainActivity.lifecycle.currentState == Lifecycle.State.RESUMED) {
-                val intent = Intent(this@MainActivity, ResultActivity::class.java)
+                val intent = Intent(this@MainActivity, XmlResultActivity::class.java)
                 startActivityForResult(intent, 0x445)
             }
         }

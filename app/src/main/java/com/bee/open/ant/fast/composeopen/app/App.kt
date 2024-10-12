@@ -37,6 +37,7 @@ import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.complexLogicReturnsFalse
 import com.bee.open.ant.fast.composeopen.net.ClockUtils.ifAddThis
 import com.bee.open.ant.fast.composeopen.net.GetNetDataUtils
+import com.bee.open.ant.fast.composeopen.ui.main.XmlMainActivity
 import com.bee.open.ant.fast.composeopen.ui.start.StartActivity
 import com.google.android.gms.ads.AdActivity
 import com.google.android.gms.ads.nativead.NativeAd
@@ -71,8 +72,6 @@ class App : Application(), LifecycleObserver {
         var isVpnState = 0
         var isShow by mutableStateOf(true)
         var isBackDataQuan = false
-//        var appNativeAdHome: NativeAd? by mutableStateOf(null)
-//        var appNativeAdEnd: NativeAd? by mutableStateOf(null)
         var isAppRunning = false
         var ad_activity_Quan: Activity? = null
         var top_activity_Quan: Activity? = null
@@ -80,8 +79,10 @@ class App : Application(), LifecycleObserver {
         var showSwitchState = false
         var jumpSwitchState = false
         var connectSwitchState = false
-//        var appNativeAdHome: NativeAd? by mutableStateOf(null)
-//        var appNativeAdEnd: NativeAd? by mutableStateOf(null)
+        var vpnModel = 3
+        fun getVpnState():Boolean{
+            return isVpnState==2
+        }
     }
 
     var isBoot = false
@@ -93,6 +94,8 @@ class App : Application(), LifecycleObserver {
         super.onCreate()
         instance = this
         appContext = this
+//        Core.init(this, XmlMainActivity::class)
+        Log.e("TAG", "onCreate: Apppppppppp=${isVpnState}", )
         ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
             MMKV.initialize(this)
             Firebase.initialize(this)

@@ -114,7 +114,7 @@ class ServiceListActivity : ComponentActivity() {
         val max = 5 * 10
         showIntAd = true
         listBackJob = GetServiceData.countDown(max, 100, MainScope(), {
-            if (inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
+            if (it > 10 && inter.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     showIntAd = false
                     inter.showFullScreenAdBIUYBUI(this@ServiceListActivity) {
@@ -286,7 +286,7 @@ fun LoadingDialog(activity: ServiceListActivity) {
                 ) {
                     CircularProgressIndicator(color = Color.Black)
                     Text(
-                        text = "Ads will show soon",
+                        text = "Loading...",
                         color = Color.Black,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
@@ -333,7 +333,7 @@ fun VpnServiceList(activity: ServiceListActivity) {
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(start = 8.dp),
                     )
-                    if(!vpnServiceData[index].isBest){
+                    if (!vpnServiceData[index].isBest) {
                         Text(
                             text = vpnServiceData[index].city,
                             color = Color(0xFF8288A0),

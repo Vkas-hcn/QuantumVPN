@@ -11,17 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
-import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
-import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
-import com.bee.open.ant.fast.composeopen.ui.service.ServiceListActivity
-
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -40,7 +35,7 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
     }
 
     override fun showMyNameIsHei(
-        activity: ComponentActivity,
+        activity: Activity,
         nativeParent: ViewGroup?,
         onAdDismissed: () -> Unit
     ) {
@@ -89,34 +84,19 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
             }
         }
 
-        fun showAdMobFullScreenAd(activity: ComponentActivity) {
+        fun showAdMobFullScreenAd(activity: Activity) {
             if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
-                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
-                // 清除缓存
-                val adLoader = if (item.where == "basex") BaseAdLoad.getInterResultAdData() else BaseAdLoad.getInterListAdData()
-                adLoader.clearAdCache()
-                // 处理广告显示逻辑
-                BaseAdLoad.setActivityShowIntAd(activity,true)
-
-                // 添加重新加载广告的逻辑
-                loadHowAreYou({
-                    activity.lifecycleScope.launch {
-                        delay(1000)
-                        BaseAdLoad.setActivityShowIntAd(activity,false)
-                        showMyNameIsHei(activity, nativeParent, onAdDismissed)
-                    }
-                }, { msg ->
-                    Log.e("TAG", "重新加载广告失败：$msg")
-                    BaseAdLoad.setActivityShowIntAd(activity,false)
-                    onAdDismissed.invoke()
-                })
-
+                Log.e(
+                    "TAG",
+                    "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"
+                )
                 return
             }
             (ad as? InterstitialAd)?.let {
                 it.fullScreenContentCallback = callback
                 it.show(activity)
                 item = CanDataUtils.afterLoadQTV(item)
+                CanDataUtils.antur30(item)
             } ?: onAdDismissed.invoke()
         }
         showAdMobFullScreenAd(activity)
@@ -129,6 +109,19 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
         onAdLoadFailed: (msg: String?) -> Unit
     ) {
         item = CanDataUtils.beforeLoadQTV(item)
+        if (App.getVpnState()) {
+            when (item.where) {
+                "tintuba" -> {
+                    DataKeyUtils.online_load_ip_service_int = item.qtv_load_ip
+                }
+                "basex" -> {
+                    DataKeyUtils.online_load_ip_end_int = item.qtv_load_ip
+                }
+                else -> {
+                    DataKeyUtils.online_load_ip_connect_int = item.qtv_load_ip
+                }
+            }
+        }
         CanDataUtils.antur14(item)
         InterstitialAd.load(context,
             item.adIdKKKK,

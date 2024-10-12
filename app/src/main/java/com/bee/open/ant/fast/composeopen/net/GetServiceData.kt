@@ -3,10 +3,7 @@ package com.bee.open.ant.fast.composeopen.net
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.getSystemService
 import com.bee.open.ant.fast.composeopen.R
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.data.ServerVpn
@@ -23,9 +20,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import org.json.JSONObject
 import java.util.Base64
-
+import android.animation.ObjectAnimator
+import android.view.View
+import android.widget.ImageView
 object GetServiceData {
     fun getVpnNetData() {
         GetNetDataUtils.getServiceData(
@@ -211,28 +209,6 @@ object GetServiceData {
         return String(android.util.Base64.decode(str, android.util.Base64.DEFAULT))
     }
 
-//    fun countDown(
-//        max: Int,
-//        time: Long,
-//        scope: CoroutineScope,
-//        onTick: (Int) -> Unit,
-//        onFinish: (() -> Unit)? = null,
-//    ): Job {
-//        return flow {
-//            for (num in 0..max) {
-//                emit(num)
-//                if (num != 0) delay(time)
-//            }
-//        }.flowOn(Dispatchers.Main)
-//            .onEach {
-//                onTick.invoke(it)
-//            }
-//            .onCompletion { cause ->
-//                if (cause == null)
-//                    onFinish?.invoke()
-//            }
-//            .launchIn(scope)
-//    }
     fun countDown(
         max: Int,
         time: Long,
@@ -257,5 +233,26 @@ object GetServiceData {
             .launchIn(scope)
     }
 
+
+
+    // 扩展函数：开始旋转
+    fun ImageView.startRotate() {
+        // 检查是否已经有动画在运行
+        val animator = ObjectAnimator.ofFloat(this, View.ROTATION, 0f, 360f)
+        animator.duration = 2000 // 每次旋转持续时间（毫秒）
+        animator.repeatCount = ObjectAnimator.INFINITE // 无限重复
+        animator.repeatMode = ObjectAnimator.RESTART // 每次旋转结束时重新开始
+        animator.start() // 开始动画
+        this.tag = animator // 将动画对象存储在 ImageView 的 tag 中，方便停止时使用
+    }
+
+    // 扩展函数：停止旋转
+    fun ImageView.stopRotate() {
+        // 检查 tag 中是否有正在运行的动画
+        val animator = this.tag as? ObjectAnimator
+        animator?.cancel() // 停止动画
+        this.rotation = 0f // 重置旋转角度
+        this.tag = null // 清空 tag
+    }
 
 }

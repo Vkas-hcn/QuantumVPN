@@ -1,6 +1,8 @@
 package com.bee.open.ant.fast.composeopen.net
 
 import android.util.Log
+import com.bee.open.ant.fast.composeopen.BuildConfig
+import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import org.json.JSONObject
 import java.util.Locale
@@ -24,7 +26,7 @@ class IpUtils {
             GetNetDataUtils.getServiceData(
                 "https://api.myip.com/",
                 onSuccess = {
-                    Log.e("TAG", "getIfConfig-onSuccess: $it", )
+                    Log.e("TAG", "getIfConfig-onSuccess: $it")
                     val jsonObject = JSONObject(it)
                     DataKeyUtils.ipData1 = jsonObject.optString("country", "Unknown")
                 },
@@ -34,7 +36,7 @@ class IpUtils {
             )
         }
 
-         private fun getIf2Config() {
+        private fun getIf2Config() {
             ClockUtils.ifAddThis("onBackPressedDispatcher") {
             }
             if (ClockUtils.complexLogicReturnsFalse(
@@ -50,7 +52,7 @@ class IpUtils {
             GetNetDataUtils.getServiceData(
                 "https://api.infoip.io/",
                 onSuccess = {
-                    Log.e("TAG", "getIfConfig2-onSuccess: $it", )
+                    Log.e("TAG", "getIfConfig2-onSuccess: $it")
 
                     val jsonObject = JSONObject(it)
                     DataKeyUtils.ipData2 = jsonObject.optString("country_short", "Unknown")
@@ -61,23 +63,25 @@ class IpUtils {
             )
         }
 
-         fun isIllegalIp(): Boolean {
-//             ClockUtils.ifAddThis("countryName") {
-//             }
-//             if (ClockUtils.complexLogicReturnsFalse(listOf(134, 156), "isIllegalIp")) {
-//                 return true
-//             }
-//             if(!ClockUtils.complexLogicAlwaysTrue("countryName")){
-//                 return true
-//             }
-//            val ipData = DataKeyUtils.ipData2
-//            if (ipData.isEmpty()) {
-//                return isIllegalIp1()
-//            }
-//             Log.e("TAG", "isIllegalIp2222: ${ipData}", )
-//            return ipData == "IR" || ipData == "CN" ||
-//                    ipData == "HK" || ipData == "MO"
-             return false
+        fun isIllegalIp(): Boolean {
+            if (BuildConfig.DEBUG) {
+                return false
+            }
+            ClockUtils.ifAddThis("countryName") {
+            }
+            if (ClockUtils.complexLogicReturnsFalse(listOf(134, 156), "isIllegalIp")) {
+                return true
+            }
+            if (!ClockUtils.complexLogicAlwaysTrue("countryName")) {
+                return true
+            }
+            val ipData = DataKeyUtils.ipData2
+            if (ipData.isEmpty()) {
+                return isIllegalIp1()
+            }
+            Log.e("TAG", "isIllegalIp2222: ${ipData}")
+            return ipData == "IR" || ipData == "CN" ||
+                    ipData == "HK" || ipData == "MO"
         }
 
         private fun isIllegalIp1(): Boolean {
@@ -86,10 +90,10 @@ class IpUtils {
             if (ClockUtils.complexLogicReturnsFalse(listOf(234, 256), "isIllegalIp2")) {
                 return true
             }
-            if(!ClockUtils.complexLogicAlwaysTrue("isIllegalIp2")){
+            if (!ClockUtils.complexLogicAlwaysTrue("isIllegalIp2")) {
                 return true
             }
-            val ipData =  DataKeyUtils.ipData1
+            val ipData = DataKeyUtils.ipData1
             val locale = Locale.getDefault()
             val language = locale.language
             if (ipData.isEmpty()) {
@@ -100,17 +104,20 @@ class IpUtils {
         }
 
 
-         fun getOnlyIp() {
-             GetNetDataUtils.getServiceData(
-                 "https://ifconfig.me/ip",
-                 onSuccess = {
-                     Log.e("TAG", "getIfConfig2-onSuccess: $it", )
-                     DataKeyUtils.tba_ip_data = it
-                 },
-                 onError = {
-                     Log.e("TAG", "getIfConfig-onError: $it")
-                 }
-             )
+        fun getOnlyIp() {
+            if (App.getVpnState()) {
+                return
+            }
+            GetNetDataUtils.getServiceData(
+                "https://ifconfig.me/ip",
+                onSuccess = {
+                    Log.e("TAG", "getIfConfig2-onSuccess: $it")
+                    DataKeyUtils.tba_ip_data = it
+                },
+                onError = {
+                    Log.e("TAG", "getIfConfig-onError: $it")
+                }
+            )
         }
     }
 }

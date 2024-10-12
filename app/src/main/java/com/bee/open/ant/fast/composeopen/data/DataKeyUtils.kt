@@ -20,6 +20,43 @@ class DataKeyUtils {
         var configOpenKey = "sad"
 
         val save = App.saveUtils
+        var online_load_ip_open = ""
+            set(value) {
+                save.encode("online_load_ip_open", value)
+                field = value
+            }
+            get() = save.decodeString("online_load_ip_open", "") ?: ""
+        var online_load_ip_service_int = ""
+            set(value) {
+                save.encode("online_load_ip_service_int", value)
+                field = value
+            }
+            get() = save.decodeString("online_load_ip_service_int", "") ?: ""
+        var online_load_ip_end_int = ""
+            set(value) {
+                save.encode("online_load_ip_end_int", value)
+                field = value
+            }
+            get() = save.decodeString("online_load_ip_end_int", "") ?: ""
+        var online_load_ip_connect_int = ""
+            set(value) {
+                save.encode("online_load_ip_connect_int", value)
+                field = value
+            }
+            get() = save.decodeString("online_load_ip_connect_int", "") ?: ""
+        var online_load_ip_home_nav = ""
+            set(value) {
+                save.encode("online_load_ip_home_nav", value)
+                field = value
+            }
+            get() = save.decodeString("online_load_ip_home_nav", "") ?: ""
+        var online_load_ip_end_nav = ""
+            set(value) {
+                save.encode("online_load_ip_end_nav", value)
+                field = value
+            }
+            get() = save.decodeString("online_load_ip_end_nav", "") ?: ""
+
         var firstDialogState = false
             set(value) {
                 save.encode("firstDialogState", value)
@@ -333,7 +370,7 @@ class DataKeyUtils {
   {
     "brisk":"3",
     "fooey":"20&20",
-    "kate":"0",
+    "kate":"1",
     "guide":"2",
     "qua8":"1",
     "hang": "2",

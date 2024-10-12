@@ -29,7 +29,7 @@ object FBADUtils {
             if (task.isSuccessful) {
                 DataKeyUtils.adOpenData =  remoteConfig?.getString(DataKeyUtils.adOpenKey)?:""
                 //TODo
-                DataKeyUtils.configOpenData =  remoteConfig?.getString(DataKeyUtils.configOpenKey)?:""
+//                DataKeyUtils.configOpenData =  remoteConfig?.getString(DataKeyUtils.configOpenKey)?:""
                 Log.e("TAG", "getFirebaseRemoteConfigData: =${ DataKeyUtils.configOpenData}")
                 initFacebookData()
                 FBAD.getFirebaseStringADData()

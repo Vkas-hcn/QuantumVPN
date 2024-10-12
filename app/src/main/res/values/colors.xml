@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="tc1">#091026</color>
+    <color name="c_model">#1B8B6B</color>
+
 </resources>

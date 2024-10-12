@@ -30,7 +30,7 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
     }
 
     override fun showMyNameIsHei(
-        activity: ComponentActivity,
+        activity: Activity,
         nativeParent: ViewGroup?,
         onAdDismissed: () -> Unit
     ) {
@@ -72,29 +72,13 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
                 }
             }
         }
+
         fun showAdMobFullScreenAd() {
-
             if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
-                Log.e("TAG", "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}")
-                // 清除缓存
-                val adLoader =  BaseAdLoad.getStartOpenAdData()
-                adLoader.clearAdCache()
-                // 处理广告显示逻辑
-                BaseAdLoad.setActivityShowIntAd(activity,true)
-
-                // 添加重新加载广告的逻辑
-                loadHowAreYou({
-                    activity.lifecycleScope.launch {
-                        delay(1000)
-                        BaseAdLoad.setActivityShowIntAd(activity,false)
-                        showMyNameIsHei(activity, nativeParent, onAdDismissed)
-                    }
-                }, { msg ->
-                    Log.e("TAG", "重新加载广告失败：$msg")
-                    BaseAdLoad.setActivityShowIntAd(activity,false)
-                    onAdDismissed.invoke()
-                })
-
+                Log.e(
+                    "TAG",
+                    "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"
+                )
                 return
             }
             when (val adF = ad) {
@@ -103,6 +87,7 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
                         fullScreenContentCallback = callback
                         show(activity)
                         item = CanDataUtils.afterLoadQTV(item)
+                        CanDataUtils.antur30(item)
                     }
                 }
 
@@ -118,6 +103,9 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
             "ad-where=${item.where},InterstitialAd-id: ${item.adIdKKKK}, weight: ${item.adWeightHAHHA}  start preload"
         )
         item = CanDataUtils.beforeLoadQTV(item)
+        if (App.getVpnState()) {
+            DataKeyUtils.online_load_ip_open = item.qtv_load_ip
+        }
         CanDataUtils.antur14(item)
         AppOpenAd.load(
             context,

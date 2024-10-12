@@ -19,7 +19,7 @@ abstract class SoWhatCanYouDo(
     )
 
     abstract fun showMyNameIsHei(
-        activity: ComponentActivity,
+        activity: Activity,
         nativeParent: ViewGroup? = null,
         onAdDismissed: () -> Unit = {}
     )

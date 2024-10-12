@@ -39,6 +39,10 @@ android {
     buildFeatures {
         compose true
     }
+    dataBinding {
+        //noinspection DataBindingWithoutKapt
+        enabled = true
+    }
     composeOptions {
         kotlinCompilerExtensionVersion '1.2.0'
     }
@@ -58,6 +62,8 @@ android {
 }
 
 dependencies {
+    //ConstraintLayout
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
     implementation 'com.airbnb.android:lottie-compose:6.3.0'
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -77,7 +83,6 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation project(':open')
-
     implementation platform('com.google.firebase:firebase-bom:31.2.2')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'

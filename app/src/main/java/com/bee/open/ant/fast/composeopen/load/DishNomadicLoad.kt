@@ -202,6 +202,7 @@ class DishNomadicLoad(
             preloadAdByIndexibscdaiuhsdbcuahsbcukashbcu(index + 1)
             return
         }
+        Log.e("TAG", "preloadAdByIndexibscdaiuhsdbcuahsbcukashbcu: ", )
         baseAdanscinc.loadHowAreYou(onAdLoaded = {
             nslcasidckn.add(baseAdanscinc)
             nslcasidckn.sortByDescending { it.adBean.adWeightHAHHA }

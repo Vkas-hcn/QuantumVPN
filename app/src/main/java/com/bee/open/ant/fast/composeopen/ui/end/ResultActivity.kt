@@ -131,13 +131,13 @@ class ResultActivity : ComponentActivity() {
                 try {
                     while (true) {
                         if (endNav.haveCache) {
-                            Log.e("TAG", "showNativeAd---: ${NativeAdLoadDis.nativeAdEnd == null}")
+//                            Log.e("TAG", "showNativeAd---: ${NativeAdLoadDis.nativeAdEnd == null}")
                             endNav.showFullScreenAdBIUYBUI(this@ResultActivity) {
-                                if (App.isVpnState == 2) {
-                                    appNativeAdEnd = NativeAdLoad.nativeAdEnd
-                                } else {
-                                    appNativeAdEnd = NativeAdLoadDis.nativeAdEnd
-                                }
+//                                if (App.isVpnState == 2) {
+//                                    appNativeAdEnd = NativeAdLoad.nativeAdEnd
+//                                } else {
+//                                    appNativeAdEnd = NativeAdLoadDis.nativeAdEnd
+//                                }
                                 adJobDialog?.cancel()
                                 adJobDialog = null
                             }
@@ -190,25 +190,25 @@ class ResultActivity : ComponentActivity() {
 
 
     private fun showCloneDialogAd(seconds: Int = 3, nextFun: () -> Unit) {
-        if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
-            nextFun()
-            return
-        }
-        jobDialog?.cancel()
-        jobDialog = null
-        val max = seconds * 10
-        jobDialog = GetServiceData.countDown(max, 100, MainScope(), {
-            if (it > 10) {
-                BaseAdLoad.showDialogAdIfCan(this@ResultActivity) {
-                    if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
-                        nextFun()
-                        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
-                    }
-                }
-            }
-        }, {
-            nextFun()
-        })
+//        if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
+//            nextFun()
+//            return
+//        }
+//        jobDialog?.cancel()
+//        jobDialog = null
+//        val max = seconds * 10
+//        jobDialog = GetServiceData.countDown(max, 100, MainScope(), {
+//            if (it > 10) {
+//                BaseAdLoad.showDialogAdIfCan(this@ResultActivity) {
+//                    if (this.lifecycle.currentState == Lifecycle.State.RESUMED || this.lifecycle.currentState == Lifecycle.State.STARTED) {
+//                        nextFun()
+//                        BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
+//                    }
+//                }
+//            }
+//        }, {
+//            nextFun()
+//        })
     }
 
     fun cloneDialogFun() {

@@ -1,9 +1,6 @@
 package com.bee.open.ant.fast.composeopen.ui.start
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Application
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,14 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import android.content.Intent
-import android.net.VpnService
 import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.addCallback
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustConfig
@@ -41,40 +34,29 @@ import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.app.App.Companion.adjustNum
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad
-import com.bee.open.ant.fast.composeopen.load.BaseAdLoad.isActivityResumed
-import com.bee.open.ant.fast.composeopen.load.DishNomadicLoad
 import com.bee.open.ant.fast.composeopen.load.FBAD
 import com.bee.open.ant.fast.composeopen.load.FBADUtils
 import com.bee.open.ant.fast.composeopen.net.CanDataUtils
-import com.bee.open.ant.fast.composeopen.net.ClockUtils
 import com.bee.open.ant.fast.composeopen.net.GetServiceData
 import com.bee.open.ant.fast.composeopen.net.GetServiceData.getVpnNetData
 import com.bee.open.ant.fast.composeopen.net.IpUtils
-import com.bee.open.ant.fast.composeopen.ui.end.ResultActivity
-import com.bee.open.ant.fast.composeopen.ui.main.MainActivity
-import com.facebook.FacebookSdk
-import com.facebook.appevents.AppEventsLogger
+import com.bee.open.ant.fast.composeopen.ui.main.XmlMainActivity
 import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {
     var job: Job? = null
     var job2: Job? = null
     private var startTimer = mutableStateOf(true)
-    lateinit var requestPermissionForResultVPN: ActivityResultLauncher<Intent?>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e("TAG", "onCreate: Apppppppppp=start=${App.isVpnState}", )
         setContent {
             QuantumVpnTheme {
                 Surface(
@@ -100,29 +82,8 @@ class StartActivity : ComponentActivity() {
             IpUtils.getOnlyIp()
             CanDataUtils.postSessionData()
         }
-        requestPermissionForResultVPN =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                requestPermissionForResult(it)
-            }
     }
 
-    private fun checkVpnPermission() {
-        if (!checkVPNPermission(this)) {
-            VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
-        }
-    }
-
-    private fun requestPermissionForResult(result: ActivityResult) {
-        if (result.resultCode == RESULT_OK) {
-
-        }
-    }
-
-    private fun checkVPNPermission(ac: Activity): Boolean {
-        VpnService.prepare(ac).let {
-            return it == null
-        }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -146,20 +107,16 @@ class StartActivity : ComponentActivity() {
             preLoadAD()
         }
     }
+
     var isAdShow = false
     private fun preLoadAD() {
-        FBAD.showVpnPermission(this@StartActivity){
-            checkVpnPermission()
-            isAdShow =true
-        }
         BaseAdLoad.getMainNativeAdData().preload(this)
-//        if(!DataKeyUtils.firstDialogState2){return}
         BaseAdLoad.getStartOpenAdData().preload(this)
     }
 
     @SuppressLint("HardwareIds")
     private fun initAdJust() {
-        Log.e("TAG", "start get initAdJust: ", )
+        Log.e("TAG", "start get initAdJust: ")
         DataKeyUtils.ad_j_v = true
         val timeStart = System.currentTimeMillis()
         Adjust.addSessionCallbackParameter(
@@ -252,11 +209,16 @@ class StartActivity : ComponentActivity() {
                     override fun onTick(millisUntilFinished: Long) {
                         progress = 1 - (millisUntilFinished / totalTime.toFloat())
                         if (progress > 0.1f && DataKeyUtils.userAdType) {
-                            BaseAdLoad.showOpenAdIfCan(this@StartActivity, isAdShow ,{
+                            BaseAdLoad.showOpenAdIfCan(this@StartActivity, isAdShow, {
                                 cancel()
                             }, {
                                 progress = 1f
-                                startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                                startActivity(
+                                    Intent(
+                                        this@StartActivity,
+                                        XmlMainActivity::class.java
+                                    )
+                                )
                                 finish()
                             })
                         }
@@ -267,7 +229,7 @@ class StartActivity : ComponentActivity() {
                         onTimerFinish()
                         if (!App.isBackDataQuan && DataKeyUtils.userAdType) {
                             progress = 1f
-                            startActivity(Intent(this@StartActivity, MainActivity::class.java))
+                            startActivity(Intent(this@StartActivity, XmlMainActivity::class.java))
                             finish()
                         }
                     }

@@ -501,4 +501,12 @@ object CanDataUtils {
             "${adBean.adIdKKKK}+${errorString}",
         )
     }
+
+    fun antur30(adBean: EveryADBean) {
+        postPointData(
+            "antur30",
+            "qu",
+            "${adBean.where}+${App.top_activity_Quan?.javaClass?.simpleName}",
+        )
+    }
 }

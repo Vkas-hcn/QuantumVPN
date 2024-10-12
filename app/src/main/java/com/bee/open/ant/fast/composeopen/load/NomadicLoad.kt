@@ -5,9 +5,11 @@ import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.app.App
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -24,17 +26,28 @@ class NomadicLoad(private val snvlinjvk: ADType) {
     fun getAdDataBean(): EveryADBean? {
         return dataList.firstOrNull()
     }
-    fun showFullScreenAdBIUYBUI(activity: ComponentActivity, onAdDismissed: () -> Unit) {
+
+    fun showFullScreenAdBIUYBUI(activity: Activity, onAdDismissed: () -> Unit) {
         if (cacheListncsudbca.isEmpty()) {
             onAdDismissed.invoke()
             return
         }
         val baseAd = adCaData()
         if (null == baseAd) {
+            Log.e("TAG", "${baseAd?.adBean?.where}---无缓存: ")
             onAdDismissed.invoke()
             return
         }
-        baseAd.showMyNameIsHei(activity = activity, onAdDismissed = onAdDismissed)
+        val activityType = when (activity) {
+            is ComponentActivity -> activity
+            is AppCompatActivity -> activity
+            else -> {
+                Log.e("AdManager", "Unsupported activity type: ${activity.javaClass.name}")
+                onAdDismissed.invoke()
+                return
+            }
+        }
+        baseAd.showMyNameIsHei(activity = activityType, onAdDismissed = onAdDismissed)
         vsnoevn = {}
         if (baseAd.adBean.where == "saxc" || baseAd.adBean.where == "mstan") {
             preload(activity)
@@ -54,6 +67,49 @@ class NomadicLoad(private val snvlinjvk: ADType) {
             BaseAdLoad.initializeAdConfig(DataKeyUtils.adHistory)
             if (dataList.isEmpty()) return@launch
             if (!BaseAdLoad.canShowAD()) return@launch
+            val loadIp = when (dataList[0].where) {
+                "tuop" -> {
+                    DataKeyUtils.online_load_ip_open
+                }
+
+                "intu" -> {
+                    DataKeyUtils.online_load_ip_connect_int
+                }
+
+                "basex" -> {
+                    DataKeyUtils.online_load_ip_end_int
+                }
+
+                "tintuba" -> {
+                    DataKeyUtils.online_load_ip_service_int
+                }
+
+                "saxc" -> {
+                    DataKeyUtils.online_load_ip_home_nav
+                }
+
+                "mstan" -> {
+                    DataKeyUtils.online_load_ip_end_nav
+                }
+
+                else -> {
+                    ""
+                }
+            }
+            Log.e("TAG", "preload: App.isVpnState == 2=${App.isVpnState == 2}")
+            Log.e("TAG", "preload: loadIp=${loadIp}")
+            Log.e("TAG", "preload: DataKeyUtils.tba_vpn_ip=${DataKeyUtils.tba_vpn_ip}")
+            if (App.isVpnState == 2 && loadIp.isNotBlank() && loadIp != DataKeyUtils.tba_vpn_ip) {
+                Log.e(
+                    "TAG",
+                    "缓存ip不相同，清除数据，重新加载=${dataList[0].where}==loadIp=${loadIp}---nowIp-${DataKeyUtils.tba_vpn_ip}"
+                )
+                clearAdCache()
+                clearLoadIp()
+                preload(context)
+                return@launch
+            }
+
             if (haveCache && isCacheOverTime().not()) {
                 Log.e(
                     "TAG",
@@ -89,5 +145,33 @@ class NomadicLoad(private val snvlinjvk: ADType) {
 
     fun clearAdCache() {
         cacheListncsudbca.clear()
+    }
+
+    private fun clearLoadIp(){
+        when (dataList[0].where) {
+            "tuop" -> {
+                DataKeyUtils.online_load_ip_open = ""
+            }
+
+            "intu" -> {
+                DataKeyUtils.online_load_ip_connect_int = ""
+            }
+
+            "basex" -> {
+                DataKeyUtils.online_load_ip_end_int = ""
+            }
+
+            "tintuba" -> {
+                DataKeyUtils.online_load_ip_service_int = ""
+            }
+
+            "saxc" -> {
+                DataKeyUtils.online_load_ip_home_nav = ""
+            }
+
+            "mstan" -> {
+                DataKeyUtils.online_load_ip_end_nav = ""
+            }
+        }
     }
 }
