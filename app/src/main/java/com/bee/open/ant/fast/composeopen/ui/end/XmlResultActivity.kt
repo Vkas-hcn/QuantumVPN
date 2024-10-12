@@ -85,7 +85,6 @@ class XmlResultActivity : AppCompatActivity() {
         showSwitchDialogFun()
         CanDataUtils.antur12()
     }
-
     private fun initData() {
         if (App.isVpnState == 2) {
             binding.tvState1.text = "Connection succeed"
