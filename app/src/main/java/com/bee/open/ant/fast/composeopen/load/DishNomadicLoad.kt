@@ -189,11 +189,10 @@ class DishNomadicLoad(
             "nnnee" -> {
                 if(App.isVpnState ==2){
                     NativeAdLoad(context = contextcaniscnaiesbc, item2 = item)
-                }else{
+                } else {
                     NativeAdLoadDis(context = contextcaniscnaiesbc, item2 = item)
                 }
             }
-
             "ity" -> IntAdLoad(context = contextcaniscnaiesbc, item = item)
             else -> null
         }
@@ -202,7 +201,7 @@ class DishNomadicLoad(
             preloadAdByIndexibscdaiuhsdbcuahsbcukashbcu(index + 1)
             return
         }
-        Log.e("TAG", "preloadAdByIndexibscdaiuhsdbcuahsbcukashbcu: ", )
+        Log.e("TAG", "preloadAdByIndexibscdaiuhsdbcuahsbcukashbcu: ")
         baseAdanscinc.loadHowAreYou(onAdLoaded = {
             nslcasidckn.add(baseAdanscinc)
             nslcasidckn.sortByDescending { it.adBean.adWeightHAHHA }

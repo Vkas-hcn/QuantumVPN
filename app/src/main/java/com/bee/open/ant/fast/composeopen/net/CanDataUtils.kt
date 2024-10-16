@@ -80,10 +80,12 @@ object CanDataUtils {
                 //manufacturer
                 put("annale", "hw")
                 //app_version
-                put("camp", App.getVpnInstance().packageManager.getPackageInfo(
-                    App.getVpnInstance().packageName,
-                    0
-                ).versionName)
+                put(
+                    "camp", App.getVpnInstance().packageManager.getPackageInfo(
+                        App.getVpnInstance().packageName,
+                        0
+                    ).versionName
+                )
             })
         }
         return jsonData
@@ -189,6 +191,10 @@ object CanDataUtils {
         parameterValue1: Any,
         parameterName2: String?,
         parameterValue2: Any?,
+        parameterName3: String?,
+        parameterValue3: Any?,
+        parameterName4: String?,
+        parameterValue4: Any?,
     ): String {
         return getTopLevelJsonData().apply {
             put("dade", name)
@@ -196,6 +202,12 @@ object CanDataUtils {
                 put(parameterName1, parameterValue1)
                 if (parameterName2 != null) {
                     put(parameterName2, parameterValue2)
+                }
+                if (parameterName3 != null) {
+                    put(parameterName3, parameterValue3)
+                }
+                if (parameterName4 != null) {
+                    put(parameterName4, parameterValue4)
                 }
             })
         }.toString()
@@ -332,10 +344,24 @@ object CanDataUtils {
         key: String? = null,
         keyValue: Any? = null,
         key2: String? = null,
-        keyValue2: Any? = null
+        keyValue2: Any? = null,
+        key3: String? = null,
+        keyValue3: Any? = null,
+        key4: String? = null,
+        keyValue4: Any? = null
     ) {
         val pointJson = if (key != null && keyValue != null) {
-            getTbaTimeDataJson(name, key, keyValue, key2, keyValue2)
+            getTbaTimeDataJson(
+                name,
+                key,
+                keyValue,
+                key2,
+                keyValue2,
+                key3,
+                keyValue3,
+                key4,
+                keyValue4
+            )
         } else {
             getTbaDataJson(name)
         }
@@ -404,6 +430,7 @@ object CanDataUtils {
             Log.d("TBA", "purchase打点--value=${adValue.valueMicros}")
         }
     }
+
     private fun isNetworkReachable(): Boolean {
         return try {
             val process = Runtime.getRuntime().exec("/system/bin/ping -c 1 8.8.8.8")
@@ -426,6 +453,7 @@ object CanDataUtils {
             false
         }
     }
+
     fun antur10() {
         GlobalScope.launch(Dispatchers.IO) {
             Log.e("TAG", "antur10: 开始检测")
@@ -441,14 +469,18 @@ object CanDataUtils {
                 "antur10",
                 "qu",
                 BaseAdLoad.interHaHaHaOPNNOPIN.haveCache.toString(),
+                "op",
+                isHaveData,
                 "hh",
-                isHaveData
+                getVpnModelName()
             )
         }
     }
 
+    var clickTimestamp: Long = 0
     fun antur12() {
-        val text = if (App.isVpnState ==2) {
+        val upTimestamp = (System.currentTimeMillis() - clickTimestamp) / 1000
+        val text = if (App.isVpnState == 2) {
             "cont"
         } else {
             "dis"
@@ -457,7 +489,10 @@ object CanDataUtils {
             "antur12", "qu",
             BaseAdLoad.interHaHaHaOPNNOPIN.haveCache.toString(),
             "op",
-            text
+            text, "hh",
+            upTimestamp,
+            "cu",
+            getVpnModelName()
         )
     }
 
@@ -467,16 +502,16 @@ object CanDataUtils {
             "qu",
             "${adBean.adIdKKKK}+${App.top_activity_Quan?.javaClass?.simpleName}",
             "op",
-            (App.isVpnState==2).toString()
+            (App.isVpnState == 2).toString()
         )
-        if ((App.isVpnState==2) && !DataKeyUtils.spoiler_data) {
+        if ((App.isVpnState == 2) && !DataKeyUtils.spoiler_data) {
             postPointData(
                 "antur22",
                 "qu",
                 adBean.where,
             )
         }
-        if (App.isVpnState==2) {
+        if (App.isVpnState == 2) {
             postPointData(
                 "antur23",
                 "qu",
@@ -508,5 +543,17 @@ object CanDataUtils {
             "qu",
             "${adBean.where}+${App.top_activity_Quan?.javaClass?.simpleName}",
         )
+    }
+
+    fun modelPost(pointName: String) {
+        postPointData(pointName, "qu", getVpnModelName())
+    }
+
+    fun getVpnModelName(): String {
+        return when (App.vpnModel) {
+            1,2 -> "ss"
+            3 -> "open"
+            else -> "ss"
+        }
     }
 }

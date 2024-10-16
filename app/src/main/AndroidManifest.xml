@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.QuanVpn"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="LockedOrientationActivity"
         android:name=".app.App"
         tools:replace="android:fullBackupContent,android:label,android:name,android:theme,android:roundIcon,android:icon"
@@ -36,17 +36,9 @@
         </activity>
 
         <activity
-            android:name=".ui.main.MainActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ui.main.XmlMainActivity"
             android:theme="@style/AppTheme"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.end.ResultActivity"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.end.XmlResultActivity"

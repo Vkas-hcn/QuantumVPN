@@ -30,8 +30,10 @@ import kotlinx.coroutines.launch
 
 class NativeAdLoadDis(private val context: Context, private var item2: EveryADBean) :
     SoWhatCanYouDo(item2) {
-    var nativeAdHome: NativeAd? = null
-    var nativeAdEnd: NativeAd? = null
+    companion object {
+        var nativeAdHome: NativeAd? = null
+        var nativeAdEnd: NativeAd? = null
+    }
     override fun loadHowAreYou(onAdLoaded: () -> Unit, onAdLoadFailed: (msg: String?) -> Unit) {
         Log.e(
             "TAG",

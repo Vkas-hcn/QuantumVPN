@@ -120,7 +120,20 @@ class NativeAdLoad(private val context: Context, private var item2: EveryADBean)
         } else {
             if (nativeAdEnd == null) return
         }
-        if (App.isVpnState == 2 && item2.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
+        val loadIp = when (item2.where) {
+            "saxc" -> {
+                DataKeyUtils.online_load_ip_home_nav
+            }
+
+            "mstan" -> {
+                DataKeyUtils.online_load_ip_end_nav
+            }
+
+            else -> {
+                ""
+            }
+        }
+        if (App.isVpnState == 2 && loadIp != DataKeyUtils.tba_vpn_ip) {
             Log.e(
                 "TAG",
                 "不相同ip禁止展示=${item2.where}==${item2.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"

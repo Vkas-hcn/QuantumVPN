@@ -80,11 +80,11 @@ public class ExternalOpenVPNService extends Service implements StateListener {
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && Intent.ACTION_UNINSTALL_PACKAGE.equals(intent.getAction())){
+            if (intent != null && Intent.ACTION_UNINSTALL_PACKAGE.equals(intent.getAction())) {
                 // Check if the running config is temporary and installed by the app being uninstalled
                 VpnProfile vp = ProfileManager.getLastConnectedVpn();
                 if (ProfileManager.isTempProfile()) {
-                    if(intent.getPackage().equals(vp.mProfileCreator)) {
+                    if (intent.getPackage().equals(vp.mProfileCreator)) {
                         if (mService != null)
                             try {
                                 mService.stopVPN(false);
@@ -108,7 +108,7 @@ public class ExternalOpenVPNService extends Service implements StateListener {
 
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         mHandler.setService(this);
-        IntentFilter uninstallBroadcast = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED );
+        IntentFilter uninstallBroadcast = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
         registerReceiver(mBroadcastReceiver, uninstallBroadcast);
 
     }
@@ -132,8 +132,7 @@ public class ExternalOpenVPNService extends Service implements StateListener {
         }
 
 
-        private void startProfile(VpnProfile vp)
-        {
+        private void startProfile(VpnProfile vp) {
             Intent vpnPermissionIntent = VpnService.prepare(ExternalOpenVPNService.this);
             /* Check if we need to show the confirmation dialog,
              * Check if we need to ask for username/password */
@@ -141,7 +140,7 @@ public class ExternalOpenVPNService extends Service implements StateListener {
             int neddPassword = vp.needUserPWInput(null, null);
             String startReason = "external OpenVPN service by uid: " + Binder.getCallingUid();
 
-            if(vpnPermissionIntent != null || neddPassword != 0){
+            if (vpnPermissionIntent != null || neddPassword != 0) {
                 Intent shortVPNIntent = new Intent(Intent.ACTION_MAIN);
                 shortVPNIntent.setClass(getBaseContext(), de.blinkt.openvpn.LaunchVPN.class);
                 shortVPNIntent.putExtra(de.blinkt.openvpn.LaunchVPN.EXTRA_KEY, vp.getUUIDString());
@@ -284,12 +283,12 @@ public class ExternalOpenVPNService extends Service implements StateListener {
             mExtAppDb.checkOpenVPNPermission(getPackageManager());
 
             if (cb != null) {
-                cb.newStatus(mMostRecentState.vpnUUID, mMostRecentState.state,
-                        mMostRecentState.logmessage, mMostRecentState.level.name());
+                if (mMostRecentState.state.equals("CONNECTED")) {
+                    cb.newStatus(mMostRecentState.vpnUUID, mMostRecentState.state,
+                            mMostRecentState.logmessage, mMostRecentState.level.name());
+                }
                 mCallbacks.register(cb);
             }
-
-
         }
 
         @Override
@@ -340,7 +339,6 @@ public class ExternalOpenVPNService extends Service implements StateListener {
         VpnStatus.removeStateListener(this);
         unregisterReceiver(mBroadcastReceiver);
     }
-
 
 
     static class UpdateMessage {
@@ -414,7 +412,6 @@ public class ExternalOpenVPNService extends Service implements StateListener {
             broadcastItem.newStatus(um.vpnUUID, um.state, um.logmessage, um.level.name());
         }
     }
-
 
 
 }

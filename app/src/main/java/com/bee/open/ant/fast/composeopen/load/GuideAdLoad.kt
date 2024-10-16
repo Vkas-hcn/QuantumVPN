@@ -74,7 +74,15 @@ class GuideAdLoad(private val context: Context, private var item: EveryADBean) :
         }
 
         fun showAdMobFullScreenAd() {
-            if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
+            val loadIp = when (item.where) {
+                "tuop" -> {
+                    DataKeyUtils.online_load_ip_open
+                }
+                else -> {
+                    ""
+                }
+            }
+            if (App.isVpnState == 2 && loadIp != DataKeyUtils.tba_vpn_ip) {
                 Log.e(
                     "TAG",
                     "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"

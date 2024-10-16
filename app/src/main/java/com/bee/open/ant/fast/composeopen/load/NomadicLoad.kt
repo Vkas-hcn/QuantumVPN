@@ -109,7 +109,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
                 preload(context)
                 return@launch
             }
-
+            Log.e("TAG", "preload: haveCache=${cacheListncsudbca.size}")
             if (haveCache && isCacheOverTime().not()) {
                 Log.e(
                     "TAG",
@@ -136,7 +136,7 @@ class NomadicLoad(private val snvlinjvk: ADType) {
     private fun isCacheOverTime(): Boolean {
         val item = cacheListncsudbca.firstOrNull() ?: return false
         return if (System.currentTimeMillis() - item.loadTime >= (1000L * 60L * 60L)) {
-            cacheListncsudbca.remove(item)
+//            cacheListncsudbca.remove(item)
             true
         } else {
             false
@@ -144,7 +144,8 @@ class NomadicLoad(private val snvlinjvk: ADType) {
     }
 
     fun clearAdCache() {
-        cacheListncsudbca.clear()
+        Log.e("TAG", "clearAdCache: ${dataList[0].where}")
+//        cacheListncsudbca.clear()
     }
 
     private fun clearLoadIp(){

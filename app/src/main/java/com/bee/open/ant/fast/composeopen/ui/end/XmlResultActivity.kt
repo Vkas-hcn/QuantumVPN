@@ -85,6 +85,7 @@ class XmlResultActivity : AppCompatActivity() {
         showSwitchDialogFun()
         CanDataUtils.antur12()
     }
+
     private fun initData() {
         if (App.isVpnState == 2) {
             binding.tvState1.text = "Connection succeed"
@@ -133,7 +134,8 @@ class XmlResultActivity : AppCompatActivity() {
     }
 
     private fun showSwitchDialogFun() {
-        if (App.isVpnState == 2 && !App.showSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist() && DishNomadicLoad.getIntervalTimes()) {
+        if (App.isVpnState == 2 && (!App.showSwitchState) && (!DishNomadicLoad.getBuyingShieldData()) && DishNomadicLoad.showAdBlacklist() && DishNomadicLoad.getIntervalTimes()) {
+            Log.e("TAG", "binding.showSwitch = true")
             binding.showSwitch = true
             BaseAdLoad.interHaHaHaOPNNOPIN.preload(this)
             CanDataUtils.postPointData(
@@ -147,6 +149,12 @@ class XmlResultActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         adJobDialog?.cancel()
+        if (NativeAdLoad.nativeAdEnd != null && App.getVpnState()) {
+            NativeAdLoad.nativeAdEnd?.destroy()
+        }
+        if (NativeAdLoadDis.nativeAdEnd != null&& !App.getVpnState()) {
+            NativeAdLoad.nativeAdEnd?.destroy()
+        }
     }
 
     private fun showNativeAd() {

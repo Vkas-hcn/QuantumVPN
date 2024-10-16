@@ -52,15 +52,29 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.widget.Button
 import androidx.core.view.isVisible
+import androidx.preference.PreferenceDataStore
+import com.bee.open.ant.fast.composeopen.data.ServerVpn
+import com.bee.open.ant.fast.composeopen.data.VpnBean
 import com.bee.open.ant.fast.composeopen.load.BaseAdLoad.isActivityResumed
 import com.bee.open.ant.fast.composeopen.net.MyService
+import com.github.shadowsocks.Core
+import com.github.shadowsocks.aidl.IShadowsocksService
+import com.github.shadowsocks.aidl.ShadowsocksConnection
+import com.github.shadowsocks.bg.BaseService
+import com.github.shadowsocks.database.Profile
+import com.github.shadowsocks.database.ProfileManager
+import com.github.shadowsocks.preference.DataStore
+import com.github.shadowsocks.preference.OnPreferenceDataStoreChangeListener
+import com.github.shadowsocks.utils.Key
 
 
-class XmlMainActivity : AppCompatActivity() {
+class XmlMainActivity : AppCompatActivity(),
+    ShadowsocksConnection.Callback,
+    OnPreferenceDataStoreChangeListener {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     var mService: IOpenVPNAPIService? = null
 
-    //    val connection = ShadowsocksConnection(true)
+    val connection = ShadowsocksConnection(true)
     lateinit var requestPermissionForResultVPN: ActivityResultLauncher<Intent?>
     var vpnState by mutableStateOf(-1)  // 0 未连接 1 连接中 2 已连接 -1 未知
     var beforeVpnState by mutableStateOf(-2)
@@ -78,9 +92,9 @@ class XmlMainActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-//        connection.connect(this, this)
-//        DataStore.publicStore.registerChangeListener(this)
-        binding.vpnGuide = App.isShow
+        connection.connect(this, this)
+        DataStore.publicStore.registerChangeListener(this)
+//        binding.vpnGuide = App.isShow
         binding.vpnModel = App.vpnModel
         intIP()
         setVpnInfor()
@@ -109,16 +123,22 @@ class XmlMainActivity : AppCompatActivity() {
             }
         }
         // 启动服务
-        val intent = Intent(this, MyService::class.java)
-        startService(intent)
-        if (DishNomadicLoad.getBuyingShieldData()) {
-            Log.e("TAG", "买量屏蔽广告show")
-            binding.adLayout.isVisible = false
-        }
+//        val intent = Intent(this, MyService::class.java)
+//        startService(intent)
+//        if (DishNomadicLoad.getBuyingShieldData()) {
+//            Log.e("TAG", "买量屏蔽广告show")
+//            binding.adLayout.isVisible = false
+//        }
     }
 
 
-    private fun setVpnInfor() {
+    private fun setVpnInfor(vpnBean: ServerVpn?=null) {
+        if(vpnBean!=null){
+            binding.tvServiceName.text =
+                "${vpnBean.country_name}, ${vpnBean.city}"
+            binding.tvCName.text = vpnBean.country_name
+            return
+        }
         binding.tvServiceName.text =
             "${GetServiceData.getNowVpnBean().country_name}, ${GetServiceData.getNowVpnBean().city}"
         binding.tvCName.text = GetServiceData.getNowVpnBean().country_name
@@ -132,9 +152,11 @@ class XmlMainActivity : AppCompatActivity() {
 
     @SuppressLint("RtlHardcoded")
     fun clickFUn() {
-        binding.viewGuide1.setOnClickListener {}
+//        binding.viewGuide1.setOnClickListener {}
         binding.linNav.setOnClickListener {
         }
+        binding.conLoadVpn.setOnClickListener {}
+        binding.conModelVpn.setOnClickListener {}
         binding.tvPrivacyPolicy.setOnClickListener {
             if (clickToast()) return@setOnClickListener
             jumpToWebActivity()
@@ -142,9 +164,9 @@ class XmlMainActivity : AppCompatActivity() {
         binding.imgVpn.setOnClickListener {
             clickVpn()
         }
-        binding.lavGuide.setOnClickListener {
-            clickVpn()
-        }
+//        binding.lavGuide.setOnClickListener {
+//            clickVpn()
+//        }
         binding.imgX.setOnClickListener {
             cloneDialogFun()
         }
@@ -163,6 +185,18 @@ class XmlMainActivity : AppCompatActivity() {
         binding.tvModel.setOnClickListener {
             setVpnModel(mModelInt)
             clickVpn()
+        }
+        binding.tvSwitch.setOnClickListener {
+            lifecycleScope.launch {
+                App.showSwitchState = true
+                binding.showSwitch = false
+                switchFun()
+                CanDataUtils.postPointData(
+                    "antur27",
+                    "qu",
+                    App.top_activity_Quan?.javaClass?.simpleName,
+                )
+            }
         }
         binding.imgSetting.setOnClickListener {
             clickSetting {
@@ -185,11 +219,11 @@ class XmlMainActivity : AppCompatActivity() {
             if (!ClockUtils.complexLogicAlwaysTrue("onBackPressedDispatcher")) {
                 return@addCallback
             }
-            if (binding?.vpnGuide == true) {
-                binding.vpnGuide = false
-                App.isShow = false
-                return@addCallback
-            }
+//            if (binding?.vpnGuide == true) {
+//                binding.vpnGuide = false
+//                App.isShow = false
+//                return@addCallback
+//            }
             clickStopFun {
                 finish()
             }
@@ -200,17 +234,23 @@ class XmlMainActivity : AppCompatActivity() {
         App.vpnModel = model
         binding.vpnModel = App.vpnModel
         binding.showModel = false
+        CanDataUtils.modelPost("antur34")
     }
 
     private fun switchVpnModel(model: Int) {
         if (binding.vpnModel == model) {
             return
         }
-        mModelInt = model
-        if (App.getVpnState()) {
-            binding.showModel = true
-        } else {
-            setVpnModel(mModelInt)
+        CanDataUtils.modelPost("antur32")
+        clickSetting {
+            if (clickToast()) return@clickSetting
+            mModelInt = model
+            if (App.getVpnState()) {
+                binding.showModel = true
+                CanDataUtils.modelPost("antur33")
+            } else {
+                setVpnModel(mModelInt)
+            }
         }
     }
 
@@ -305,7 +345,7 @@ class XmlMainActivity : AppCompatActivity() {
             }
             if (App.isVpnState == 2 && App.showSwitchState && !App.connectSwitchState && !DishNomadicLoad.getBuyingShieldData() && DishNomadicLoad.showAdBlacklist()) {
                 switchFun()
-            }else{
+            } else {
                 getHomeNativeAd()
             }
         }
@@ -316,15 +356,15 @@ class XmlMainActivity : AppCompatActivity() {
         GetServiceData.setNowVpnBean(GetServiceData.getVpnSmartData())
         App.jumpSwitchState = true
         mService?.disconnect()
-//        Core.stopService()
-        delay(100)
-        clickVpn()
+        Core.stopService()
+        delay(300)
+        clickVpn(false)
     }
 
 
     private fun getHomeNativeAd() {
-        Log.e("TAG", "getHomeNativeAd: ", )
-        App.isAppRunning=false
+        Log.e("TAG", "getHomeNativeAd: ")
+        App.isAppRunning = false
         adJobDialogMain?.cancel()
         adJobDialogMain = null
         val endNav = BaseAdLoad.getMainNativeAdData()
@@ -333,7 +373,6 @@ class XmlMainActivity : AppCompatActivity() {
             delay(300)
             runCatching {
                 while (true) {
-                    Log.e("TAG", "showNativeAd: ${endNav.haveCache}")
                     if (endNav.haveCache && lifecycle.currentState == Lifecycle.State.RESUMED) {
                         endNav.showFullScreenAdBIUYBUI(this@XmlMainActivity) {
                             adJobDialogMain?.cancel()
@@ -356,7 +395,10 @@ class XmlMainActivity : AppCompatActivity() {
 
     private fun showConnectAdTime(seconds: Int = 20, nextFun: () -> Unit) {
         if ((!DishNomadicLoad.showAdBlacklist()) || !BaseAdLoad.canShowAD()) {
-            nextFun()
+            lifecycleScope.launch {
+                delay(2000)
+                nextFun()
+            }
             return
         }
         jobConnect?.cancel()
@@ -414,9 +456,9 @@ class XmlMainActivity : AppCompatActivity() {
         }
     }
 
-    private fun clickVpn() {
+    private fun clickVpn(isSwitch: Boolean = true) {
         App.isShow = false
-        binding.vpnGuide = false
+//        binding.vpnGuide = false
         if (vpnState == 1) {
             return
         }
@@ -432,6 +474,7 @@ class XmlMainActivity : AppCompatActivity() {
             Toast.makeText(this, "Please check your network", Toast.LENGTH_SHORT).show()
             return
         }
+
         if (!checkVPNPermission(this@XmlMainActivity)) {
             if (!DataKeyUtils.service_q_x_type) {
                 DataKeyUtils.service_q_x_type = true
@@ -440,6 +483,7 @@ class XmlMainActivity : AppCompatActivity() {
             VpnService.prepare(this)?.let(requestPermissionForResultVPN::launch)
             return
         }
+        CanDataUtils.clickTimestamp = System.currentTimeMillis()
         connectVpnStateFun {
             beforeVpnState = vpnState
             connecting()
@@ -447,21 +491,21 @@ class XmlMainActivity : AppCompatActivity() {
             Log.e("TAG", "clickVpn: beforeVpnState=${beforeVpnState}")
             App.jumpSwitchState = false
             if (beforeVpnState == 0 || beforeVpnState == -1) {
-                setVpnInfor()
+                if (isSwitch) {
+                    showStateFalse()
+                }
                 setUpConfigConnections(this@XmlMainActivity)
                 return@connectVpnStateFun
             }
             showConnectAdTime(DishNomadicLoad.parseTwoNumbers().second) {
-                Log.e("TAG", "clickVpn: stopService1")
-//                Core.stopService()
-                mService?.let {
-                    setVpnInfor()
-                    lifecycleScope.launch {
-                        if (beforeVpnState == 2) {
-                            Log.e("TAG", "clickVpn: stopService2")
-                            it.disconnect()
-                            CanDataUtils.postPointData("antur13")
-                        }
+                Log.e("TAG", "clickVpn: stopService1==${beforeVpnState}")
+                setVpnInfor()
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (beforeVpnState == 2) {
+                        Log.e("TAG", "clickVpn: stopService2")
+                        mService?.disconnect()
+                        Core.stopService()
+                        CanDataUtils.postPointData("antur13")
                     }
                 }
             }
@@ -474,6 +518,7 @@ class XmlMainActivity : AppCompatActivity() {
             if (GetServiceData.isHaveServeData()) {
                 withContext(Dispatchers.Main) {
                     binding.showIntAd = false
+                    delay(100)
                     nextFun()
                 }
             } else {
@@ -487,9 +532,9 @@ class XmlMainActivity : AppCompatActivity() {
         }
     }
 
-    fun connectSuccess() {
+    private fun connectSuccess() {
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.vpnGuide = false
+//            binding.vpnGuide = false
             App.isVpnState = 2
             binding.imgVpn.stopRotate()
             timerViewModel.startTimer()
@@ -510,7 +555,6 @@ class XmlMainActivity : AppCompatActivity() {
 
     fun disConnectSuccess() {
         lifecycleScope.launch(Dispatchers.Main) {
-            App.isVpnState = 0
             binding.imgVpn.setImageResource(R.drawable.ic_vpn_1)
             binding.imgVpn.stopRotate()
             timerViewModel.stopTimer()
@@ -581,6 +625,7 @@ class XmlMainActivity : AppCompatActivity() {
     }
 
     fun showStateFalse() {
+        Log.e("TAG", "showStateFalse: ")
         App.showSwitchState = false
         App.connectSwitchState = false
     }
@@ -588,7 +633,6 @@ class XmlMainActivity : AppCompatActivity() {
     private fun requestPermissionForResult(result: ActivityResult) {
         if (result.resultCode == RESULT_OK) {
             clickVpn()
-            showStateFalse()
             if (!DataKeyUtils.service_q_x_type2) {
                 DataKeyUtils.service_q_x_type2 = true
                 CanDataUtils.postPointData("antur8")
@@ -619,59 +663,53 @@ class XmlMainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun setSkServerData(profile: Profile, serverVpn: ServerVpn): Profile {
-//        Log.e("TAG", "setSkServerData: ip=${serverVpn.ip}")
-//        profile.name = serverVpn.country_name + "-" + serverVpn.city
-//        profile.host = serverVpn.ip
-//        profile.password = serverVpn.user_pwd
-//        profile.method = "chacha20-ietf-poly1305"
-//        profile.remotePort = serverVpn.port
-//        return profile
-//    }
+    private fun setSkServerData(profile: Profile, serverVpn: ServerVpn): Profile {
+        Log.e("TAG", "setSkServerData: ip=${serverVpn.ip}")
+        profile.name = serverVpn.country_name + "-" + serverVpn.city
+        profile.host = serverVpn.ip
+        profile.password = "69jeAV1mkW5_aUYI"
+        profile.method = "chacha20-ietf-poly1305"
+        profile.remotePort = 9012
+        return profile
+    }
 
     private fun setUpConfigConnections(context: Context) {
         val vpnData = GetServiceData.getNowVpnBean()
         DataKeyUtils.tba_vpn_ip = vpnData.ip
         DataKeyUtils.tba_vpn_city = vpnData.city
-//        if (binding.vpnModel != 3) {
-//            Log.e("TAG", "setUpConfigConnections1: $vpnData")
-//            if (App.getVpnState()) {
-//                Log.e("TAG", "setUpConfigConnections2: $vpnData")
-//                mService?.disconnect()
-//            }
-//            ProfileManager.getProfile(DataStore.profileId).let {
-//                if (it != null) {
-//                    ProfileManager.updateProfile(setSkServerData(it, vpnData))
-//                } else {
-//                    val profile = Profile()
-//                    ProfileManager.createProfile(setSkServerData(profile, vpnData))
-//                }
-//            }
-//            DataStore.profileId = 1L
-//            Core.startService()
-//            return
-//        }
+        setVpnInfor(vpnData)
         MainScope().launch(Dispatchers.IO) {
+            delay(2000)
+            if (beforeVpnState == -2) return@launch
             runCatching {
-//                if (App.getVpnState()) {
-//                    Core.stopService()
-//                }
-                CanDataUtils.postPointData("antur9")
+                CanDataUtils.postPointData("antur9","qu",CanDataUtils.getVpnModelName())
+                if (binding.vpnModel != 3) {
+                    Log.e("TAG", "setUpConfigConnections1: $vpnData")
+                    if (App.getVpnState()) {
+                        Log.e("TAG", "setUpConfigConnections2: $vpnData")
+                        mService?.disconnect()
+                    }
+                    ProfileManager.getProfile(DataStore.profileId).let {
+                        if (it != null) {
+                            ProfileManager.updateProfile(setSkServerData(it, vpnData))
+                        } else {
+                            val profile = Profile()
+                            ProfileManager.createProfile(setSkServerData(profile, vpnData))
+                        }
+                    }
+                    DataStore.profileId = 1L
+                    Core.startService()
+                    return@launch
+                }
+                if (App.getVpnState()) {
+                    Core.stopService()
+                }
                 context.assets.open("fast_ippooltest.ovpn").bufferedReader().use { br ->
                     val config = br.lineSequence().map { line ->
                         when {
                             line.contains(
                                 "remote 195", ignoreCase = true
-                            ) -> "remote ${vpnData.ip} ${vpnData.port}"
-
-                            line.contains(
-                                "wrongpassword", ignoreCase = true
-                            ) -> vpnData.user_pwd
-
-                            line.contains(
-                                "cipher AES-256-GCM", ignoreCase = true
-                            ) -> "cipher ${vpnData.mode}"
-
+                            ) -> "remote ${vpnData.ip} 443"
                             else -> line
                         }
                     }.joinToString("\n")
@@ -693,11 +731,9 @@ class XmlMainActivity : AppCompatActivity() {
             setVpnInfor()
             DataKeyUtils.selectVpnServiceData = ""
             clickVpn()
-            showStateFalse()
         }
         if (requestCode == 0x334 && DataKeyUtils.selectVpnServiceData != "" && vpnState == 2) {
             clickVpn()
-            showStateFalse()
         }
         if (requestCode == 0x445 && DataKeyUtils.selectVpnServiceData != "" && vpnState != 2) {
             DataKeyUtils.nowVpnServiceData = DataKeyUtils.selectVpnServiceData
@@ -705,7 +741,7 @@ class XmlMainActivity : AppCompatActivity() {
             DataKeyUtils.selectVpnServiceData = ""
         }
         if (requestCode == 0x445) {
-            Log.e("TAG", "onActivityResult: $requestCode")
+            Log.e("TAG", "onActivityResult: $requestCode-----${App.connectSwitchState}")
             showSwitchDialogFun()
         }
         if (requestCode == 0x334 || requestCode == 0x555) {
@@ -733,14 +769,14 @@ class XmlMainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-//        connection.bandwidthTimeout = 500
+        connection.bandwidthTimeout = 500
     }
 
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
             delay(100)
-            if(this@XmlMainActivity.isActivityResumed()){
+            if (this@XmlMainActivity.isActivityResumed()) {
                 if (App.isAppRunning) {
                     getHomeNativeAd()
                 }
@@ -750,16 +786,15 @@ class XmlMainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-//        connection.bandwidthTimeout = 0
-//        connection.disconnect(this)
-        Log.e("TAG", "onStop: ")
         jobConnect?.cancel()
         jobConnect = null
         if (isDisConnect()) {
+            Log.e("TAG", "onStop: isDisConnect()")
             vpnState = -1
-            connecting()
+            connectSuccess()
         }
         if (isConnect()) {
+            Log.e("TAG", "onStop: isConnect()")
             vpnState = -1
             disConnectSuccess()
         }
@@ -768,8 +803,9 @@ class XmlMainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.e("TAG", "main--------onDestroy: ")
-//        DataStore.publicStore.unregisterChangeListener(this)
-//        connection.disconnect(this)
+        beforeVpnState = -2
+        DataStore.publicStore.unregisterChangeListener(this)
+        connection.disconnect(this)
         try {
             this.unbindService(mConnection)
         } catch (e: Exception) {
@@ -778,38 +814,41 @@ class XmlMainActivity : AppCompatActivity() {
         adJobDialogMain = null
     }
 
-//    override fun stateChanged(state: BaseService.State, profileName: String?, msg: String?) {
-//        Log.e("TAG", "vpnState-ss: ${state.name}-beforeVpnState=${beforeVpnState}")
-//        if (state.name == "Connected") {
-//            connectFun()
-//        }
-//        if (state.name == "Stopped") {
-//            disConnectFun()
-//        }
-//    }
-//
-//    override fun onServiceConnected(service: IShadowsocksService) {
-//        if (App.vpnModel == 3) {
-//            return
-//        }
-//        val state = BaseService.State.values()[service.state]
-//        Log.e("TAG", "vpnState-ss-c: ${state.name}-beforeVpnState=${beforeVpnState}")
-//        if (state.name == "Connected") {
-//            connectFun()
-//        }
-//        if (state.name == "Stopped") {
-//            disConnectFun()
-//        }
-//    }
-//
-//    override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
-//        when (key) {
-//            Key.serviceMode -> {
-//                connection.disconnect(this)
-//                connection.connect(this, this)
-//            }
-//        }
-//    }
+    override fun stateChanged(state: BaseService.State, profileName: String?, msg: String?) {
+        Log.e("TAG", "vpnState-ss: ${state.name}-beforeVpnState=${beforeVpnState}")
+        if (state.name == "Connected") {
+            connectFun()
+        }
+        if (state.name == "Stopped") {
+            disConnectFun()
+        }
+    }
+
+    override fun onServiceConnected(service: IShadowsocksService) {
+        if (App.vpnModel == 3) {
+            return
+        }
+        val state = BaseService.State.values()[service.state]
+        Log.e(
+            "TAG",
+            "vpnState-ss-c: ${state.name}-beforeVpnState=${beforeVpnState}---${App.vpnModel}"
+        )
+        if (state.name == "Connected") {
+            connectFun()
+        }
+        if (state.name == "Stopped") {
+            disConnectFun()
+        }
+    }
+
+    override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
+        when (key) {
+            Key.serviceMode -> {
+                connection.disconnect(this)
+                connection.connect(this, this)
+            }
+        }
+    }
 
     private val mCallback = object : IOpenVPNStatusCallback.Stub() {
         override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
@@ -817,16 +856,13 @@ class XmlMainActivity : AppCompatActivity() {
                 "TAG",
                 "vpnState-open: ${state}-beforeVpnState=${beforeVpnState}-App.vpnModel=${App.vpnModel}"
             )
-//            if (App.vpnModel != 3) {
-//                return
-//            }
             if (state == "CONNECTED") {
                 connectFun()
             }
             if (state == "RECONNECTING") {
                 connectFail()
                 BaseAdLoad.getEndNativeAdData().preload(this@XmlMainActivity)
-                CanDataUtils.postPointData("antur11")
+                CanDataUtils.postPointData("antur11","qu",CanDataUtils.getVpnModelName())
                 beforeVpnState = -2
                 showStateFalse()
             }
@@ -841,6 +877,8 @@ class XmlMainActivity : AppCompatActivity() {
             connectSuccess()
             return
         }
+        App.isVpnState = 2
+        vpnState = 2
         if (DataKeyUtils.firstDialogState) {
             BaseAdLoad.getInterResultAdData().preload(this@XmlMainActivity)
             BaseAdLoad.getMainNativeAdData().preload(this@XmlMainActivity)
@@ -856,6 +894,7 @@ class XmlMainActivity : AppCompatActivity() {
     }
 
     private fun disConnectFun() {
+        App.isVpnState = 0
         disConnectSuccess()
         if (beforeVpnState == 2) {
             BaseAdLoad.getInterResultAdData().preload(this@XmlMainActivity)

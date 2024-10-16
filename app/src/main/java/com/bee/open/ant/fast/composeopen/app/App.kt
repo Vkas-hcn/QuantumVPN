@@ -39,6 +39,7 @@ import com.bee.open.ant.fast.composeopen.net.ClockUtils.ifAddThis
 import com.bee.open.ant.fast.composeopen.net.GetNetDataUtils
 import com.bee.open.ant.fast.composeopen.ui.main.XmlMainActivity
 import com.bee.open.ant.fast.composeopen.ui.start.StartActivity
+import com.github.shadowsocks.Core
 import com.google.android.gms.ads.AdActivity
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.firebase.FirebaseApp
@@ -79,7 +80,7 @@ class App : Application(), LifecycleObserver {
         var showSwitchState = false
         var jumpSwitchState = false
         var connectSwitchState = false
-        var vpnModel = 3
+        var vpnModel = 1
         fun getVpnState():Boolean{
             return isVpnState==2
         }
@@ -94,7 +95,7 @@ class App : Application(), LifecycleObserver {
         super.onCreate()
         instance = this
         appContext = this
-//        Core.init(this, XmlMainActivity::class)
+        Core.init(this, XmlMainActivity::class)
         Log.e("TAG", "onCreate: Apppppppppp=${isVpnState}", )
         ifAddThis("com.bee.open.ant.fast.composeopen.app.App") {
             MMKV.initialize(this)
@@ -132,23 +133,10 @@ class App : Application(), LifecycleObserver {
                 delay(4000)
                 FBADUtils.appCircleToRequestFireData()
             }
-            try {
-                this.bindService(
-                    Intent(this, ExternalOpenVPNService::class.java), mConnection, BIND_AUTO_CREATE
-                )
-            } catch (e: Exception) {
-                Log.e("AppLifecycle", "bindService failed: $e")
-            }
         }
     }
 
-    override fun onLowMemory() {
-        super.onLowMemory()
-        try {
-            this.unbindService(mConnection)
-        } catch (e: Exception) {
-        }
-    }
+
 
     private fun getBlackList(context: Context) {
         if (DataKeyUtils.black_data.isNotEmpty() && !complexLogicReturnsFalse(
@@ -273,34 +261,6 @@ class App : Application(), LifecycleObserver {
                 }
             })
         }.onFailure { e ->
-        }
-    }
-
-    private val mConnection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(
-            className: ComponentName?,
-            service: IBinder?,
-        ) {
-            mService = IOpenVPNAPIService.Stub.asInterface(service)
-            try {
-                mService?.registerStatusCallback(mCallback)
-            } catch (e: Exception) {
-            }
-        }
-
-        override fun onServiceDisconnected(className: ComponentName?) {
-            mService = null
-        }
-    }
-    private val mCallback = object : IOpenVPNStatusCallback.Stub() {
-        override fun newStatus(uuid: String?, state: String?, message: String?, level: String?) {
-            Log.e("TAG", "newStatus-App: ${state}")
-            if (state == "CONNECTED") {
-                isVpnState = 2
-            }
-            if (state == "NOPROCESS") {
-                isVpnState = 0
-            }
         }
     }
 

@@ -85,7 +85,24 @@ class IntAdLoad(private val context: Context, private var item: EveryADBean) :
         }
 
         fun showAdMobFullScreenAd(activity: Activity) {
-            if (App.isVpnState == 2 && item.qtv_load_ip != DataKeyUtils.tba_vpn_ip) {
+            val loadIp = when (item.where) {
+                "intu" -> {
+                    DataKeyUtils.online_load_ip_connect_int
+                }
+
+                "basex" -> {
+                    DataKeyUtils.online_load_ip_end_int
+                }
+
+                "tintuba" -> {
+                    DataKeyUtils.online_load_ip_service_int
+                }
+
+                else -> {
+                    ""
+                }
+            }
+            if (App.isVpnState == 2 && loadIp != DataKeyUtils.tba_vpn_ip) {
                 Log.e(
                     "TAG",
                     "不相同ip禁止展示=${item.where}==${item.qtv_load_ip}----${DataKeyUtils.tba_vpn_ip}"

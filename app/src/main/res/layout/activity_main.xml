@@ -11,10 +11,10 @@
             type="Integer"
             android:value="1" />
 
-        <variable
-            name="vpnGuide"
-            type="Boolean"
-            android:value="false" />
+<!--        <variable-->
+<!--            name="vpnGuide"-->
+<!--            type="Boolean"-->
+<!--            android:value="false" />-->
 
         <variable
             name="showIntAd"
@@ -144,7 +144,6 @@
                 android:layout_marginTop="120dp"
                 android:background="@drawable/bg_model"
                 android:gravity="center"
-                android:visibility="gone"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toTopOf="@+id/img_u">
 
@@ -223,14 +222,14 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            <View
-                android:id="@+id/view_guide_1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="#B3252525"
-                android:visibility="@{vpnGuide?View.VISIBLE:View.GONE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+<!--            <View-->
+<!--                android:id="@+id/view_guide_1"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0dp"-->
+<!--                android:background="#B3252525"-->
+<!--                android:visibility="@{vpnGuide?View.VISIBLE:View.GONE}"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
 
             <ImageView
                 android:id="@+id/img_vpn"
@@ -253,20 +252,20 @@
                 app:layout_constraintStart_toStartOf="@+id/img_vpn"
                 app:layout_constraintTop_toTopOf="@+id/img_vpn" />
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/lav_guide"
-                android:layout_width="141dp"
-                android:layout_height="136dp"
-                android:layout_marginStart="100dp"
-                android:layout_marginTop="60dp"
-                android:visibility="@{vpnGuide?View.VISIBLE:View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/img_vpn"
-                app:layout_constraintEnd_toEndOf="@+id/img_vpn"
-                app:layout_constraintStart_toStartOf="@+id/img_vpn"
-                app:layout_constraintTop_toTopOf="@+id/img_vpn"
-                app:lottie_autoPlay="true"
-                app:lottie_fileName="data.zip"
-                app:lottie_loop="true" />
+<!--            <com.airbnb.lottie.LottieAnimationView-->
+<!--                android:id="@+id/lav_guide"-->
+<!--                android:layout_width="141dp"-->
+<!--                android:layout_height="136dp"-->
+<!--                android:layout_marginStart="100dp"-->
+<!--                android:layout_marginTop="60dp"-->
+<!--                android:visibility="@{vpnGuide?View.VISIBLE:View.GONE}"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/img_vpn"-->
+<!--                app:layout_constraintEnd_toEndOf="@+id/img_vpn"-->
+<!--                app:layout_constraintStart_toStartOf="@+id/img_vpn"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/img_vpn"-->
+<!--                app:lottie_autoPlay="true"-->
+<!--                app:lottie_fileName="data.zip"-->
+<!--                app:lottie_loop="true" />-->
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/con_load_vpn"
