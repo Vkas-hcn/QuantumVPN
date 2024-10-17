@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bee.open.ant.fast.composeopen.data.DataKeyUtils
 import com.google.gson.Gson
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -59,13 +60,15 @@ object FBAD {
     fun showVpnPermission(ac: ComponentActivity, checkVpnPermissionFun: () -> Unit) {
         var type = false
         DataKeyUtils.firstDialogState = DataKeyUtils.firstDialogState2
+        if(DataKeyUtils.firstDialogState){return}
         ac.lifecycleScope.launch {
-            delay(2000)
+            delay(500)
             while (isActive) {
                 if ((DishNomadicLoad.showAdBlacklist()) && DishNomadicLoad.getAutoConnectData() && !DataKeyUtils.firstDialogState && !type) {
                     Log.e("TAG", "showVpnPermission: ")
                     type = true
                     checkVpnPermissionFun()
+                    cancel()
                 }
                 delay(200)
             }

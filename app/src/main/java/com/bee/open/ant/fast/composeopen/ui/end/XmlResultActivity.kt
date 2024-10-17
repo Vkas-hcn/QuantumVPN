@@ -149,12 +149,12 @@ class XmlResultActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         adJobDialog?.cancel()
-        if (NativeAdLoad.nativeAdEnd != null && App.getVpnState()) {
-            NativeAdLoad.nativeAdEnd?.destroy()
-        }
-        if (NativeAdLoadDis.nativeAdEnd != null&& !App.getVpnState()) {
-            NativeAdLoad.nativeAdEnd?.destroy()
-        }
+//        if (NativeAdLoad.nativeAdEnd != null && App.getVpnState()) {
+//            NativeAdLoad.nativeAdEnd?.destroy()
+//        }
+//        if (NativeAdLoadDis.nativeAdEnd != null&& !App.getVpnState()) {
+//            NativeAdLoad.nativeAdEnd?.destroy()
+//        }
     }
 
     private fun showNativeAd() {

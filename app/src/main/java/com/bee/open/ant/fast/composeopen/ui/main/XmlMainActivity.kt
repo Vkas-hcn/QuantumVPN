@@ -106,12 +106,7 @@ class XmlMainActivity : AppCompatActivity(),
         } catch (e: Exception) {
             Log.e("TAG", "main---- bindService: $e")
         }
-        FBAD.showVpnPermission(this) {
-            DataKeyUtils.firstDialogState = true
-            clickVpn()
-            CanDataUtils.postPointData("antur30")
-        }
-        DataKeyUtils.firstDialogState2 = true
+
         DishNomadicLoad.getSpoilerData()
         requestPermissionForResultVPN =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -122,13 +117,12 @@ class XmlMainActivity : AppCompatActivity(),
                 binding.tvTime.text = time
             }
         }
-        // 启动服务
-//        val intent = Intent(this, MyService::class.java)
-//        startService(intent)
-//        if (DishNomadicLoad.getBuyingShieldData()) {
-//            Log.e("TAG", "买量屏蔽广告show")
-//            binding.adLayout.isVisible = false
-//        }
+        FBAD.showVpnPermission(this) {
+            DataKeyUtils.firstDialogState = true
+            clickVpn()
+            CanDataUtils.postPointData("antur30")
+        }
+        DataKeyUtils.firstDialogState2 = true
     }
 
 
@@ -458,10 +452,10 @@ class XmlMainActivity : AppCompatActivity(),
 
     private fun clickVpn(isSwitch: Boolean = true) {
         App.isShow = false
-//        binding.vpnGuide = false
         if (vpnState == 1) {
             return
         }
+        Log.e("TAG", "clickVpn-vpnState: ${vpnState}", )
         IpUtils.getIfConfig()
         intIP()
         if (showIpDialog) {
@@ -512,9 +506,8 @@ class XmlMainActivity : AppCompatActivity(),
         }
     }
 
-    private fun connectVpnStateFun(nextFun: () -> Unit) {
+    private fun connectVpnStateFun( nextFun: () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-
             if (GetServiceData.isHaveServeData()) {
                 withContext(Dispatchers.Main) {
                     binding.showIntAd = false
@@ -878,7 +871,6 @@ class XmlMainActivity : AppCompatActivity(),
             return
         }
         App.isVpnState = 2
-        vpnState = 2
         if (DataKeyUtils.firstDialogState) {
             BaseAdLoad.getInterResultAdData().preload(this@XmlMainActivity)
             BaseAdLoad.getMainNativeAdData().preload(this@XmlMainActivity)
